@@ -10,15 +10,15 @@ set( BOARD servo-1 )
 
 set( SOURCES
 	main.c
-	../nio15-firmware/system/io.c
-	../nio15-firmware/system/usbcfg.c
-	../nio15-firmware/driver/flash.c
-	../nio15-firmware/board/${BOARD}/board.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/system/io.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/system/usbcfg.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/driver/flash.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/board/${BOARD}/board.c
 )
 set( INCLUDE
-	../nio15-firmware/system/include
-	../nio15-firmware/driver/include
-	../nio15-firmware/board/${BOARD}
+	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/system/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/driver/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/board/${BOARD}
 )
 include( ../library/chibios.cmake )
 

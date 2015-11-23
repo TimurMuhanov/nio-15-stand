@@ -12,6 +12,10 @@ int main(void) {
 	ioInit();
 	parameterInit();
 
+	Parameter* param1 = parameterGet( "param1" );
+	param1->val.Int = 2;
+	parameterSync();
+
 	imuInit();
 	encoderInit();
 	servoInit();
@@ -25,5 +29,6 @@ int main(void) {
 	while(1) {
 		palTogglePad(GPIOC, 15);
 		chThdSleepMilliseconds(500);
+		//print("as");
 	}
 }

@@ -26,14 +26,14 @@ void ioInit(void){
 	}
 	if(!tries) return;
 
-	if( f_mount(&sd_filesystem, "", 1 ) == FR_OK ) {
-		sd_accessibility = true;
-	}
+	if( f_mount(&sd_filesystem, "", 0 ) == FR_OK ) {
+		TCHAR name[50];
+		DWORD num;
 
-	/*
-	print("open file: %u\n\r", f_open(&fp, "smt", FA_READ | FA_WRITE | FA_CREATE_ALWAYS ) );
-	print("write: %d, written: %u bytes\n\r", f_write (&fp, buffer, 4, &wrtn), wrtn );
-	print("close file: %u\n\r", f_close (&fp) );*/
+		sd_accessibility = true;
+		print("get label: %u\n\r", f_getlabel ("0", name, &num) );
+		print("name: %s, serialnum: %u\n\r", name, num );
+	}
 }
 
 

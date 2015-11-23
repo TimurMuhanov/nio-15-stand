@@ -5,27 +5,25 @@
 #include "ch.h"
 
 
-#define PARAMETER_MAX_NAME			32
-#define PARAMETER_MAX_STRING		255
-#define PARAMETER_FLOAT_PRECISION	3
+#define PARAMETER_MAX_RECORD_LENGTH	255
+#define PARAMETER_MAX_STRING_LENGTH	255
+#define PARAMETER_FLOAT_PRECISION	"3"
 
 
 typedef enum {
 	Int,
 	Float,
 	String
-} parameterType;
-
-typedef union {
-	int				Int;
-	float			Float;
-	char*			String;
-} parameterUnion;
+} ParameterType;
 
 typedef struct {
-	parameterType	type;
-	parameterUnion	val;
-} parameter;
+	ParameterType	type;
+	union {
+		int		Int;
+		float	Float;
+		char*	String;
+	}				val;
+} Parameter;
 
 
 #ifdef __cplusplus
@@ -33,9 +31,9 @@ extern "C" {
 #endif
 
 	void				parameterInit(void);
-	bool				parameterSearch( const char* name );
-	parameter			parameterGet( const char* name );
-	void				parameterSet( const char* name, const parameter value );
+	Parameter*			parameterGet( const char* name );
+	void				parameterAdd( const char* name, Parameter* parameter );
+	void				parameterSync();
 
 #ifdef __cplusplus
 }

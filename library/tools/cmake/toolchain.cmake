@@ -13,8 +13,9 @@ SET(MCU_FLAGS "-mcpu=cortex-m4    -mthumb -DTHUMB -DTHUMB_PRESENT     -mno-thumb
 SET(RELEASE_FLAGS "-flto -O2" )
 SET(DEBUG_FLAGS "-ggdb" )
 SET(WARNING_FLAGS "-Wall -Wextra -Wno-unused-parameter")
-SET(CMAKE_C_FLAGS "${MCU_FLAGS} ${WARNING_FLAGS} ${RELEASE_FLAGS}"  CACHE INTERNAL "c compiler flags")
-SET(CMAKE_CXX_FLAGS "${MCU_FLAGS} ${WARNING_FLAGS} ${RELEASE_FLAGS} -std=c++11"  CACHE INTERNAL "cxx compiler flags")
-SET(CMAKE_ASM_FLAGS "-x assembler-with-cpp ${MCU_FLAGS} ${RELEASE_FLAGS}" CACHE INTERNAL "asm compiler flags")
+SET(CMAKE_C_FLAGS "${MCU_FLAGS} ${WARNING_FLAGS} ${DEBUG_FLAGS}"  CACHE INTERNAL "c compiler flags")
+add_definitions(-D_GLIBCXX_USE_C99)		#gcc 4.9 stdlib bug, enables c++11 stoi, stol etc.
+SET(CMAKE_CXX_FLAGS "${MCU_FLAGS} ${WARNING_FLAGS} ${DEBUG_FLAGS} -std=c++11"  CACHE INTERNAL "cxx compiler flags")
+SET(CMAKE_ASM_FLAGS "-x assembler-with-cpp ${MCU_FLAGS} ${DEBUG_FLAGS}" CACHE INTERNAL "asm compiler flags")
 
-SET(CMAKE_EXE_LINKER_FLAGS "${MCU_FLAGS} ${RELEASE_FLAGS} -nostartfiles --specs=nosys.specs -Wl,--gc-sections,-lnosys,--defsym=__process_stack_size__=0x400,--defsym=__main_stack_size__=0x400" CACHE INTERNAL "exe link flags")
+SET(CMAKE_EXE_LINKER_FLAGS "${MCU_FLAGS} ${DEBUG_FLAGS} -nostartfiles --specs=nosys.specs -Wl,--gc-sections,-lnosys,--defsym=__process_stack_size__=0x400,--defsym=__main_stack_size__=0x400" CACHE INTERNAL "exe link flags")
