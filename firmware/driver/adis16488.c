@@ -1,8 +1,10 @@
 #include "adis16488.h"
+#include "connection.h"
+#include "imu.h"
 
 
 
-#define	ADIS_BUFFER_SIZE	100
+#define	ADIS_BUFFER_SIZE	20
 #define	ADIS_CHIP_SELECT	palClearPad(BOARD_ADIS16488_CS_PORT, BOARD_ADIS16488_CS_PIN)
 #define	ADIS_CHIP_DESELECT	palSetPad(BOARD_ADIS16488_CS_PORT, BOARD_ADIS16488_CS_PIN)
 
@@ -14,6 +16,8 @@ static u16 txBuffer[ADIS_BUFFER_SIZE];
 static u16 rxBuffer[ADIS_BUFFER_SIZE];
 static u32 i;
 static thread_t* updateThread;
+static THD_FUNCTION(adis16488Update, arg);
+static THD_WORKING_AREA(adis16488UpdateWorkingArea, 128);
 
 void adis16488Read( u8 page, u8 address, u32 length, u16* buffer ) {
 	// if length > ADIS_BUFFER_SIZE
@@ -24,20 +28,20 @@ void adis16488Read( u8 page, u8 address, u32 length, u16* buffer ) {
 //	txBuffer[0] = 0x8000 | page;
 //	spiExchange( &BOARD_ADIS16488_DEVICE, 1, txBuffer, rxBuffer );
 
-	// read data by 16 bit blocks
-	for( i=0; i<length; i++ )
-		txBuffer[i] = ( ( address + i*2 ) & 0x7F ) << 8;
-	spiExchange( &BOARD_ADIS16488_DEVICE, length+1, txBuffer, rxBuffer );
-	for( i=0; i<length; i++ )
-		buffer[i] = rxBuffer[i+1];
+    for( i=0; i<length; i++ )
+        txBuffer[i] = ( (( address + 2*i ) & 0x7F) << 8) & 0xFF00;
+    txBuffer[i] = 0x0000;
+    spiExchange( &BOARD_ADIS16488_DEVICE, length+1, txBuffer, rxBuffer );
+    for( i=0; i<length; i++ )
+        buffer[i] = rxBuffer[i+1];
 
 	#ifdef ADIS16488_DEBUG
 	print( "driver/"ADIS16488_NAME"/read: sent:" );
-	for( i=0; i<length; i++ )
-		print( " 0x%X", txBuffer[i] );
+    for( i=0; i<length+1; i++ )
+        print( " 0x%04X", txBuffer[i] );
 	print( ", received:" );
-	for( i=0; i<length+1; i++ )
-		print( " 0x%X", rxBuffer[i] );
+    for( i=0; i<length+1; i++ )
+        print( " 0x%04X", rxBuffer[i] );
 	print( "\n\r" );
 	#endif
 
@@ -83,7 +87,7 @@ void adis16488Reset(void) {
 
 u8 adis16488TestConnection(void) {
 	u16 prodId;
-	adis16488Read( 0, ADIS16488_PROD_ID_ADDRESS, 1, &prodId );
+    adis16488Read( 0, ADIS16488_PROD_ID_ADDRESS, 1, &prodId );
 	if( prodId != ADIS16488_PROD_ID ) {
 		print( "driver/"ADIS16488_NAME"/testConnection: error, test connection failed, response is 0x%X, correct response is 0x%X\n\r", prodId, ADIS16488_PROD_ID );
 		return FALSE;
@@ -95,58 +99,57 @@ u8 adis16488TestConnection(void) {
 	}
 }
 
-msg_t adis16488Update(void* arg) {
+THD_FUNCTION(adis16488Update, arg) {
 	systime_t chibios_time = chVTGetSystemTime();
 
 	while (1) {
 		chibios_time += MS2ST(ADIS16488_UPDATE_PERIOD);
 		{
-			u16 buffer[18];
+            s16 buffer[17];
 			vectorData vData;
 			scalarData sData;
 
-			adis16488Read(0, 0x0E, 18, buffer );
-			sData.time = vData.time = chVTGetSystemTime();
+            sData.time = vData.time = chVTGetSystemTime();
+            adis16488Read(0, 0x10, 17, (u8*)buffer );
 
-			vData.x = -( (float)( (s16) buffer[2] ) )*0.02f;			// out register
-			//vData.x += 0.01f/((float)(1<<16))*( (float) buffer[1] );	// low register
-			vData.y = -( (float)( (s16) buffer[4] ) )*0.02f;
-			//vData.y += 0.01f/((float)(1<<16))*( (float) buffer[3] );
-			vData.z = ( (float)( (s16) buffer[6] ) )*0.02f;
-			//vData.z += 0.01f/((float)(1<<16))*( (float) buffer[5] );
+            vData.x = -buffer[1]*0.02f;
+            vData.x += -buffer[0]*0.02f/(2<<16);
+            vData.y = -buffer[3]*0.02f;
+            vData.y += -buffer[2]*0.02f/(2<<16);
+            vData.z = buffer[5]*0.02f;
+            vData.z += buffer[4]*0.02f/(2<<16);
 			imuGyroSet(vData);
 
-			vData.x = -( (float)( (s16) buffer[8] ) )*0.0008f;
-			//vData.x += 0.0004f/((float)(1<<16))*( (float) buffer[7] );
-			vData.y = -( (float)( (s16) buffer[10] ) )*0.0008f;
-			//vData.y += 0.0004f/((float)(1<<16))*( (float) buffer[9] );
-			vData.z = ( (float)( (s16) buffer[12] ) )*0.0008f;
-			//vData.z += 0.0004f/((float)(1<<16))*( (float) buffer[11] );
-			imuAccelSet(vData);
+            vData.x = buffer[7]*0.0008f;
+            vData.x += buffer[6]*0.0008f/(2<<16);
+            vData.y = buffer[9]*0.0008f;
+            vData.y += buffer[8]*0.0008f/(2<<16);
+            vData.z = buffer[11]*0.0008f;
+            vData.z += buffer[10]*0.0008f/(2<<16);
+            imuAccelSet(vData);
 
-			vData.x = -( (float)( (s16) buffer[13] ) )*0.0001f;
-			vData.y = -( (float)( (s16) buffer[14] ) )*0.0001f;
-			vData.z = ( (float)( (s16) buffer[15] ) )*0.0001f;
+            vData.x = -buffer[12]*0.0001f;
+            vData.y = -buffer[13]*0.0001f;
+            vData.z = buffer[14]*0.0001f;
 			imuMagSet(vData);
 
-			sData.val = ( (float)( (s16) buffer[17] ) )*0.00004f;
-			sData.val += 0.00002f/((float)(1<<16))*( (float) buffer[16] );
+            sData.val = buffer[16]*0.00004f;
+            sData.val += buffer[15]*0.00004f/(2<<16);
 			imuPressureSet(sData);
 
 			#ifdef ADIS16488_DEBUG
-			print( "gyro: %.3f %.3f %.3f\n\raccel: %.3f %.3f %.3f\n\rmag: %.3f %.3f %.3f\n\rbaro: %.3f\n\rtemp: %.3f\n\r",
+            /*print( "gyro: %.3f %.3f %.3f\n\raccel: %.3f %.3f %.3f\n\rmag: %.3f %.3f %.3f\n\rbaro: %.3f\n\rtemp: %.3f\n\r",
 				   imu.g.x,imu.g.y,imu.g.z,
 				   imu.a.x,imu.a.y,imu.a.z,
 				   imu.m.x,imu.m.y,imu.m.z,
-				   imu.p.val, imu.T.val );
+                   imu.p.val, imu.T.val );*/
 			#endif
 		}
 
 		/*if( chThdShouldTerminateX() )
 			chThdExit( 0 );*/
 		chThdSleepUntil(chibios_time);
-	}
-	return 0;
+    }
 }
 
 void adis16488Init() {
@@ -155,11 +158,9 @@ void adis16488Init() {
 	if( !adis16488TestConnection() )
 		return;
 
-	updateThread = chThdCreateFromHeap(	NULL,
-		THD_WORKING_AREA_SIZE(256),
-		HIGHPRIO,
-		adis16488Update,
-		NULL );
+    updateThread = chThdCreateStatic(   adis16488UpdateWorkingArea,
+                                        sizeof(adis16488UpdateWorkingArea),
+                                        NORMALPRIO, adis16488Update, NULL);
 
 	/*while (TRUE) {
 		adis16488Update();

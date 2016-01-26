@@ -1,6 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006,2007,2008,2009,2010,
-              2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -52,10 +51,14 @@
  */
 #define ARM_WFI_IMPL            (PCON = 1)
 
+#if !defined(_FROM_ASM_) || defined(__DOXYGEN__)
 /**
  * @brief   Address of the IRQ vector register in the interrupt controller.
  */
+#define ARM_IRQ_VECTOR_REG      0xFFFFF030U
+#else
 #define ARM_IRQ_VECTOR_REG      0xFFFFF030
+#endif
 
 #endif /* _ARMPARAMS_H_ */
 

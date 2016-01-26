@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -53,6 +53,13 @@
 #define STM32_CAN2_RX0_NUMBER       64
 #define STM32_CAN2_RX1_NUMBER       65
 #define STM32_CAN2_SCE_NUMBER       66
+
+/*
+ * Ethernet
+ */
+#define STM32_ETH_HANDLER                   Vector134
+
+#define STM32_ETH_NUMBER                    61
 
 /*
  * I2C units.

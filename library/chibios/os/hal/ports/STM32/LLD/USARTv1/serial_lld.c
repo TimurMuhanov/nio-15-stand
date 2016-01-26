@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -165,11 +165,16 @@ static void serve_interrupt(SerialDriver *sdp) {
 
   /* Data available.*/
   osalSysLockFromISR();
-  while (sr & USART_SR_RXNE) {
+  while (sr & (USART_SR_RXNE | USART_SR_ORE | USART_SR_NE | USART_SR_FE |
+               USART_SR_PE)) {
+    uint8_t b;
+
     /* Error condition detection.*/
     if (sr & (USART_SR_ORE | USART_SR_NE | USART_SR_FE  | USART_SR_PE))
       set_error(sdp, sr);
-    sdIncomingDataI(sdp, u->DR);
+    b = u->DR;
+    if (sr & USART_SR_RXNE)
+      sdIncomingDataI(sdp, b);
     sr = u->SR;
   }
   osalSysUnlockFromISR();

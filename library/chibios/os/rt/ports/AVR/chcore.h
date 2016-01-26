@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -102,6 +101,9 @@ struct port_extctx {
   uint8_t       sr;
   uint8_t       r1;
   uint8_t       r0;
+#ifdef __AVR_3_BYTE_PC__
+  uint8_t       pcx;
+#endif
   uint16_t      pc;
 };
 
@@ -132,6 +134,9 @@ struct port_intctx {
   uint8_t       r4;
   uint8_t       r3;
   uint8_t       r2;
+#ifdef __AVR_3_BYTE_PC__
+  uint8_t       pcx;
+#endif
   uint8_t       pcl;
   uint8_t       pch;
 };
@@ -151,6 +156,19 @@ struct context {
  * @details This code usually setup the context switching frame represented
  *          by an @p port_intctx structure.
  */
+#ifdef __AVR_3_BYTE_PC__
+#define PORT_SETUP_CONTEXT(tp, workspace, wsize, pf, arg) {                 \
+  tp->p_ctx.sp = (struct port_intctx*)((uint8_t *)workspace + wsize  -      \
+                                  sizeof(struct port_intctx));              \
+  tp->p_ctx.sp->r2  = (int)pf;                                              \
+  tp->p_ctx.sp->r3  = (int)pf >> 8;                                         \
+  tp->p_ctx.sp->r4  = (int)arg;                                             \
+  tp->p_ctx.sp->r5  = (int)arg >> 8;                                        \
+  tp->p_ctx.sp->pcx = (int)_port_thread_start >> 16;                        \
+  tp->p_ctx.sp->pcl = (int)_port_thread_start >> 8;                         \
+  tp->p_ctx.sp->pch = (int)_port_thread_start;                              \
+}
+#else /* __AVR_3_BYTE_PC__ */
 #define PORT_SETUP_CONTEXT(tp, workspace, wsize, pf, arg) {                 \
   tp->p_ctx.sp = (struct port_intctx*)((uint8_t *)workspace + wsize  -      \
                                   sizeof(struct port_intctx));              \
@@ -161,6 +179,7 @@ struct context {
   tp->p_ctx.sp->pcl = (int)_port_thread_start >> 8;                         \
   tp->p_ctx.sp->pch = (int)_port_thread_start;                              \
 }
+#endif /* __AVR_3_BYTE_PC__ */
 
 /**
  * @brief   Stack size for the system idle thread.

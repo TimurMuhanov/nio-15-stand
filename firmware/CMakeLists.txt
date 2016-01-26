@@ -9,16 +9,17 @@ set( ASM arm-none-eabi-gcc )
 set( BOARD servo-1 )
 
 set( SOURCES
-	main.c
+    main.cpp
 	app/imu.c
+	app/nav.c
 	app/encoder.c
 	app/servo.c
 	app/user_func_RBF_127_150819.c
 	system/control.c
-	system/gcs.c
+    system/connection.cpp
 	system/io.c
 	system/usbcfg.c
-	system/parameter.cpp
+    system/settings.cpp
 	driver/led.c
 	driver/ls7366.c
 	driver/adis16488.c
@@ -30,7 +31,7 @@ set( INCLUDE
 	driver/include
 	board/${BOARD}
 	../library/mavlink
-	../library/mavlink/nio15_1
+    ../library/mavlink/nio15
 )
 include( ../library/chibios.cmake )
 

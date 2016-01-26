@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -29,7 +28,7 @@
 
 #include "ch.h"
 
-#if CH_CFG_USE_TM || defined(__DOXYGEN__)
+#if (CH_CFG_USE_TM == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module local definitions.                                                 */
@@ -56,12 +55,16 @@ static inline void tm_stop(time_measurement_t *tmp,
                            rtcnt_t offset) {
 
   tmp->n++;
-  tmp->last = now - tmp->last - offset;
+  tmp->last = (now - tmp->last) - offset;
   tmp->cumulative += (rttime_t)tmp->last;
-  if (tmp->last > tmp->worst)
+  /*lint -save -e9013 [15.7] There is no else because it is not needed.*/
+  if (tmp->last > tmp->worst) {
     tmp->worst = tmp->last;
-  else if (tmp->last < tmp->best)
+  }
+  else if (tmp->last < tmp->best) {
     tmp->best = tmp->last;
+  }
+  /*lint -restore*/
 }
 
 /*===========================================================================*/
@@ -79,7 +82,7 @@ void _tm_init(void) {
   /* Time Measurement subsystem calibration, it does a null measurement
      and calculates the call overhead which is subtracted to real
      measurements.*/
-  ch.tm.offset = 0;
+  ch.tm.offset = (rtcnt_t)0;
   chTMObjectInit(&tm);
   chTMStartMeasurementX(&tm);
   chTMStopMeasurementX(&tm);
@@ -147,9 +150,9 @@ NOINLINE void chTMChainMeasurementToX(time_measurement_t *tmp1,
   tmp2->last = chSysGetRealtimeCounterX();
 
   /* Stops previous measurement using the same time stamp.*/
-  tm_stop(tmp1, tmp2->last, 0);
+  tm_stop(tmp1, tmp2->last, (rtcnt_t)0);
 }
 
-#endif /* CH_CFG_USE_TM */
+#endif /* CH_CFG_USE_TM == TRUE */
 
 /** @} */

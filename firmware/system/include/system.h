@@ -7,7 +7,9 @@
 #define SYSTEM_H
 
 #include "io.h"
-#include "gcs.h"
+#include "connection.h"
+#include "settings.h"
+#include "control.h"
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -55,6 +55,13 @@
 #define STM32_CAN2_SCE_NUMBER       66
 
 /*
+ * Ethernet
+ */
+#define STM32_ETH_HANDLER                   Vector134
+
+#define STM32_ETH_NUMBER                    61
+
+/*
  * I2C units.
  */
 #define STM32_I2C1_EVENT_HANDLER    VectorBC
@@ -106,8 +113,10 @@
 #define STM32_TIM8_UP_HANDLER       VectorF0
 #define STM32_TIM8_CC_HANDLER       VectorF8
 #define STM32_TIM9_HANDLER          VectorA0
+#define STM32_TIM10_HANDLER         VectorA4 /* Note: same as STM32_TIM1_UP */
 #define STM32_TIM11_HANDLER         VectorA8
 #define STM32_TIM12_HANDLER         VectorEC
+#define STM32_TIM13_HANDLER         VectorF0 /* Note: same as STM32_TIM8_UP */
 #define STM32_TIM14_HANDLER         VectorF4
 
 #define STM32_TIM1_UP_NUMBER        25
@@ -121,8 +130,10 @@
 #define STM32_TIM8_UP_NUMBER        44
 #define STM32_TIM8_CC_NUMBER        46
 #define STM32_TIM9_NUMBER           24
+#define STM32_TIM10_NUMBER          25 /* Note: same as STM32_TIM1_UP */
 #define STM32_TIM11_NUMBER          26
 #define STM32_TIM12_NUMBER          43
+#define STM32_TIM13_NUMBER          44 /* Note: same as STM32_TIM8_UP */
 #define STM32_TIM14_NUMBER          45
 
 /*
@@ -143,16 +154,27 @@
 #define STM32_USART6_NUMBER         71
 
 /*
- * Ethernet
- */
-#define ETH_IRQHandler              Vector134
-
-/*
  * FSMC
  */
 #define STM32_FSMC_HANDLER          Vector100
 
 #define STM32_FSMC_NUMBER           48
+
+/*
+ * LTDC
+ */
+#define STM32_LTDC_EV_HANDLER       Vector1A0
+#define STM32_LTDC_ER_HANDLER       Vector1A4
+
+#define STM32_LTDC_EV_NUMBER        88
+#define STM32_LTDC_ER_NUMBER        89
+
+/*
+ * DMA2D
+ */
+#define STM32_DMA2D_HANDLER         Vector1A8
+
+#define STM32_DMA2D_NUMBER          90
 
 /** @} */
 

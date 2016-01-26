@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -52,11 +52,10 @@ static time_t unix_time;
 static THD_WORKING_AREA(blinkWA, 128);
 static THD_FUNCTION(blink_thd, arg){
   (void)arg;
-  while (TRUE) {
+  while (true) {
     chThdSleepMilliseconds(100);
     palTogglePad(GPIOB, GPIOB_LED_R);
   }
-  return 0;
 }
 
 /*
@@ -144,7 +143,7 @@ static time_t GetTimeUnixSec(void) {
   struct tm tim;
 
   rtcGetTime(&RTCD1, &timespec);
-  rtcConvertDateTimeToStructTm(&timespec, &tim);
+  rtcConvertDateTimeToStructTm(&timespec, &tim, NULL);
   return mktime(&tim);
 }
 
@@ -153,7 +152,7 @@ static time_t GetTimeUnixSec(void) {
  */
 static void GetTimeTm(struct tm *timp) {
   rtcGetTime(&RTCD1, &timespec);
-  rtcConvertDateTimeToStructTm(&timespec, timp);
+  rtcConvertDateTimeToStructTm(&timespec, timp, NULL);
 }
 
 /*
@@ -282,7 +281,7 @@ int main(void){
   shellCreateStatic(&shell_cfg1, waShell, sizeof(waShell), NORMALPRIO);
 
   /* wait until user do not want to test wakeup */
-  while (TRUE){
+  while (true){
     osalThreadSleepMilliseconds(200);
   }
 #endif /* WAKEUP_TEST */

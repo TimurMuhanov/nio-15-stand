@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ static THD_FUNCTION(Thread1, arg) {
   (void)arg;
 
   chRegSetThreadName("blinker");
-  while (TRUE) {
+  while (true) {
     palSetPad(GPIOB, GPIOB_LED4);
     chThdSleepMilliseconds(500);
     palClearPad(GPIOB, GPIOB_LED4);
@@ -154,7 +154,7 @@ int main(void) {
   /*
    * Normal main() thread activity, in this demo it does nothing.
    */
-  while (TRUE) {
+  while (true) {
     if (palReadPad(GPIOA, GPIOA_BUTTON)) {
       adcStopConversion(&ADCD1);
       adcSTM32DisableTSVREFE();

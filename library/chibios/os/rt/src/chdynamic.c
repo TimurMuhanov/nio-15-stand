@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -29,7 +28,7 @@
 
 #include "ch.h"
 
-#if CH_CFG_USE_DYNAMIC || defined(__DOXYGEN__)
+#if (CH_CFG_USE_DYNAMIC == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module local definitions.                                                 */
@@ -69,9 +68,10 @@
 thread_t *chThdAddRef(thread_t *tp) {
 
   chSysLock();
-  chDbgAssert(tp->p_refs < 255, "too many references");
+  chDbgAssert(tp->p_refs < (trefs_t)255, "too many references");
   tp->p_refs++;
   chSysUnlock();
+
   return tp;
 }
 
@@ -92,36 +92,41 @@ void chThdRelease(thread_t *tp) {
   trefs_t refs;
 
   chSysLock();
-  chDbgAssert(tp->p_refs > 0, "not referenced");
-  refs = --tp->p_refs;
+  chDbgAssert(tp->p_refs > (trefs_t)0, "not referenced");
+  tp->p_refs--;
+  refs = tp->p_refs;
   chSysUnlock();
 
   /* If the references counter reaches zero and the thread is in its
      terminated state then the memory can be returned to the proper
      allocator. Of course static threads are not affected.*/
-  if ((refs == 0) && (tp->p_state == CH_STATE_FINAL)) {
+  if ((refs == (trefs_t)0) && (tp->p_state == CH_STATE_FINAL)) {
     switch (tp->p_flags & CH_FLAG_MODE_MASK) {
-#if CH_CFG_USE_HEAP
+#if CH_CFG_USE_HEAP == TRUE
     case CH_FLAG_MODE_HEAP:
-#if CH_CFG_USE_REGISTRY
+#if CH_CFG_USE_REGISTRY == TRUE
       REG_REMOVE(tp);
 #endif
       chHeapFree(tp);
       break;
 #endif
-#if CH_CFG_USE_MEMPOOLS
-    case CH_FLAG_MODE_MEMPOOL:
-#if CH_CFG_USE_REGISTRY
+#if CH_CFG_USE_MEMPOOLS == TRUE
+    case CH_FLAG_MODE_MPOOL:
+#if CH_CFG_USE_REGISTRY == TRUE
       REG_REMOVE(tp);
 #endif
       chPoolFree(tp->p_mpool, tp);
       break;
 #endif
+    default:
+      /* Nothing to do for static threads, those are removed from the
+         registry on exit.*/
+      break;
     }
   }
 }
 
-#if CH_CFG_USE_HEAP || defined(__DOXYGEN__)
+#if (CH_CFG_USE_HEAP == TRUE) || defined(__DOXYGEN__)
 /**
  * @brief   Creates a new thread allocating the memory from the heap.
  * @pre     The configuration options @p CH_CFG_USE_DYNAMIC and
@@ -150,10 +155,11 @@ thread_t *chThdCreateFromHeap(memory_heap_t *heapp, size_t size,
   thread_t *tp;
 
   wsp = chHeapAlloc(heapp, size);
-  if (wsp == NULL)
+  if (wsp == NULL) {
     return NULL;
+  }
   
-#if CH_DBG_FILL_THREADS
+#if CH_DBG_FILL_THREADS == TRUE
   _thread_memfill((uint8_t *)wsp,
                   (uint8_t *)wsp + sizeof(thread_t),
                   CH_DBG_THREAD_FILL_VALUE);
@@ -167,11 +173,12 @@ thread_t *chThdCreateFromHeap(memory_heap_t *heapp, size_t size,
   tp->p_flags = CH_FLAG_MODE_HEAP;
   chSchWakeupS(tp, MSG_OK);
   chSysUnlock();
+
   return tp;
 }
-#endif /* CH_CFG_USE_HEAP */
+#endif /* CH_CFG_USE_HEAP == TRUE */
 
-#if CH_CFG_USE_MEMPOOLS || defined(__DOXYGEN__)
+#if (CH_CFG_USE_MEMPOOLS == TRUE) || defined(__DOXYGEN__)
 /**
  * @brief   Creates a new thread allocating the memory from the specified
  *          memory pool.
@@ -202,10 +209,11 @@ thread_t *chThdCreateFromMemoryPool(memory_pool_t *mp, tprio_t prio,
   chDbgCheck(mp != NULL);
 
   wsp = chPoolAlloc(mp);
-  if (wsp == NULL)
+  if (wsp == NULL) {
     return NULL;
+  }
   
-#if CH_DBG_FILL_THREADS
+#if CH_DBG_FILL_THREADS == TRUE
   _thread_memfill((uint8_t *)wsp,
                   (uint8_t *)wsp + sizeof(thread_t),
                   CH_DBG_THREAD_FILL_VALUE);
@@ -216,14 +224,15 @@ thread_t *chThdCreateFromMemoryPool(memory_pool_t *mp, tprio_t prio,
 
   chSysLock();
   tp = chThdCreateI(wsp, mp->mp_object_size, prio, pf, arg);
-  tp->p_flags = CH_FLAG_MODE_MEMPOOL;
+  tp->p_flags = CH_FLAG_MODE_MPOOL;
   tp->p_mpool = mp;
   chSchWakeupS(tp, MSG_OK);
   chSysUnlock();
+
   return tp;
 }
-#endif /* CH_CFG_USE_MEMPOOLS */
+#endif /* CH_CFG_USE_MEMPOOLS == TRUE */
 
-#endif /* CH_CFG_USE_DYNAMIC */
+#endif /* CH_CFG_USE_DYNAMIC == TRUE */
 
 /** @} */

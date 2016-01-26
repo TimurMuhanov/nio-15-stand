@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -95,8 +95,10 @@
 #define STM32_CAN_MAX_FILTERS               28
 
 /* DAC attributes.*/
-#define STM32_HAS_DAC1                      FALSE
-#define STM32_HAS_DAC2                      FALSE
+#define STM32_HAS_DAC1_CH1                  FALSE
+#define STM32_HAS_DAC1_CH2                  FALSE
+#define STM32_HAS_DAC2_CH1                  FALSE
+#define STM32_HAS_DAC2_CH2                  FALSE
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA                  TRUE
@@ -320,6 +322,12 @@
 #define STM32_HAS_OTG1                      TRUE
 #define STM32_HAS_OTG2                      TRUE
 
+/* LTDC attributes.*/
+#define STM32_HAS_LTDC                      TRUE
+
+/* DMA2D attributes.*/
+#define STM32_HAS_DMA2D                     TRUE
+
 /* FSMC attributes.*/
 #define STM32_HAS_FSMC                      TRUE
 #define STM32_FSMC_IS_FMC                   TRUE
@@ -332,6 +340,11 @@
                                              STM32_DMA_STREAM_ID_MSK(2, 6) |\
                                              STM32_DMA_STREAM_ID_MSK(2, 7))
 #define STM32_FSMC_DMA_CHN                  0x03010201
+
+/* CRC attributes.*/
+#define STM32_HAS_CRC                       TRUE
+#define STM32_CRC_PROGRAMMABLE              FALSE
+
 #endif /* defined(STM32F429_439xx) || defined(STM32F427_437xx) */
 
 /*===========================================================================*/
@@ -366,8 +379,16 @@
 #define STM32_CAN_MAX_FILTERS               28
 
 /* DAC attributes.*/
-#define STM32_HAS_DAC1                      FALSE
-#define STM32_HAS_DAC2                      FALSE
+#define STM32_HAS_DAC1_CH1                  TRUE
+#define STM32_DAC1_CH1_DMA_MSK              (STM32_DMA_STREAM_ID_MSK(1, 5))
+#define STM32_DAC1_CH1_DMA_CHN              0x00700000
+
+#define STM32_HAS_DAC1_CH2                  TRUE
+#define STM32_DAC1_CH2_DMA_MSK              (STM32_DMA_STREAM_ID_MSK(1, 6))
+#define STM32_DAC1_CH2_DMA_CHN              0x07000000
+
+#define STM32_HAS_DAC2_CH1                  FALSE
+#define STM32_HAS_DAC2_CH2                  FALSE
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA                  TRUE
@@ -581,6 +602,12 @@
 #define STM32_HAS_OTG1                      TRUE
 #define STM32_HAS_OTG2                      TRUE
 
+/* LTDC attributes.*/
+#define STM32_HAS_LTDC                      FALSE
+
+/* DMA2D attributes.*/
+#define STM32_HAS_DMA2D                     FALSE
+
 /* FSMC attributes.*/
 #define STM32_HAS_FSMC                      TRUE
 #define STM32_FSMC_DMA_MSK                  (STM32_DMA_STREAM_ID_MSK(2, 0) |\
@@ -592,6 +619,11 @@
                                              STM32_DMA_STREAM_ID_MSK(2, 6) |\
                                              STM32_DMA_STREAM_ID_MSK(2, 7))
 #define STM32_FSMC_DMA_CHN                  0x03010201
+
+/* CRC attributes.*/
+#define STM32_HAS_CRC                       TRUE
+#define STM32_CRC_PROGRAMMABLE              FALSE
+
 #endif /* defined(STM32F40_41xxx) || defined(STM32F2XX) */
 
 /*===========================================================================*/
@@ -626,8 +658,10 @@
 #define STM32_CAN_MAX_FILTERS               28
 
 /* DAC attributes.*/
-#define STM32_HAS_DAC1                      FALSE
-#define STM32_HAS_DAC2                      FALSE
+#define STM32_HAS_DAC1_CH1                  FALSE
+#define STM32_HAS_DAC1_CH2                  FALSE
+#define STM32_HAS_DAC2_CH1                  FALSE
+#define STM32_HAS_DAC2_CH2                  FALSE
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA                  TRUE
@@ -803,8 +837,19 @@
 #define STM32_HAS_OTG1                      TRUE
 #define STM32_HAS_OTG2                      FALSE
 
+/* LTDC attributes.*/
+#define STM32_HAS_LTDC                      FALSE
+
+/* DMA2D attributes.*/
+#define STM32_HAS_DMA2D                     FALSE
+
 /* FSMC attributes.*/
 #define STM32_HAS_FSMC                      FALSE
+
+/* CRC attributes.*/
+#define STM32_HAS_CRC                       TRUE
+#define STM32_CRC_PROGRAMMABLE              FALSE
+
 #endif /* defined(STM32F401xx) */
 
 /*===========================================================================*/
@@ -830,8 +875,10 @@
 #define STM32_HAS_CAN2                      FALSE
 
 /* DAC attributes.*/
-#define STM32_HAS_DAC1                      FALSE
-#define STM32_HAS_DAC2                      FALSE
+#define STM32_HAS_DAC1_CH1                  FALSE
+#define STM32_HAS_DAC1_CH2                  FALSE
+#define STM32_HAS_DAC2_CH1                  FALSE
+#define STM32_HAS_DAC2_CH2                  FALSE
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA                  TRUE
@@ -940,7 +987,9 @@
 /* TIM attributes.*/
 #define STM32_TIM_MAX_CHANNELS              4
 
-#define STM32_HAS_TIM1                      FALSE
+#define STM32_HAS_TIM1                      TRUE
+#define STM32_TIM1_IS_32BITS                FALSE
+#define STM32_TIM1_CHANNELS                 4
 
 #define STM32_HAS_TIM2                      TRUE
 #define STM32_TIM2_IS_32BITS                TRUE
@@ -1013,8 +1062,19 @@
 #define STM32_HAS_OTG1                      TRUE
 #define STM32_HAS_OTG2                      FALSE
 
+/* LTDC attributes.*/
+#define STM32_HAS_LTDC                      FALSE
+
+/* DMA2D attributes.*/
+#define STM32_HAS_DMA2D                     FALSE
+
 /* FSMC attributes.*/
 #define STM32_HAS_FSMC                      FALSE
+
+/* CRC attributes.*/
+#define STM32_HAS_CRC                       TRUE
+#define STM32_CRC_PROGRAMMABLE              FALSE
+
 #endif
 /** @} */
 

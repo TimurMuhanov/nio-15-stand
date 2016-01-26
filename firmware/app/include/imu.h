@@ -22,25 +22,33 @@ typedef struct {
 	u32 time;			// us
 } scalarData;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void imuInit(void);
 
-// in deg
-vectorData imuGyroGet(void);
-void imuGyroSet(vectorData);
+	void imuInit(void);
 
-vectorData imuAccelGet(void);
-void imuAccelSet(vectorData);
+	// in deg
+	vectorData imuGyroGet(void);
+	void imuGyroSet(vectorData);
 
-vectorData imuMagGet(void);
-void imuMagSet(vectorData);
+	vectorData imuAccelGet(void);
+	void imuAccelSet(vectorData);
 
-scalarData imuPressureGet(void);
-void imuPressureSet(scalarData);
+	vectorData imuMagGet(void);
+	void imuMagSet(vectorData);
 
-scalarData imuTempGet(void);
-void imuTempSet(scalarData);
+	scalarData imuPressureGet(void);
+	void imuPressureSet(scalarData);
 
+	scalarData imuTempGet(void);
+	void imuTempSet(scalarData);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

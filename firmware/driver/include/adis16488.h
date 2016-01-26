@@ -13,9 +13,6 @@
 #include "ch.h"
 #include "hal.h"
 
-#include "gcs.h"
-#include "imu.h"
-
 
 #define	ADIS16488_NAME			"ADIS16488"
 //#define	ADIS16488_DEBUG						// uncomment for enable debug, comment for disable

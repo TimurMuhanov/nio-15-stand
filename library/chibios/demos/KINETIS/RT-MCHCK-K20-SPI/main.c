@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2014 Derek Mulcahy
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ static THD_FUNCTION(Thread1, arg) {
 
   (void)arg;
   chRegSetThreadName("Blinker");
-  while (TRUE) {
+  while (true) {
     palSetPad(GPIOB, GPIOB_LED);
 
     /* Send the Manufacturer and Device ID Read command */
@@ -54,8 +54,6 @@ static THD_FUNCTION(Thread1, arg) {
 
     chThdSleepMilliseconds(1000);
   }
-
-  return 0;
 }
 
 /*

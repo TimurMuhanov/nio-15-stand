@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #include "hal.h"
 
 /*
- * GPT2 callback.
+ * GPT4 callback.
  */
 static void gpt4cb(GPTDriver *gptp) {
 
@@ -74,7 +74,7 @@ int main(void) {
   chSysInit();
 
   /*
-   * Initializes the GPT drivers 2 and 3.
+   * Initializes the GPT drivers 4 and 3.
    */
   gptStart(&GPTD4, &gpt4cfg);
   gptPolledDelay(&GPTD4, 10); /* Small delay.*/
@@ -82,10 +82,10 @@ int main(void) {
   gptPolledDelay(&GPTD3, 10); /* Small delay.*/
 
   /*
-   * Normal main() thread activity, it changes the GPT1 period every
+   * Normal main() thread activity, it changes the GPT4 period every
    * five seconds.
    */
-  while (TRUE) {
+  while (true) {
     palSetPad(GPIOD, GPIOD_LED4);
     gptStartContinuous(&GPTD4, 5000);
     chThdSleepMilliseconds(5000);

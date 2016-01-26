@@ -1,21 +1,17 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
-    This file is part of ChibiOS/HAL 
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -28,7 +24,7 @@
 
 #include "hal.h"
 
-#if HAL_USE_EXT || defined(__DOXYGEN__)
+#if (HAL_USE_EXT == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -128,7 +124,7 @@ void extStop(EXTDriver *extp) {
  */
 void extChannelEnable(EXTDriver *extp, expchannel_t channel) {
 
-  osalDbgCheck((extp != NULL) && (channel < EXT_MAX_CHANNELS));
+  osalDbgCheck((extp != NULL) && (channel < (expchannel_t)EXT_MAX_CHANNELS));
 
   osalSysLock();
   osalDbgAssert((extp->state == EXT_ACTIVE) &&
@@ -150,7 +146,7 @@ void extChannelEnable(EXTDriver *extp, expchannel_t channel) {
  */
 void extChannelDisable(EXTDriver *extp, expchannel_t channel) {
 
-  osalDbgCheck((extp != NULL) && (channel < EXT_MAX_CHANNELS));
+  osalDbgCheck((extp != NULL) && (channel < (expchannel_t)EXT_MAX_CHANNELS));
 
   osalSysLock();
   osalDbgAssert((extp->state == EXT_ACTIVE) &&
@@ -184,21 +180,23 @@ void extSetChannelModeI(EXTDriver *extp,
   EXTChannelConfig *oldcp;
 
   osalDbgCheck((extp != NULL) &&
-               (channel < EXT_MAX_CHANNELS) &&
+               (channel < (expchannel_t)EXT_MAX_CHANNELS) &&
                (extcp != NULL));
 
   osalDbgAssert(extp->state == EXT_ACTIVE, "invalid state");
 
   /* Note that here the access is enforced as non-const, known access
      violation.*/
+  /*lint -save -e9005 [11.8] Known issue, the driver needs rework here.*/
   oldcp = (EXTChannelConfig *)&extp->config->channels[channel];
+  /*lint -restore*/
 
-  /* Overwiting the old channels configuration then the channel is reconfigured
-     by the low level driver.*/
+  /* Overwriting the old channels configuration then the channel is
+     reconfigured by the low level driver.*/
   *oldcp = *extcp;
   ext_lld_channel_enable(extp, channel);
 }
 
-#endif /* HAL_USE_EXT */
+#endif /* HAL_USE_EXT == TRUE */
 
 /** @} */

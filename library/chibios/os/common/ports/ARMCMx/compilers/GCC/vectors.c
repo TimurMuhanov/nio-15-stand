@@ -1,6 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006,2007,2008,2009,2010,
-              2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -31,7 +30,7 @@
 
 #include "cmparams.h"
 
-#if (CORTEX_NUM_VECTORS & 7) != 0
+#if (CORTEX_NUM_VECTORS % 8) != 0
 #error "the constant CORTEX_NUM_VECTORS must be a multiple of 8"
 #endif
 
@@ -74,10 +73,12 @@ typedef struct {
  *
  * @notapi
  */
+/*lint -save -e9075 [8.4] All symbols are invoked from asm context.*/
 void _unhandled_exception(void) {
+/*lint -restore*/
 
-  while (true)
-    ;
+  while (true) {
+  }
 }
 
 #if !defined(__DOXYGEN__)
@@ -461,9 +462,11 @@ void Vector3FC(void) __attribute__((weak, alias("_unhandled_exception")));
  * @brief   STM32 vectors table.
  */
 #if !defined(__DOXYGEN__)
-__attribute__ ((used, section("vectors")))
+__attribute__ ((used, section(".vectors")))
 #endif
+/*lint -save -e9075 [8.4] All symbols are invoked from asm context.*/
 vectors_t _vectors = {
+/*lint -restore*/
   &__main_stack_end__,Reset_Handler,      NMI_Handler,        HardFault_Handler,
   MemManage_Handler,  BusFault_Handler,   UsageFault_Handler, Vector1C,
   Vector20,           Vector24,           Vector28,           SVC_Handler,

@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -146,17 +146,17 @@
 #endif
 
 #if STM32_SPI_USE_SPI1 &&                                                   \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_SPI_SPI1_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_SPI_SPI1_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to SPI1"
 #endif
 
 #if STM32_SPI_USE_SPI2 &&                                                   \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_SPI_SPI2_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_SPI_SPI2_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to SPI2"
 #endif
 
 #if STM32_SPI_USE_SPI3 &&                                                   \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_SPI_SPI3_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_SPI_SPI3_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to SPI3"
 #endif
 

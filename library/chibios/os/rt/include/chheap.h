@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -29,7 +28,7 @@
 #ifndef _CHHEAP_H_
 #define _CHHEAP_H_
 
-#if CH_CFG_USE_HEAP || defined(__DOXYGEN__)
+#if (CH_CFG_USE_HEAP == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -43,11 +42,11 @@
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
 
-#if !CH_CFG_USE_MEMCORE
+#if CH_CFG_USE_MEMCORE == FALSE
 #error "CH_CFG_USE_HEAP requires CH_CFG_USE_MEMCORE"
 #endif
 
-#if !CH_CFG_USE_MUTEXES && !CH_CFG_USE_SEMAPHORES
+#if (CH_CFG_USE_MUTEXES == FALSE) && (CH_CFG_USE_SEMAPHORES == FALSE)
 #error "CH_CFG_USE_HEAP requires CH_CFG_USE_MUTEXES and/or CH_CFG_USE_SEMAPHORES"
 #endif
 
@@ -81,7 +80,7 @@ struct memory_heap {
   memgetfunc_t          h_provider; /**< @brief Memory blocks provider for
                                                 this heap.                  */
   union heap_header     h_free;     /**< @brief Free blocks list header.    */
-#if CH_CFG_USE_MUTEXES
+#if CH_CFG_USE_MUTEXES == TRUE
   mutex_t               h_mtx;      /**< @brief Heap access mutex.          */
 #else
   semaphore_t           h_sem;      /**< @brief Heap access semaphore.      */
@@ -112,7 +111,7 @@ extern "C" {
 /* Module inline functions.                                                  */
 /*===========================================================================*/
 
-#endif /* CH_CFG_USE_HEAP */
+#endif /* CH_CFG_USE_HEAP == TRUE */
 
 #endif /* _CHHEAP_H_ */
 

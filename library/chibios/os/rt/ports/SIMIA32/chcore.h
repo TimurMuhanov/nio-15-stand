@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -61,7 +60,7 @@
 /**
  * @brief   This port supports a realtime counter.
  */
-#define PORT_SUPPORTS_RT                FALSE
+#define PORT_SUPPORTS_RT                TRUE
 
 /*===========================================================================*/
 /* Module pre-compile time settings.                                         */
@@ -155,13 +154,17 @@ struct context {
 /* Module macros.                                                            */
 /*===========================================================================*/
 
-#define APUSH(p, a) (p) -= sizeof(void *), *(void **)(p) = (void*)(a)
+#define APUSH(p, a) do {                                                    \
+  (p) -= sizeof(void *);                                                    \
+  *(void **)(p) = (void*)(a);                                               \
+} while (false)
 
 /* Darwin requires the stack to be aligned to a 16-byte boundary at
  * the time of a call instruction (in case the called function needs
  * to save MMX registers). This aligns to 'mod' module 16, so that we'll end
  * up with the right alignment after pushing the args. */
-#define AALIGN(p, mask, mod) p = (void *)((((uintptr_t)(p) - mod) & ~mask) + mod)
+#define AALIGN(p, mask, mod)                                                \
+  p = (void *)((((uint32_t)(p) - (uint32_t)(mod)) & ~(uint32_t)(mask)) + (uint32_t)(mod)) \
 
 /**
  * @brief   Platform dependent part of the @p chThdCreateI() API.
@@ -169,6 +172,7 @@ struct context {
  *          by an @p port_intctx structure.
  */
 #define PORT_SETUP_CONTEXT(tp, workspace, wsize, pf, arg) {                 \
+  /*lint -save -e611 -e9033 -e9074 -e9087 [10.8, 11.1, 11.3] Valid casts.*/ \
   uint8_t *esp = (uint8_t *)workspace + wsize;                              \
   APUSH(esp, 0);                                                            \
   uint8_t *savebp = esp;                                                    \
@@ -178,36 +182,41 @@ struct context {
   APUSH(esp, 0);                                                            \
   esp -= sizeof(struct port_intctx);                                        \
   ((struct port_intctx *)esp)->eip = (void *)_port_thread_start;            \
-  ((struct port_intctx *)esp)->ebx = 0;                                     \
-  ((struct port_intctx *)esp)->edi = 0;                                     \
-  ((struct port_intctx *)esp)->esi = 0;                                     \
+  ((struct port_intctx *)esp)->ebx = NULL;                                  \
+  ((struct port_intctx *)esp)->edi = NULL;                                  \
+  ((struct port_intctx *)esp)->esi = NULL;                                  \
   ((struct port_intctx *)esp)->ebp = (void *)savebp;                        \
   (tp)->p_ctx.esp = (struct port_intctx *)esp;                              \
+  /*lint -restore*/                                                         \
 }
 
  /**
  * @brief   Computes the thread working area global size.
  * @note    There is no need to perform alignments in this macro.
   */
-#define PORT_WA_SIZE(n) (sizeof(void *) * 4 +                               \
+#define PORT_WA_SIZE(n) ((sizeof(void *) * 4U) +                            \
                          sizeof(struct port_intctx) +                       \
-                         sizeof(struct port_extctx) +                       \
-                         (n) +                                              \
-                         PORT_INT_REQUIRED_STACK)
+                         ((size_t)(n)) +                                    \
+                         ((size_t)(PORT_INT_REQUIRED_STACK)))
 
 /**
  * @brief   IRQ prologue code.
  * @details This macro must be inserted at the start of all IRQ handlers
  *          enabled to invoke system APIs.
  */
-#define PORT_IRQ_PROLOGUE()
+#define PORT_IRQ_PROLOGUE() {                                               \
+  port_isr_context_flag = true;                                             \
+}
 
 /**
  * @brief   IRQ epilogue code.
  * @details This macro must be inserted at the end of all IRQ handlers
  *          enabled to invoke system APIs.
  */
-#define PORT_IRQ_EPILOGUE()
+#define PORT_IRQ_EPILOGUE() {                                               \
+  port_isr_context_flag = false;                                            \
+}
+
 
 /**
  * @brief   IRQ handler function declaration.
@@ -227,12 +236,18 @@ struct context {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
+extern bool port_isr_context_flag;
+extern syssts_t port_irq_sts;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+  /*lint -save -e950 [Dir-2.1] Non-ANSI keywords are fine in the port layer.*/
   __attribute__((fastcall)) void port_switch(thread_t *ntp, thread_t *otp);
-  __attribute__((cdecl, noreturn)) void _port_thread_start(msg_t (*pf)(void *),
+  __attribute__((cdecl, noreturn)) void _port_thread_start(msg_t (*pf)(void *p),
                                                            void *p);
+  /*lint -restore*/
+  rtcnt_t port_rt_get_counter_value(void);
   void _sim_check_for_interrupts(void);
 #ifdef __cplusplus
 }
@@ -247,6 +262,8 @@ extern "C" {
  */
 static inline void port_init(void) {
 
+  port_irq_sts = (syssts_t)0;
+  port_isr_context_flag = false;
 }
 
 /**
@@ -256,7 +273,7 @@ static inline void port_init(void) {
  */
 static inline syssts_t port_get_irq_status(void) {
 
-  return (syssts_t)0;
+  return port_irq_sts;
 }
 
 /**
@@ -270,7 +287,7 @@ static inline syssts_t port_get_irq_status(void) {
  */
 static inline bool port_irq_enabled(syssts_t sts) {
 
-  return (sts & 1) == 0;
+  return sts == (syssts_t)0;
 }
 
 /**
@@ -282,7 +299,7 @@ static inline bool port_irq_enabled(syssts_t sts) {
  */
 static inline bool port_is_isr_context(void) {
 
-  return false;
+  return port_isr_context_flag;
 }
 
 /**
@@ -291,7 +308,7 @@ static inline bool port_is_isr_context(void) {
  */
 static inline void port_lock(void) {
 
-  asm volatile("nop");
+  port_irq_sts = (syssts_t)1;
 }
 
 /**
@@ -300,7 +317,7 @@ static inline void port_lock(void) {
  */
 static inline void port_unlock(void) {
 
-  asm volatile("nop");
+  port_irq_sts = (syssts_t)0;
 }
 
 /**
@@ -310,7 +327,7 @@ static inline void port_unlock(void) {
  */
 static inline void port_lock_from_isr(void) {
 
-  asm volatile("nop");
+  port_irq_sts = (syssts_t)1;
 }
 
 /**
@@ -320,7 +337,7 @@ static inline void port_lock_from_isr(void) {
  */
 static inline void port_unlock_from_isr(void) {
 
-  asm volatile("nop");
+  port_irq_sts = (syssts_t)0;
 }
 
 /**
@@ -328,7 +345,7 @@ static inline void port_unlock_from_isr(void) {
  */
 static inline void port_disable(void) {
 
-  asm volatile("nop");
+  port_irq_sts = (syssts_t)1;
 }
 
 /**
@@ -336,7 +353,7 @@ static inline void port_disable(void) {
  */
 static inline void port_suspend(void) {
 
-  asm volatile("nop");
+  port_irq_sts = (syssts_t)1;
 }
 
 /**
@@ -344,7 +361,7 @@ static inline void port_suspend(void) {
  */
 static inline void port_enable(void) {
 
-  asm volatile("nop");
+  port_irq_sts = (syssts_t)0;
 }
 
 /**

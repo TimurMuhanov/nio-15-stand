@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ static THD_FUNCTION(Thread1, arg) {
   (void)arg;
 
   chRegSetThreadName("blinker");
-  while (TRUE) {
+  while (true) {
     palClearPad(GPIOC, GPIOC_LED1);
     chThdSleepMilliseconds(250);
     palSetPad(GPIOC, GPIOC_LED1);
@@ -74,7 +74,7 @@ int main(void) {
    * sleeping in a loop and check the button state, when the button is
    * pressed the test procedure is launched.
    */
-  while (TRUE) {
+  while (true) {
     if (palReadPad(GPIOA, GPIOA_WKUP_BUTTON))
       TestThread(&SD2);
     chThdSleepMilliseconds(500);

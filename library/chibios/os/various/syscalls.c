@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -132,7 +132,7 @@ caddr_t _sbrk_r(struct _reent *r, int incr)
 #if CH_CFG_USE_MEMCORE
   void *p;
 
-  chDbgCheck(incr > 0);
+  chDbgCheck(incr >= 0);
 
   p = chCoreAlloc((size_t)incr);
   if (p == NULL) {

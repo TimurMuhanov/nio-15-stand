@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,6 +31,12 @@
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
+
+/**
+ * @brief   CMSIS system core clock variable.
+ * @note    It is declared in system_stm32f3xx.h.
+ */
+uint32_t SystemCoreClock = STM32_SYSCLK;
 
 /*===========================================================================*/
 /* Driver local variables and types.                                         */

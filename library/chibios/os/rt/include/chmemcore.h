@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -29,7 +28,7 @@
 #ifndef _CHMEMCORE_H_
 #define _CHMEMCORE_H_
 
-#if CH_CFG_USE_MEMCORE || defined(__DOXYGEN__)
+#if (CH_CFG_USE_MEMCORE == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -69,7 +68,7 @@ typedef void *(*memgetfunc_t)(size_t size);
 /**
  * @brief   Alignment mask constant.
  */
-#define MEM_ALIGN_MASK      (MEM_ALIGN_SIZE - 1)
+#define MEM_ALIGN_MASK      (MEM_ALIGN_SIZE - 1U)
 
 /**
  * @brief   Alignment helper macro.
@@ -85,7 +84,7 @@ typedef void *(*memgetfunc_t)(size_t size);
  * @brief   Returns whatever a pointer or memory size is aligned to
  *          the type @p align_t.
  */
-#define MEM_IS_ALIGNED(p)   (((size_t)(p) & MEM_ALIGN_MASK) == 0)
+#define MEM_IS_ALIGNED(p)   (((size_t)(p) & MEM_ALIGN_MASK) == 0U)
 /** @} */
 
 /*===========================================================================*/
@@ -107,7 +106,7 @@ extern "C" {
 /* Module inline functions.                                                  */
 /*===========================================================================*/
 
-#endif /* CH_CFG_USE_MEMCORE */
+#endif /* CH_CFG_USE_MEMCORE == TRUE */
 
 #endif /* _CHMEMCORE_H_ */
 

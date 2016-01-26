@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@
 ADCDriver ADCD1;
 #endif
 
-/** @brief ADC1 driver identifier.*/
+/** @brief ADC3 driver identifier.*/
 #if STM32_ADC_USE_ADC3 || defined(__DOXYGEN__)
 ADCDriver ADCD3;
 #endif
@@ -89,7 +89,7 @@ static void adc_lld_vreg_on(ADCDriver *adcp) {
 #if STM32_ADC_DUAL_MODE
   adcp->adcs->CR = ADC_CR_ADVREGEN_0;
 #endif
-  osalSysPolledDelayX(US2RTC(STM32_HCLK, 10));
+  osalSysPolledDelayX(OSAL_US2RTC(STM32_HCLK, 10));
 }
 
 /**
@@ -322,7 +322,11 @@ void adc_lld_init(void) {
 #if STM32_ADC_USE_ADC1
   /* Driver initialization.*/
   adcObjectInit(&ADCD1);
+#if defined(ADC1_2_COMMON)
   ADCD1.adcc = ADC1_2_COMMON;
+#else
+  ADCD1.adcc = ADC1_COMMON;
+#endif
   ADCD1.adcm = ADC1;
 #if STM32_ADC_DUAL_MODE
   ADCD1.adcs = ADC2;
@@ -339,14 +343,18 @@ void adc_lld_init(void) {
 #if STM32_ADC_USE_ADC3
   /* Driver initialization.*/
   adcObjectInit(&ADCD3);
+#if defined(ADC3_4_COMMON)
   ADCD3.adcc = ADC3_4_COMMON;
+#else
+  ADCD3.adcc = ADC3_COMMON;
+#endif
   ADCD3.adcm = ADC3;
 #if STM32_ADC_DUAL_MODE
   ADCD3.adcs = ADC4;
 #endif
   ADCD3.dmastp  = STM32_DMA2_STREAM5;
   ADCD3.dmamode = ADC_DMA_SIZE |
-                  STM32_DMA_CR_PL(STM32_ADC_ADC12_DMA_PRIORITY) |
+                  STM32_DMA_CR_PL(STM32_ADC_ADC34_DMA_PRIORITY) |
                   STM32_DMA_CR_DIR_P2M |
                   STM32_DMA_CR_MINC        | STM32_DMA_CR_TCIE        |
                   STM32_DMA_CR_DMEIE       | STM32_DMA_CR_TEIE;
@@ -390,7 +398,7 @@ void adc_lld_start(ADCDriver *adcp) {
       osalDbgAssert(!b, "stream already allocated");
       rccEnableADC34(FALSE);
     }
-#endif /* STM32_ADC_USE_ADC2 */
+#endif /* STM32_ADC_USE_ADC3 */
 
     /* Setting DMA peripheral-side pointer.*/
 #if STM32_ADC_DUAL_MODE
@@ -484,8 +492,8 @@ void adc_lld_start_conversion(ADCDriver *adcp) {
   dmaStreamSetTransactionSize(adcp->dmastp, ((uint32_t)grpp->num_channels/2) *
                                             (uint32_t)adcp->depth);
 #else
-    dmaStreamSetTransactionSize(adcp->dmastp, (uint32_t)grpp->num_channels *
-                                              (uint32_t)adcp->depth);
+  dmaStreamSetTransactionSize(adcp->dmastp, (uint32_t)grpp->num_channels *
+                                            (uint32_t)adcp->depth);
 #endif
   dmaStreamSetMode(adcp->dmastp, dmamode);
   dmaStreamEnable(adcp->dmastp);

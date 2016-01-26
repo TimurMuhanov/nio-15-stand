@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -29,7 +28,7 @@
 #ifndef _CHREGISTRY_H_
 #define _CHREGISTRY_H_
 
-#if CH_CFG_USE_REGISTRY || defined(__DOXYGEN__)
+#if (CH_CFG_USE_REGISTRY == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -78,26 +77,6 @@ typedef struct {
 /*===========================================================================*/
 
 /**
- * @name    Macro Functions
- * @{
- */
-/**
- * @brief   Sets the current thread name.
- * @pre     This function only stores the pointer to the name if the option
- *          @p CH_CFG_USE_REGISTRY is enabled else no action is performed.
- *
- * @param[in] p         thread name as a zero terminated string
- *
- * @api
- */
-#define chRegSetThreadName(p) (ch.rlist.r_current->p_name = (p))
-/** @} */
-#else /* !CH_CFG_USE_REGISTRY */
-#define chRegSetThreadName(p)
-#endif /* !CH_CFG_USE_REGISTRY */
-
-#if CH_CFG_USE_REGISTRY || defined(__DOXYGEN__)
-/**
  * @brief   Removes a thread from the registry list.
  * @note    This macro is not meant for use in application code.
  *
@@ -117,7 +96,8 @@ typedef struct {
 #define REG_INSERT(tp) {                                                    \
   (tp)->p_newer = (thread_t *)&ch.rlist;                                    \
   (tp)->p_older = ch.rlist.r_older;                                         \
-  (tp)->p_older->p_newer = ch.rlist.r_older = (tp);                         \
+  (tp)->p_older->p_newer = (tp);                                            \
+  ch.rlist.r_older = (tp);                                                  \
 }
 
 /*===========================================================================*/
@@ -134,9 +114,29 @@ extern "C" {
 }
 #endif
 
+#endif /* CH_CFG_USE_REGISTRY == TRUE */
+
 /*===========================================================================*/
 /* Module inline functions.                                                  */
 /*===========================================================================*/
+
+/**
+ * @brief   Sets the current thread name.
+ * @pre     This function only stores the pointer to the name if the option
+ *          @p CH_CFG_USE_REGISTRY is enabled else no action is performed.
+ *
+ * @param[in] name      thread name as a zero terminated string
+ *
+ * @api
+ */
+static inline void chRegSetThreadName(const char *name) {
+
+#if CH_CFG_USE_REGISTRY == TRUE
+  ch.rlist.r_current->p_name = name;
+#else
+  (void)name;
+#endif
+}
 
 /**
  * @brief   Returns the name of the specified thread.
@@ -148,13 +148,10 @@ extern "C" {
  * @return              Thread name as a zero terminated string.
  * @retval NULL         if the thread name has not been set.
  *
- * @iclass
  */
-static inline const char *chRegGetThreadNameI(thread_t *tp) {
+static inline const char *chRegGetThreadNameX(thread_t *tp) {
 
-  chDbgCheckClassI();
-
-#if CH_CFG_USE_REGISTRY
+#if CH_CFG_USE_REGISTRY == TRUE
   return tp->p_name;
 #else
   (void)tp;
@@ -162,7 +159,25 @@ static inline const char *chRegGetThreadNameI(thread_t *tp) {
 #endif
 }
 
-#endif /* CH_CFG_USE_REGISTRY */
+/**
+ * @brief   Changes the name of the specified thread.
+ * @pre     This function only stores the pointer to the name if the option
+ *          @p CH_CFG_USE_REGISTRY is enabled else no action is performed.
+ *
+ * @param[in] tp        pointer to the thread
+ * @param[in] name      thread name as a zero terminated string
+ *
+ * @xclass
+ */
+static inline void chRegSetThreadNameX(thread_t *tp, const char *name) {
+
+#if CH_CFG_USE_REGISTRY == TRUE
+  tp->p_name = name;
+#else
+  (void)tp;
+  (void)name;
+#endif
+}
 
 #endif /* _CHREGISTRY_H_ */
 

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@
 typedef semaphore_t *   sys_sem_t;
 typedef mailbox_t *     sys_mbox_t;
 typedef thread_t *      sys_thread_t;
-typedef int             sys_prot_t;
+typedef syssts_t        sys_prot_t;
 
 #define SYS_MBOX_NULL   (mailbox_t *)0
 #define SYS_THREAD_NULL (thread_t *)0

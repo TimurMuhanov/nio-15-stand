@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -37,8 +37,6 @@ static THD_FUNCTION(Thread1, arg) {
     }
     chThdSleepMilliseconds(500);
   }
-
-  return 0;
 }
 
 /*

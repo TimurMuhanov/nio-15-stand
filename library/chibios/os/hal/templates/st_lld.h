@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -80,13 +80,13 @@ static inline systime_t st_lld_get_counter(void) {
  * @note    Makes sure that no spurious alarms are triggered after
  *          this call.
  *
- * @param[in] time      the time to be set for the first alarm
+ * @param[in] abstime   the time to be set for the first alarm
  *
  * @notapi
  */
-static inline void st_lld_start_alarm(systime_t time) {
+static inline void st_lld_start_alarm(systime_t abstime) {
 
-  (void)time;
+  (void)abstime;
 }
 
 /**
@@ -101,13 +101,13 @@ static inline void st_lld_stop_alarm(void) {
 /**
  * @brief   Sets the alarm time.
  *
- * @param[in] time      the time to be set for the next alarm
+ * @param[in] abstime   the time to be set for the next alarm
  *
  * @notapi
  */
-static inline void st_lld_set_alarm(systime_t time) {
+static inline void st_lld_set_alarm(systime_t abstime) {
 
-  (void)time;
+  (void)abstime;
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@
 #error "SDIO not present in the selected device"
 #endif
 
-#if !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_SDC_SDIO_IRQ_PRIORITY)
+#if !OSAL_IRQ_IS_VALID_PRIORITY(STM32_SDC_SDIO_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to SDIO"
 #endif
 
@@ -159,6 +159,10 @@
 #error "SDIO requires STM32_CLOCK48_REQUIRED to be enabled"
 #endif
 
+#if STM32_PLL48CLK != 48000000
+#error "invalid STM32_PLL48CLK clock value"
+#endif
+
 #define STM32_SDC_WRITE_TIMEOUT                                             \
   (((STM32_PLL48CLK / (STM32_SDIO_DIV_HS + 2)) / 1000) *                    \
    STM32_SDC_WRITE_TIMEOUT_MS)
@@ -182,15 +186,6 @@
 /*===========================================================================*/
 
 /**
- * @brief   Type of SDIO bus mode.
- */
-typedef enum {
-  SDC_MODE_1BIT = 0,
-  SDC_MODE_4BIT,
-  SDC_MODE_8BIT
-} sdcbusmode_t;
-
-/**
  * @brief   Type of card flags.
  */
 typedef uint32_t sdcmode_t;
@@ -210,7 +205,20 @@ typedef struct SDCDriver SDCDriver;
  * @note    It could be empty on some architectures.
  */
 typedef struct {
-  uint32_t dummy;
+  /**
+   * @brief   Working area for memory consuming operations.
+   * @note    Buffer must be word aligned and big enough to store 512 bytes.
+   * @note    It is mandatory for detecting MMC cards bigger than 2GB else it
+   *          can be @p NULL. SD cards do NOT need it.
+   * @note    Memory pointed by this buffer is only used by @p sdcConnect(),
+   *          afterward it can be reused for other purposes.
+   */
+  uint8_t       *scratchpad;
+  /**
+   * @brief   Bus width.
+   */
+  sdcbusmode_t  bus_width;
+  /* End of the mandatory fields.*/
 } SDCConfig;
 
 /**
@@ -266,13 +274,11 @@ struct SDCDriver {
    * @brief     Transmit DMA channel.
    */
   const stm32_dma_stream_t  *dma;
-#if CH_DBG_ENABLE_ASSERTS || defined(__DOXYGEN__)
   /**
    * @brief     Pointer to the SDIO registers block.
-   * @note      Used only for dubugging purpose.
+   * @note      Needed for debugging aid.
    */
   SDIO_TypeDef              *sdio;
-#endif
 };
 
 /*===========================================================================*/
@@ -294,7 +300,7 @@ extern "C" {
   void sdc_lld_start(SDCDriver *sdcp);
   void sdc_lld_stop(SDCDriver *sdcp);
   void sdc_lld_start_clk(SDCDriver *sdcp);
-  void sdc_lld_set_data_clk(SDCDriver *sdcp);
+  void sdc_lld_set_data_clk(SDCDriver *sdcp, sdcbusclk_t clk);
   void sdc_lld_stop_clk(SDCDriver *sdcp);
   void sdc_lld_set_bus_mode(SDCDriver *sdcp, sdcbusmode_t mode);
   void sdc_lld_send_cmd_none(SDCDriver *sdcp, uint8_t cmd, uint32_t arg);
@@ -304,10 +310,12 @@ extern "C" {
                                   uint32_t *resp);
   bool sdc_lld_send_cmd_long_crc(SDCDriver *sdcp, uint8_t cmd, uint32_t arg,
                                  uint32_t *resp);
+  bool sdc_lld_read_special(SDCDriver *sdcp, uint8_t *buf, size_t bytes,
+                            uint8_t cmd, uint32_t argument);
   bool sdc_lld_read(SDCDriver *sdcp, uint32_t startblk,
-                    uint8_t *buf, uint32_t n);
+                    uint8_t *buf, uint32_t blocks);
   bool sdc_lld_write(SDCDriver *sdcp, uint32_t startblk,
-                     const uint8_t *buf, uint32_t n);
+                     const uint8_t *buf, uint32_t blocks);
   bool sdc_lld_sync(SDCDriver *sdcp);
   bool sdc_lld_is_card_inserted(SDCDriver *sdcp);
   bool sdc_lld_is_write_protected(SDCDriver *sdcp);

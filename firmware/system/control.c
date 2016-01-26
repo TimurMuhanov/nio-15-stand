@@ -3,7 +3,8 @@
 
 static u32 status;
 thread_t* userCodeThread;
-msg_t userCodeUpdate(void* var);
+static THD_FUNCTION(userCodeUpdate, arg);
+static THD_WORKING_AREA(userCodeUpdateWorkingArea, 128);
 extern void process( void );
 extern void processInit( void );
 
@@ -24,11 +25,10 @@ void controlStart() {
 	status |= CONTROL_MODE_RUN;
 
 	processInit();
-	userCodeThread = chThdCreateFromHeap(	NULL,
-								THD_WORKING_AREA_SIZE(256),
-								NORMALPRIO,
-								userCodeUpdate,
-								NULL );
+    userCodeThread = chThdCreateStatic( userCodeUpdateWorkingArea,
+                                        sizeof(userCodeUpdateWorkingArea),
+                                        NORMALPRIO, userCodeUpdate, NULL);
+
 }
 
 void controlStop() {
@@ -41,19 +41,15 @@ void controlStop() {
 }
 
 
-msg_t userCodeUpdate(void* var) {
+THD_FUNCTION(userCodeUpdate, arg) {
 	systime_t time = chVTGetSystemTime();
 
-	while (1) {
+    while( !chThdShouldTerminateX() ) {
 		time += MS2ST(CONTROL_USER_CODE_UPDATE);
 
 		process();
 
 		chThdSleepUntil(time);
-
-		if( chThdShouldTerminateX() ) {
-			chThdExit( 0 );
-		}
-	}
-	return 0;
+    }
+    chThdExit( 0 );
 }

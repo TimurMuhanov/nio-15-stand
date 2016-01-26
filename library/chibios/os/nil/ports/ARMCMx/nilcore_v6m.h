@@ -1,14 +1,14 @@
 /*
-    ChibiOS/NIL - Copyright (C) 2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/NIL.
+    This file is part of ChibiOS.
 
-    ChibiOS/NIL is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/NIL is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -31,42 +31,6 @@
 /*===========================================================================*/
 /* Module constants.                                                         */
 /*===========================================================================*/
-
-/**
- * @name    Architecture and Compiler
- * @{
- */
-#if (CORTEX_MODEL == CORTEX_M0) || defined(__DOXYGEN__)
-/**
- * @brief   Macro defining the specific ARM architecture.
- */
-#define PORT_ARCHITECTURE_ARM_v6M
-
-/**
- * @brief   Name of the implemented architecture.
- */
-#define PORT_ARCHITECTURE_NAME          "ARMv6-M"
-
-/**
- * @brief   Name of the architecture variant.
- */
-#define PORT_CORE_VARIANT_NAME          "Cortex-M0"
-
-#elif (CORTEX_MODEL == CORTEX_M0PLUS)
-#define PORT_ARCHITECTURE_ARM_v6M
-#define PORT_ARCHITECTURE_NAME          "ARMv6-M"
-#define PORT_CORE_VARIANT_NAME          "Cortex-M0+"
-#endif
-
-/**
- * @brief   Port-specific information string.
- */
-#if !CORTEX_ALTERNATE_SWITCH || defined(__DOXYGEN__)
-#define PORT_INFO                       "Preemption through NMI"
-#else
-#define PORT_INFO                       "Preemption through PendSV"
-#endif
-/** @} */
 
 /**
  * @brief   This port does not support a realtime counter.
@@ -132,9 +96,46 @@
 /*===========================================================================*/
 
 /**
+ * @name    Architecture and Compiler
+ * @{
+ */
+#if ((CORTEX_MODEL == 0) && !defined(__CORE_CM0PLUS_H_DEPENDANT)) ||        \
+    defined(__DOXYGEN__)
+/**
+ * @brief   Macro defining the specific ARM architecture.
+ */
+#define PORT_ARCHITECTURE_ARM_v6M
+
+/**
+ * @brief   Name of the implemented architecture.
+ */
+#define PORT_ARCHITECTURE_NAME          "ARMv6-M"
+
+/**
+ * @brief   Name of the architecture variant.
+ */
+#define PORT_CORE_VARIANT_NAME          "Cortex-M0"
+
+#elif (CORTEX_MODEL == 0) && defined(__CORE_CM0PLUS_H_DEPENDANT)
+#define PORT_ARCHITECTURE_ARM_v6M
+#define PORT_ARCHITECTURE_NAME          "ARMv6-M"
+#define PORT_CORE_VARIANT_NAME          "Cortex-M0+"
+#endif
+
+/**
+ * @brief   Port-specific information string.
+ */
+#if (CORTEX_ALTERNATE_SWITCH == FALSE) || defined(__DOXYGEN__)
+#define PORT_INFO                       "Preemption through NMI"
+#else
+#define PORT_INFO                       "Preemption through PendSV"
+#endif
+/** @} */
+
+/**
  * @brief   Maximum usable priority for normal ISRs.
  */
-#if CORTEX_ALTERNATE_SWITCH || defined(__DOXYGEN__)
+#if (CORTEX_ALTERNATE_SWITCH == TRUE) || defined(__DOXYGEN__)
 #define CORTEX_MAX_KERNEL_PRIORITY      1
 #else
 #define CORTEX_MAX_KERNEL_PRIORITY      0
@@ -183,11 +184,11 @@ struct port_intctx {
  *          by an @p port_intctx structure.
  */
 #define PORT_SETUP_CONTEXT(tp, wend, pf, arg) {                             \
-  (tp)->ctxp = (struct port_intctx *)(((uint8_t *)(wend)) -                 \
+  (tp)->ctxp = (struct port_intctx *)((uint8_t *)(wend) -                   \
                                       sizeof(struct port_intctx));          \
   (tp)->ctxp->r4 = (regarm_t)(pf);                                          \
   (tp)->ctxp->r5 = (regarm_t)(arg);                                         \
-  (tp)->ctxp->lr = (regarm_t)(_port_thread_start);                          \
+  (tp)->ctxp->lr = (regarm_t)_port_thread_start;                            \
 }
 
 /**
@@ -196,16 +197,23 @@ struct port_intctx {
  */
 #define PORT_WA_SIZE(n) (sizeof(struct port_intctx) +                       \
                          sizeof(struct port_extctx) +                       \
-                         (n) + (PORT_INT_REQUIRED_STACK))
+                         ((size_t)(n)) + ((size_t)(PORT_INT_REQUIRED_STACK)))
 
 /**
  * @brief   IRQ prologue code.
  * @details This macro must be inserted at the start of all IRQ handlers
  *          enabled to invoke system APIs.
  */
+#if defined(__GNUC__) || defined(__DOXYGEN__)
 #define PORT_IRQ_PROLOGUE()                                                 \
-  regarm_t _saved_lr;                                                       \
-  asm volatile ("mov     %0, lr" : "=r" (_saved_lr) : : "memory")
+  regarm_t _saved_lr = (regarm_t)__builtin_return_address(0)
+#elif defined(__ICCARM__)
+#define PORT_IRQ_PROLOGUE()                                                 \
+  regarm_t _saved_lr = (regarm_t)__get_LR()
+#elif defined(__CC_ARM)
+#define PORT_IRQ_PROLOGUE()                                                 \
+  regarm_t _saved_lr = (regarm_t)__return_address()
+#endif
 
 /**
  * @brief   IRQ epilogue code.
@@ -238,13 +246,14 @@ struct port_intctx {
  * @param[in] ntp       the thread to be switched in
  * @param[in] otp       the thread to be switched out
  */
-#if !NIL_CFG_ENABLE_STACK_CHECK || defined(__DOXYGEN__)
+#if (NIL_CFG_ENABLE_STACK_CHECK == FALSE) || defined(__DOXYGEN__)
 #define port_switch(ntp, otp) _port_switch(ntp, otp)
 #else
 #define port_switch(ntp, otp) {                                             \
   struct port_intctx *r13 = (struct port_intctx *)__get_PSP();              \
-  if ((stkalign_t *)(r13 - 1) < (otp)->stklim)                              \
+  if ((stkalign_t *)(r13 - 1) < (otp)->stklim) {                            \
     chSysHalt("stack overflow");                                            \
+  }                                                                         \
   _port_switch(ntp, otp);                                                   \
 }
 #endif
@@ -298,7 +307,7 @@ static inline syssts_t port_get_irq_status(void) {
  */
 static inline bool port_irq_enabled(syssts_t sts) {
 
-  return (sts & 1) == 0;
+  return (sts & (syssts_t)1) == (syssts_t)0;
 }
 
 /**
@@ -310,7 +319,7 @@ static inline bool port_irq_enabled(syssts_t sts) {
  */
 static inline bool port_is_isr_context(void) {
 
-  return (bool)((__get_IPSR() & 0x1FF) != 0);
+  return (bool)((__get_IPSR() & 0x1FFU) != 0U);
 }
 
 /**
@@ -385,8 +394,8 @@ static inline void port_enable(void) {
  */
 static inline void port_wait_for_interrupt(void) {
 
-#if CORTEX_ENABLE_WFI_IDLE
-  __WFI;
+#if CORTEX_ENABLE_WFI_IDLE == TRUE
+  __WFI();
 #endif
 }
 

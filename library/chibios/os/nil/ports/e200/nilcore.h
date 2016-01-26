@@ -1,14 +1,14 @@
 /*
-    ChibiOS/NIL - Copyright (C) 2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/NIL.
+    This file is part of ChibiOS.
 
-    ChibiOS/NIL is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/NIL is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -104,6 +104,21 @@
  */
 #if !defined(PORT_USE_ALT_TIMER)
 #define PORT_USE_ALT_TIMER              FALSE
+#endif
+
+/**
+ * @brief   Use VLE instruction set.
+ * @note    This parameter is usually set in the Makefile.
+ */
+#if !defined(PPC_USE_VLE) || defined(__DOXYGEN__)
+#define PPC_USE_VLE                     TRUE
+#endif
+
+/**
+ * @brief   Enables the use of the @p WFI instruction.
+ */
+#if !defined(PPC_ENABLE_WFI_IDLE) || defined(__DOXYGEN__)
+#define PPC_ENABLE_WFI_IDLE             FALSE
 #endif
 
 /*===========================================================================*/
@@ -288,6 +303,18 @@ struct port_intctx {
  *          port implementation.
  */
 #define PORT_FAST_IRQ_HANDLER(id) void id(void)
+
+/**
+ * @brief   Priority level verification macro.
+ */
+#define PORT_IRQ_IS_VALID_PRIORITY(n)                                       \
+  (((n) >= 0U) && ((n) < INTC_PRIORITY_LEVELS))
+
+/**
+ * @brief   Priority level verification macro.
+ */
+#define PORT_IRQ_IS_VALID_KERNEL_PRIORITY(n)                                \
+    (((n) >= 0U) && ((n) < INTC_PRIORITY_LEVELS))
 
 /**
  * @brief   Performs a context switch between two threads.

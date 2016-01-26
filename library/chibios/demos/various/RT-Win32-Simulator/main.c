@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -103,7 +103,7 @@ static const ShellConfig shell_cfg2 = {
  * to the C printf() thread safe and the print operation atomic among threads.
  * In this example the message is the zero terminated string itself.
  */
-static msg_t console_thread(void *arg) {
+static THD_FUNCTION(console_thread, arg) {
 
   (void)arg;
   while (!chThdShouldTerminateX()) {
@@ -112,7 +112,6 @@ static msg_t console_thread(void *arg) {
     fflush(stdout);
     chMsgRelease(tp, MSG_OK);
   }
-  return 0;
 }
 
 /**

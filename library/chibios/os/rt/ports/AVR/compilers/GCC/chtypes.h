@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -65,33 +64,27 @@ typedef uint8_t         eventflags_t;   /**< Event flags.                   */
 typedef int8_t          cnt_t;          /**< Resources counter.             */
 
 /**
- * @brief   Inline function modifier.
- */
-#define INLINE inline
-
-/**
  * @brief   ROM constant modifier.
  * @note    It is set to use the "const" keyword in this port.
  */
 #define ROMCONST const
 
 /**
- * @brief   Packed structure modifier (within).
- * @note    It uses the "packed" GCC attribute.
+ * @brief   Makes functions not inlineable.
+ * @note    If the compiler does not support such attribute then the
+ *          realtime counter precision could be degraded.
  */
-#define PACK_STRUCT_STRUCT __attribute__((packed))
+#define NOINLINE __attribute__((noinline))
 
 /**
- * @brief   Packed structure modifier (before).
- * @note    Empty in this port.
+ * @brief   Optimized thread function declaration macro.
  */
-#define PACK_STRUCT_BEGIN
+#define PORT_THD_FUNCTION(tname, arg) void tname(void *arg)
 
 /**
- * @brief   Packed structure modifier (after).
- * @note    Empty in this port.
+ * @brief   Packed variable specifier.
  */
-#define PACK_STRUCT_END
+#define PACKED_VAR __attribute__((packed))
 
 #endif /* _CHTYPES_H_ */
 

@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -84,20 +83,6 @@ typedef uint32_t            ucnt_t;         /**< Generic unsigned counter.  */
 /** @} */
 
 /**
- * @name    User types
- * @{
- */
-typedef uint64_t            u64;
-typedef int64_t             s64;
-typedef uint32_t            u32;
-typedef int32_t             s32;
-typedef uint16_t            u16;
-typedef int16_t             s16;
-typedef uint8_t             u8;
-typedef int8_t              s8;
-/** @} */
-
-/**
  * @brief   ROM constant modifier.
  * @note    It is set to use the "const" keyword in this port.
  */
@@ -113,7 +98,7 @@ typedef int8_t              s8;
 /**
  * @brief   Optimized thread function declaration macro.
  */
-#define PORT_THD_FUNCTION(tname, arg) msg_t tname(void *arg)
+#define PORT_THD_FUNCTION(tname, arg) void tname(void *arg)
 
 /**
  * @brief   Packed variable specifier.

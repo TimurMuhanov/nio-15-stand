@@ -1,6 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006,2007,2008,2009,2010,
-              2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -71,6 +70,7 @@ __iar_program_start:
         bl      __iar_init_vfp
         b       __cmain
 
+        SECTION .text:CODE:NOROOT:REORDER(2)
         PUBWEAK __early_init
 __early_init:
         bx      lr

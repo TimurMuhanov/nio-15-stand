@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -47,7 +47,6 @@ static THD_FUNCTION(can_rx, p) {
     }
   }
   chEvtUnregister(&CAND1.rxfull_event, &el);
-  return 0;
 }
 
 /*
@@ -70,7 +69,6 @@ static THD_FUNCTION(can_tx, p) {
     canTransmit(&CAND1, CAN_ANY_MAILBOX, &txmsg, MS2ST(100));
     chThdSleepMilliseconds(500);
   }
-  return 0;
 }
 
 /*
@@ -102,7 +100,7 @@ int main(void) {
   /*
    * Normal main() thread activity, in this demo it does nothing.
    */
-  while (TRUE) {
+  while (true) {
     chThdSleepMilliseconds(500);
   }
   return 0;

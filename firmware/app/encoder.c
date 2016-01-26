@@ -2,13 +2,15 @@
 
 
 static thread_t* updateThread;
+static THD_FUNCTION(encoderUpdate, arg);
+static THD_WORKING_AREA(encoderUpdateWorkingArea, 128);
 scalarData encoder[ENCODER_NUMBER];
 float encoderOffset[ENCODER_NUMBER];
 static binary_semaphore_t dataAccess;
 
 
 
-msg_t encoderUpdate(void* arg) {
+THD_FUNCTION(encoderUpdate, arg) {
 	systime_t chibios_time = chVTGetSystemTime();
 
 	while(1) {
@@ -35,8 +37,7 @@ msg_t encoderUpdate(void* arg) {
 		//print("encoder %u %f %f %f\n\r", encoder[0].time, encoder[0].val, encoder[1].val, encoder[2].val);
 
 		chThdSleepUntil(chibios_time);
-	}
-	return 0;
+    }
 }
 
 
@@ -59,11 +60,9 @@ void encoderInit(void) {
 	encoderOffset[7] = paramGet(PARAM_ENCODER8_OFFSET);
 	encoderOffset[8] = paramGet(PARAM_ENCODER9_OFFSET);*/
 
-	updateThread = chThdCreateFromHeap(	NULL,
-										THD_WORKING_AREA_SIZE(256),
-										NORMALPRIO,
-										encoderUpdate,
-										NULL );
+    updateThread = chThdCreateStatic(   encoderUpdateWorkingArea,
+                                        sizeof(encoderUpdateWorkingArea),
+                                        NORMALPRIO, encoderUpdate, NULL);
 }
 
 

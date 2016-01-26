@@ -1,21 +1,17 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
-    This file is part of ChibiOS/HAL 
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -274,6 +270,11 @@ typedef struct {
  * @{
  */
 /**
+ * @brief   Priority level verification macro.
+ */
+#define OSAL_IRQ_IS_VALID_PRIORITY(n) CH_IRQ_IS_VALID_KERNEL_PRIORITY(n)
+
+/**
  * @brief   IRQ prologue code.
  * @details This macro must be inserted at the start of all IRQ handlers.
  */
@@ -333,6 +334,52 @@ typedef struct {
  * @api
  */
 #define OSAL_US2ST(usec) US2ST(usec)
+/** @} */
+
+/**
+ * @name    Time conversion utilities for the realtime counter
+ * @{
+ */
+/**
+ * @brief   Seconds to realtime counter.
+ * @details Converts from seconds to realtime counter cycles.
+ * @note    The macro assumes that @p freq >= @p 1.
+ *
+ * @param[in] freq      clock frequency, in Hz, of the realtime counter
+ * @param[in] sec       number of seconds
+ * @return              The number of cycles.
+ *
+ * @api
+ */
+#define OSAL_S2RTC(freq, sec) S2RTC(freq, sec)
+
+/**
+ * @brief   Milliseconds to realtime counter.
+ * @details Converts from milliseconds to realtime counter cycles.
+ * @note    The result is rounded upward to the next millisecond boundary.
+ * @note    The macro assumes that @p freq >= @p 1000.
+ *
+ * @param[in] freq      clock frequency, in Hz, of the realtime counter
+ * @param[in] msec      number of milliseconds
+ * @return              The number of cycles.
+ *
+ * @api
+ */
+#define OSAL_MS2RTC(freq, msec) MS2RTC(freq, msec)
+
+/**
+ * @brief   Microseconds to realtime counter.
+ * @details Converts from microseconds to realtime counter cycles.
+ * @note    The result is rounded upward to the next microsecond boundary.
+ * @note    The macro assumes that @p freq >= @p 1000000.
+ *
+ * @param[in] freq      clock frequency, in Hz, of the realtime counter
+ * @param[in] usec      number of microseconds
+ * @return              The number of cycles.
+ *
+ * @api
+ */
+#define OSAL_US2RTC(freq, usec) US2RTC(freq, usec)
 /** @} */
 
 /**
@@ -413,6 +460,26 @@ static inline void osalInit(void) {
 static inline void osalSysHalt(const char *reason) {
 
   chSysHalt(reason);
+}
+
+/**
+ * @brief   Disables interrupts globally.
+ *
+ * @special
+ */
+static inline void osalSysDisable(void) {
+
+  chSysDisable();
+}
+
+/**
+ * @brief   Enables interrupts globally.
+ *
+ * @special
+ */
+static inline void osalSysEnable(void) {
+
+  chSysEnable();
 }
 
 /**
@@ -704,7 +771,7 @@ static inline void osalThreadQueueObjectInit(threads_queue_t *tqp) {
  *                      .
  * @return              The message from @p osalQueueWakeupOneI() or
  *                      @p osalQueueWakeupAllI() functions.
- * @retval RDY_TIMEOUT  if the thread has not been dequeued within the
+ * @retval MSG_TIMEOUT  if the thread has not been dequeued within the
  *                      specified timeout or if the function has been
  *                      invoked with @p TIME_IMMEDIATE as timeout
  *                      specification.
@@ -825,7 +892,7 @@ static inline void osalMutexObjectInit(mutex_t *mp) {
 #endif
 }
 
-/*
+/**
  * @brief   Locks the specified mutex.
  * @post    The mutex is locked and inserted in the per-thread stack of owned
  *          mutexes.

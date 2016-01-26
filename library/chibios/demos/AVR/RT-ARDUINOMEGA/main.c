@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@
 #include "test.h"
 
 static WORKING_AREA(waThread1, 32);
-static msg_t Thread1(void *arg) {
+static THD_FUNCTION(Thread1, arg) {
 
-  while (TRUE) {
+  (void)arg;
+  chRegSetThreadName("Blinker");
+  while (true) {
     palTogglePad(IOPORT2, PORTB_LED1);
     chThdSleepMilliseconds(1000);
   }
-  return 0;
 }
 
 /*

@@ -24,13 +24,25 @@
 #define	CONTROL_USER_CODE_UPDATE	20
 
 
-void controlInit( void );
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-u32 controlStatus( void );
 
-void controlStart( void );
+	void controlInit( void );
 
-void controlStop( void );
+	u32 controlStatus( void );
+
+	void controlStart( void );
+
+	void controlStop( void );
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif
 

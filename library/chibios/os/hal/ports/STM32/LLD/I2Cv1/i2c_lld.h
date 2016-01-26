@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@
  *          error can only happen because programming errors.
  */
 #if !defined(STM32_I2C_DMA_ERROR_HOOK) || defined(__DOXYGEN__)
-#define STM32_I2C_DMA_ERROR_HOOK(i2cp)      chSysHalt("DMA failure")
+#define STM32_I2C_DMA_ERROR_HOOK(i2cp)      osalSysHalt("DMA failure")
 #endif
 
 #if STM32_ADVANCED_DMA || defined(__DOXYGEN__)
@@ -235,17 +235,17 @@
 #endif
 
 #if STM32_I2C_USE_I2C1 &&                                                   \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_I2C_I2C1_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_I2C_I2C1_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to I2C1"
 #endif
 
 #if STM32_I2C_USE_I2C2 &&                                                   \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_I2C_I2C2_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_I2C_I2C2_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to I2C2"
 #endif
 
 #if STM32_I2C_USE_I2C3 &&                                                   \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_I2C_I2C3_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_I2C_I2C3_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to I2C3"
 #endif
 

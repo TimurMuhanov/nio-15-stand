@@ -1,5 +1,10 @@
 #include "connection.h"
-#include "control/control.h"
+#include "control.h"
+#include "encoders.h"
+#include "servos.h"
+#include "plot.h"
+#include "logger.h"
+//#include "parameters.h"
 #include "ui_mainwindow.h"
 #include "mainwindow.h"
 
@@ -90,20 +95,33 @@ void Connection::userCodeRun(bool status) {
 		0,							// p4
 		0,							// x
 		0,							// y
-				0);							// z
+        0);							// z
 }
 
 void Connection::jumpToBootloader() {
 	mavlink_msg_mcu_jump_to_send(MAVLINK_COMM_0, MCU_JUMP_TO_BOOTLOADER);
-	qDebug() << "Connection::jumpToBootloader()";
+}
+
+void Connection::settingsRequest() {
+    mavlink_msg_settings_request_send( MAVLINK_COMM_0, 0, 0 );
+//    qDebug() << "Connection::settingsRequest()";
+}
+
+void Connection::settingsSend(std::string key, std::string value) {
+    mavlink_msg_settings_item_send( MAVLINK_COMM_0, key.substr(0,50).c_str(), value.substr(0,50).c_str() );
+    //    qDebug() << "Connection::settingsSend()" << QString::fromStdString( key.substr(0,50) ) <<  QString::fromStdString( value.substr(0,50) );
+}
+
+void Connection::settingsRemove(std::string key) {
+    mavlink_msg_settings_remove_send( MAVLINK_COMM_0, key.substr(0,50).c_str() );
 }
 
 void Connection::parseSerial(const QByteArray& data) {
-	foreach(char c, data) {
+    foreach(char c, data) {
 		if(mavlink_parse_char(MAVLINK_COMM_0, c, &mavlink_message, &mavlink_status)) {
 			switch(mavlink_message.msgid) {
 				case MAVLINK_MSG_ID_HEARTBEAT: {
-					//qDebug() << "heartbeat";
+                    //qDebug() << "heartbeat";
 					timer->start();					// reset connection timer
 
 					if(!isConnected()) firmwareConnect();
@@ -116,10 +134,9 @@ void Connection::parseSerial(const QByteArray& data) {
 				} break;
 
 				case MAVLINK_MSG_ID_SCALED_IMU: {
-                    //qDebug() << "scaled imu";
 					mavlink_scaled_imu_t scaled_imu;
 					mavlink_msg_scaled_imu_decode(&mavlink_message, &scaled_imu);
-					//qDebug() << "scaled imu" << scaled_imu.xacc << scaled_imu.yacc << scaled_imu.zacc;
+//                    qDebug() << "scaled imu" << scaled_imu.xacc << scaled_imu.yacc << scaled_imu.zacc;
                     Plot::instance().addData( "ax", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.xacc/1000.0 );
                     Plot::instance().addData( "ay", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.yacc/1000.0 );
                     Plot::instance().addData( "az", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.zacc/1000.0 );
@@ -129,6 +146,29 @@ void Connection::parseSerial(const QByteArray& data) {
                     Plot::instance().addData( "mx", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.xmag/1000.0 );
                     Plot::instance().addData( "my", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.ymag/1000.0 );
                     Plot::instance().addData( "mz", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.zmag/1000.0 );
+                    emit valueVectorReceived( ValueVector::Mag, (double)scaled_imu.xmag/1000.0, (double)scaled_imu.ymag/1000.0, (double)scaled_imu.zmag/1000.0 );
+				} break;
+
+				case MAVLINK_MSG_ID_ATTITUDE: {
+					mavlink_attitude_t attitude;
+					mavlink_msg_attitude_decode(&mavlink_message, &attitude);
+					//qDebug() << "Connection::parseSerial() attitude" << attitude.roll << attitude.pitch << attitude.yaw;
+					emit valueReceived( Value::Roll, attitude.roll );
+					MainWindow::ui().imuRollIndicateLabel->setText( QString::number(RAD_DEG(attitude.roll), 'f', 2) );
+					emit valueReceived( Value::Pitch, attitude.pitch );
+					MainWindow::ui().imuPitchIndicateLabel->setText( QString::number(RAD_DEG(attitude.pitch), 'f', 2) );
+					emit valueReceived( Value::Yaw, attitude.yaw );
+					MainWindow::ui().imuYawIndicateLabel->setText( QString::number(RAD_DEG(attitude.yaw), 'f', 2) );
+				} break;
+
+				case MAVLINK_MSG_ID_ATTITUDE_QUATERNION: {
+					mavlink_attitude_quaternion_t quaternion;
+					mavlink_msg_attitude_quaternion_decode(&mavlink_message, &quaternion);
+					//qDebug() << "Connection::parseSerial() quaternion" << quaternion.q1 << quaternion.q2 << quaternion.q3 << quaternion.q4;
+					emit valueReceived( Value::Q0, quaternion.q1);
+					emit valueReceived( Value::Q1, quaternion.q2);
+					emit valueReceived( Value::Q2, quaternion.q3);
+					emit valueReceived( Value::Q3, quaternion.q4);
 				} break;
 
                 /*case MAVLINK_MSG_ID_SCALED_PRESSURE: {
@@ -181,6 +221,20 @@ void Connection::parseSerial(const QByteArray& data) {
 
 				} break;
 
+                case MAVLINK_MSG_ID_SETTINGS_ITEM: {
+                    mavlink_settings_item_t mavlink_settings_item;
+                    mavlink_msg_settings_item_decode(&mavlink_message, &mavlink_settings_item);
+                    //qDebug() << "Connection::parseSerial() settings item received" << QString(mavlink_settings_item.name) << QString(mavlink_settings_item.value);
+                    emit settingReceived( std::string(mavlink_settings_item.name), std::string(mavlink_settings_item.value) );
+                } break;
+
+                case MAVLINK_MSG_ID_SETTINGS_REMOVE: {
+                    mavlink_settings_remove_t mavlink_settings_remove;
+                    mavlink_msg_settings_remove_decode(&mavlink_message, &mavlink_settings_remove);
+                    //qDebug() << "Connection::parseSerial() settings item remoce" << QString(mavlink_settings_item.name);
+                    emit settingRemoved( std::string( mavlink_settings_remove.name ) );
+                } break;
+
 				default: break;
 			}
 		}
@@ -192,9 +246,8 @@ void Connection::firmwareConnect() {
 	MainWindow::ui().signalValueLabel->setText(
 		QString("<html><head/><body><p><span style=\"font-size:12pt;\">%1</span><span style=\"font-size:12pt; color:#666666;\">%</span></p></body></html>").arg(100));
 	status = true;
-    Plot::instance().clear();
 	emit connected();
-    //qDebug() << "connected";
+	qDebug() << "connected";
 }
 
 void Connection::firmwareDisconnect() {
@@ -204,5 +257,5 @@ void Connection::firmwareDisconnect() {
 		QString("<html><head/><body><p><span style=\"font-size:12pt;\">%1</span><span style=\"font-size:12pt; color:#666666;\">%</span></p></body></html>").arg(0));
 	status = false;
 	emit disconnected();
-    //qDebug() << "disconnected";
+	qDebug() << "disconnected";
 }

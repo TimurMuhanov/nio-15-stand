@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ int main(void) {
    * Normal main() thread activity, in this demo it enables and disables the
    * button EXT channel using 5 seconds intervals.
    */
-  while (TRUE) {
+  while (true) {
     chThdSleepMilliseconds(5000);
     extChannelDisable(&EXTD1, 0);
     chThdSleepMilliseconds(5000);

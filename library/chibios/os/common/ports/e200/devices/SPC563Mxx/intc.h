@@ -1,6 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006,2007,2008,2009,2010,
-              2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -41,6 +40,11 @@
 #define INTC_IACKR_ADDR     (INTC_BASE + 0x10)
 #define INTC_EOIR_ADDR      (INTC_BASE + 0x18)
 /** @} */
+
+/**
+ * @brief   INTC priority levels.
+ */
+#define INTC_PRIORITY_LEVELS 16U
 
 /*===========================================================================*/
 /* Module pre-compile time settings.                                         */

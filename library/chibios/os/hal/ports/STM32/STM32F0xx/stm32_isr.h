@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -33,6 +33,11 @@
  * @name    ISR names and numbers remapping
  * @{
  */
+/*
+ * CAN units.
+ */
+#define STM32_CAN1_UNIFIED_HANDLER  VectorB8
+#define STM32_CAN1_UNIFIED_NUMBER   30
 
 /*
  * I2C units.
@@ -50,11 +55,23 @@
 #define STM32_TIM1_CC_HANDLER       Vector78
 #define STM32_TIM2_HANDLER          Vector7C
 #define STM32_TIM3_HANDLER          Vector80
+#define STM32_TIM6_HANDLER          Vector84
+#define STM32_TIM7_HANDLER          Vector88
+#define STM32_TIM14_HANDLER         Vector8C
+#define STM32_TIM15_HANDLER         Vector90
+#define STM32_TIM16_HANDLER         Vector94
+#define STM32_TIM17_HANDLER         Vector98
 
 #define STM32_TIM1_UP_NUMBER        13
 #define STM32_TIM1_CC_NUMBER        14
 #define STM32_TIM2_NUMBER           15
 #define STM32_TIM3_NUMBER           16
+#define STM32_TIM6_NUMBER           17
+#define STM32_TIM7_NUMBER           18
+#define STM32_TIM14_NUMBER          19
+#define STM32_TIM15_NUMBER          20
+#define STM32_TIM16_NUMBER          21
+#define STM32_TIM17_NUMBER          22
 
 /*
  * USART units.
@@ -64,6 +81,14 @@
 
 #define STM32_USART1_NUMBER         27
 #define STM32_USART2_NUMBER         28
+
+/*
+ * USB units.
+ */
+#define STM32_USB1_LP_HANDLER       VectorBC
+#define STM32_USB1_LP_NUMBER        31
+#define STM32_USB1_HP_HANDLER       VectorBC
+#define STM32_USB1_HP_NUMBER        31
 /** @} */
 
 /*===========================================================================*/

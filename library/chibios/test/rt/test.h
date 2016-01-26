@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -76,10 +76,12 @@ union test_buffers {
 };
 #endif
 
+extern bool test_global_fail;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-  msg_t TestThread(void *p);
+  void TestThread(void *p);
   void test_printn(uint32_t n);
   void test_print(const char *msgp);
   void test_println(const char *msgp);

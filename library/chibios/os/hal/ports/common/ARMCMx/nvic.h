@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@
 /**
  * @brief   Priority level to priority mask conversion macro.
  */
-#define NVIC_PRIORITY_MASK(prio) ((prio) << (8 - __NVIC_PRIO_BITS))
+#define NVIC_PRIORITY_MASK(prio) ((prio) << (8U - (unsigned)__NVIC_PRIO_BITS))
 
 /*===========================================================================*/
 /* External declarations.                                                    */
@@ -78,6 +78,7 @@ extern "C" {
   void nvicEnableVector(uint32_t n, uint32_t prio);
   void nvicDisableVector(uint32_t n);
   void nvicSetSystemHandlerPriority(uint32_t handler, uint32_t prio);
+  void nvicClearPending(uint32_t n);
 #ifdef __cplusplus
 }
 #endif

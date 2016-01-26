@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -29,7 +28,7 @@
 #ifndef _CHQUEUES_H_
 #define _CHQUEUES_H_
 
-#if CH_CFG_USE_QUEUES || defined(__DOXYGEN__)
+#if (CH_CFG_USE_QUEUES == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -42,8 +41,8 @@
 #define Q_OK            MSG_OK      /**< @brief Operation successful.       */
 #define Q_TIMEOUT       MSG_TIMEOUT /**< @brief Timeout condition.          */
 #define Q_RESET         MSG_RESET   /**< @brief Queue has been reset.       */
-#define Q_EMPTY         -3          /**< @brief Queue empty.                */
-#define Q_FULL          -4          /**< @brief Queue full,                 */
+#define Q_EMPTY         (msg_t)-3   /**< @brief Queue empty.                */
+#define Q_FULL          (msg_t)-4   /**< @brief Queue full,                 */
 /** @} */
 
 /*===========================================================================*/
@@ -77,7 +76,7 @@ typedef void (*qnotify_t)(io_queue_t *qp);
  */
 struct io_queue {
   threads_queue_t       q_waiting;  /**< @brief Queue of waiting threads.   */
-  size_t                q_counter;  /**< @brief Resources counter.          */
+  volatile size_t       q_counter;  /**< @brief Resources counter.          */
   uint8_t               *q_buffer;  /**< @brief Pointer to the queue buffer.*/
   uint8_t               *q_top;     /**< @brief Pointer to the first location
                                                 after the buffer.           */
@@ -130,7 +129,7 @@ typedef io_queue_t output_queue_t;
  */
 #define _INPUTQUEUE_DATA(name, buffer, size, inotify, link) {               \
   _THREADS_QUEUE_DATA(name),                                                \
-  0,                                                                        \
+  0U,                                                                       \
   (uint8_t *)(buffer),                                                      \
   (uint8_t *)(buffer) + (size),                                             \
   (uint8_t *)(buffer),                                                      \
@@ -196,19 +195,22 @@ typedef io_queue_t output_queue_t;
 /**
  * @brief   Returns the queue's buffer size.
  *
- * @param[in] qp        pointer to a @p io_queue_t structure.
+ * @param[in] qp        pointer to a @p io_queue_t structure
  * @return              The buffer size.
  *
- * @iclass
+ * @xclass
  */
-#define chQSizeI(qp) ((size_t)((qp)->q_top - (qp)->q_buffer))
+#define chQSizeX(qp)                                                        \
+  /*lint -save -e9033 [10.8] The cast is safe.*/                            \
+  ((size_t)((qp)->q_top - (qp)->q_buffer))                                  \
+  /*lint -restore*/
 
 /**
  * @brief   Queue space.
  * @details Returns the used space if used on an input queue or the empty
  *          space if used on an output queue.
  *
- * @param[in] qp        pointer to a @p io_queue_t structure.
+ * @param[in] qp        pointer to a @p io_queue_t structure
  * @return              The buffer space.
  *
  * @iclass
@@ -218,7 +220,7 @@ typedef io_queue_t output_queue_t;
 /**
  * @brief   Returns the queue application-defined link.
  *
- * @param[in] qp        pointer to a @p io_queue_t structure.
+ * @param[in] qp        pointer to a @p io_queue_t structure
  * @return              The application-defined link.
  *
  * @xclass
@@ -237,17 +239,17 @@ extern "C" {
                       qnotify_t infy, void *link);
   void chIQResetI(input_queue_t *iqp);
   msg_t chIQPutI(input_queue_t *iqp, uint8_t b);
-  msg_t chIQGetTimeout(input_queue_t *iqp, systime_t time);
+  msg_t chIQGetTimeout(input_queue_t *iqp, systime_t timeout);
   size_t chIQReadTimeout(input_queue_t *iqp, uint8_t *bp,
-                         size_t n, systime_t time);
+                         size_t n, systime_t timeout);
 
   void chOQObjectInit(output_queue_t *oqp, uint8_t *bp, size_t size,
                       qnotify_t onfy, void *link);
   void chOQResetI(output_queue_t *oqp);
-  msg_t chOQPutTimeout(output_queue_t *oqp, uint8_t b, systime_t time);
+  msg_t chOQPutTimeout(output_queue_t *oqp, uint8_t b, systime_t timeout);
   msg_t chOQGetI(output_queue_t *oqp);
   size_t chOQWriteTimeout(output_queue_t *oqp, const uint8_t *bp,
-                          size_t n, systime_t time);
+                          size_t n, systime_t timeout);
 #ifdef __cplusplus
 }
 #endif
@@ -285,13 +287,13 @@ static inline size_t chIQGetEmptyI(input_queue_t *iqp) {
 
   chDbgCheckClassI();
 
-  return (size_t)(chQSizeI(iqp) - chQSpaceI(iqp));
+  return (size_t)(chQSizeX(iqp) - chQSpaceI(iqp));
 }
 
 /**
  * @brief   Evaluates to @p true if the specified input queue is empty.
  *
- * @param[in] iqp       pointer to an @p input_queue_t structure.
+ * @param[in] iqp       pointer to an @p input_queue_t structure
  * @return              The queue status.
  * @retval false        if the queue is not empty.
  * @retval true         if the queue is empty.
@@ -302,13 +304,13 @@ static inline bool chIQIsEmptyI(input_queue_t *iqp) {
 
   chDbgCheckClassI();
 
-  return (bool)(chQSpaceI(iqp) <= 0);
+  return (bool)(chQSpaceI(iqp) == 0U);
 }
 
 /**
  * @brief   Evaluates to @p true if the specified input queue is full.
  *
- * @param[in] iqp       pointer to an @p input_queue_t structure.
+ * @param[in] iqp       pointer to an @p input_queue_t structure
  * @return              The queue status.
  * @retval false        if the queue is not full.
  * @retval true         if the queue is full.
@@ -319,7 +321,7 @@ static inline bool chIQIsFullI(input_queue_t *iqp) {
 
   chDbgCheckClassI();
 
-  return (bool)((iqp->q_wrptr == iqp->q_rdptr) && (iqp->q_counter != 0));
+  return (bool)((iqp->q_wrptr == iqp->q_rdptr) && (iqp->q_counter != 0U));
 }
 
 /**
@@ -352,7 +354,7 @@ static inline size_t chOQGetFullI(output_queue_t *oqp) {
 
   chDbgCheckClassI();
 
-  return (size_t)(chQSizeI(oqp) - chQSpaceI(oqp));
+  return (size_t)(chQSizeX(oqp) - chQSpaceI(oqp));
 }
 
 /**
@@ -374,7 +376,7 @@ static inline size_t chOQGetEmptyI(output_queue_t *oqp) {
 /**
  * @brief   Evaluates to @p true if the specified output queue is empty.
  *
- * @param[in] oqp       pointer to an @p output_queue_t structure.
+ * @param[in] oqp       pointer to an @p output_queue_t structure
  * @return              The queue status.
  * @retval false        if the queue is not empty.
  * @retval true         if the queue is empty.
@@ -385,13 +387,13 @@ static inline bool chOQIsEmptyI(output_queue_t *oqp) {
 
   chDbgCheckClassI();
 
-  return (bool)((oqp->q_wrptr == oqp->q_rdptr) && (oqp->q_counter != 0));
+  return (bool)((oqp->q_wrptr == oqp->q_rdptr) && (oqp->q_counter != 0U));
 }
 
 /**
  * @brief   Evaluates to @p true if the specified output queue is full.
  *
- * @param[in] oqp       pointer to an @p output_queue_t structure.
+ * @param[in] oqp       pointer to an @p output_queue_t structure
  * @return              The queue status.
  * @retval false        if the queue is not full.
  * @retval true         if the queue is full.
@@ -402,7 +404,7 @@ static inline bool chOQIsFullI(output_queue_t *oqp) {
 
   chDbgCheckClassI();
 
-  return (bool)(chQSpaceI(oqp) <= 0);
+  return (bool)(chQSpaceI(oqp) == 0U);
 }
 
 /**
@@ -424,7 +426,7 @@ static inline msg_t chOQPut(output_queue_t *oqp, uint8_t b) {
   return chOQPutTimeout(oqp, b, TIME_INFINITE);
 }
 
-#endif /* CH_CFG_USE_QUEUES */
+#endif /* CH_CFG_USE_QUEUES == TRUE */
 
 #endif /* _CHQUEUES_H_ */
 

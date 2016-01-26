@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -29,7 +28,7 @@
 #ifndef _CHSTATS_H_
 #define _CHSTATS_H_
 
-#if CH_DBG_STATISTICS || defined(__DOXYGEN__)
+#if (CH_DBG_STATISTICS == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -39,7 +38,7 @@
 /* Module pre-compile time settings.                                         */
 /*===========================================================================*/
 
-#if !CH_CFG_USE_TM
+#if CH_CFG_USE_TM == FALSE
 #error "CH_DBG_STATISTICS requires CH_CFG_USE_TM"
 #endif
 
@@ -89,7 +88,7 @@ extern "C" {
 /* Module inline functions.                                                  */
 /*===========================================================================*/
 
-#else /* !CH_DBG_STATISTICS */
+#else /* CH_DBG_STATISTICS == FALSE */
 
 /* Stub functions for when the statistics module is disabled. */
 #define _stats_increase_irq()
@@ -99,7 +98,7 @@ extern "C" {
 #define _stats_start_measure_crit_isr()
 #define _stats_stop_measure_crit_isr()
 
-#endif /* !CH_DBG_STATISTICS */
+#endif /* CH_DBG_STATISTICS == FALSE */
 
 #endif /* _CHSTATS_H_ */
 

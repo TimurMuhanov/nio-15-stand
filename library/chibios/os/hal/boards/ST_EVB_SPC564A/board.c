@@ -1,5 +1,5 @@
 /*
-    SPC5 HAL - Copyright (C) 2013 STMicroelectronics
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #if HAL_USE_PAL || defined(__DOXYGEN__)
 /* Initial setup of all defined pads, the list is terminated by a {-1, 0, 0}.*/
 static const spc_siu_init_t spc_siu_init[] = {
-  {PCR(PORT5, P5_ESCI_A_TX),      PAL_HIGH,   PAL_MODE_OUTPUT_ALTERNATE(1)},
-  {PCR(PORT5, P5_ESCI_A_RX),      PAL_HIGH,   PAL_MODE_OUTPUT_ALTERNATE(1)},
+  {PCR(PORT5, P5_ESCI_A_TX),      PAL_HIGH,   PAL_MODE_INPUT_ALTERNATE_PRIMARY},
+  {PCR(PORT5, P5_ESCI_A_RX),      PAL_HIGH,   PAL_MODE_INPUT_ALTERNATE_PRIMARY},
   {PCR(PORT11, P11_BUTTON1),      PAL_LOW,    PAL_MODE_INPUT},
   {PCR(PORT11, P11_BUTTON2),      PAL_LOW,    PAL_MODE_INPUT},
   {PCR(PORT11, P11_BUTTON3),      PAL_LOW,    PAL_MODE_INPUT},

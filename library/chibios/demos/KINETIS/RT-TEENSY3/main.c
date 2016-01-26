@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,16 +22,14 @@
  * LED blinker thread.
  */
 static THD_WORKING_AREA(waThread1, 64);
-static msg_t Thread1(void *arg) {
+static THD_FUNCTION(Thread1, arg) {
 
     (void)arg;
     chRegSetThreadName("LEDBlinker");
-    while (TRUE) {
+    while (true) {
         palTogglePad(IOPORT3, PORTC_TEENSY_PIN13);
         chThdSleepMilliseconds(500);
     }
-
-    return 0;
 }
 
 /*
@@ -60,7 +58,7 @@ int main(void) {
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
   TestThread(&SD1);
-  while (TRUE) {
+  while (true) {
       chThdSleepMilliseconds(1000);
   }
 

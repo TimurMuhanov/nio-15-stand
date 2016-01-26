@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #ifndef _USB_LLD_H_
 #define _USB_LLD_H_
 
-#if HAL_USE_USB || defined(__DOXYGEN__)
+#if (HAL_USE_USB == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
@@ -46,6 +46,11 @@
  */
 #define USB_SET_ADDRESS_MODE                USB_LATE_SET_ADDRESS
 
+/**
+ * @brief   Method for set address acknowledge.
+ */
+#define USB_SET_ADDRESS_ACK_HANDLING        USB_SET_ADDRESS_ACK_SW
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -57,6 +62,7 @@
 /**
  * @brief   USB driver enable switch.
  * @details If set to @p TRUE the support for USB1 is included.
+ * @note    The default is @p FALSE.
  */
 #if !defined(PLATFORM_USB_USE_USB1) || defined(__DOXYGEN__)
 #define PLATFORM_USB_USE_USB1                  FALSE
@@ -346,7 +352,7 @@ struct USBDriver {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#if PLATFORM_USB_USE_USB1 && !defined(__DOXYGEN__)
+#if (PLATFORM_USB_USE_USB1 == TRUE) && !defined(__DOXYGEN__)
 extern USBDriver USBD1;
 #endif
 
@@ -375,7 +381,7 @@ extern "C" {
 }
 #endif
 
-#endif /* HAL_USE_USB */
+#endif /* HAL_USE_USB == TRUE */
 
 #endif /* _USB_LLD_H_ */
 

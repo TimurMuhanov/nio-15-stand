@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -63,10 +62,12 @@ _port_switch:
                 mov     r6, r10
                 mov     r7, r11
                 push    {r4, r5, r6, r7}
-                mov r3, sp
-                str r3, [r1, #CONTEXT_OFFSET]
-                ldr r3, [r0, #CONTEXT_OFFSET]
-                mov sp, r3
+                
+                mov     r3, sp
+                str     r3, [r1, #CONTEXT_OFFSET]
+                ldr     r3, [r0, #CONTEXT_OFFSET]
+                mov     sp, r3
+                
                 pop     {r4, r5, r6, r7}
                 mov     r8, r4
                 mov     r9, r5
@@ -94,6 +95,7 @@ _port_thread_start:
                 cpsie   i
                 mov     r0, r5
                 blx     r4
+                movs    r0, #0              /* MSG_OK */
                 bl      chThdExit
 
 /*--------------------------------------------------------------------------*

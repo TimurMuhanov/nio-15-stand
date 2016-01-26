@@ -9,7 +9,7 @@
 
 #include "ch.h"
 #include "math.h"
-#include "driver.h"
+#include "imu.h"
 
 
 #define ENCODER_PERIOD_MS			20
@@ -39,13 +39,23 @@
 													)
 
 
-void encoderInit(void);
 
-/**	get encoder value
-	@param		id					encoder id form 0 to ENCODER_NUMBER-1
-	@retval		structure with encoder data in deg */
-scalarData encoderGet(u32 id);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+	void encoderInit(void);
+
+	/**	get encoder value
+		@param		id					encoder id form 0 to ENCODER_NUMBER-1
+		@retval		structure with encoder data in deg */
+	scalarData encoderGet(u32 id);
+
+#ifdef __cplusplus
+}
+#endif
 
 
 

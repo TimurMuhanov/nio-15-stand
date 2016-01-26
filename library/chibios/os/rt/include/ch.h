@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -38,14 +37,19 @@
 #define _CHIBIOS_RT_
 
 /**
- * @brief   Kernel version string.
+ * @brief   Stable release flag.
  */
-#define CH_KERNEL_VERSION       "3.0.0dev"
+#define CH_KERNEL_STABLE        1
 
 /**
- * @name    Kernel version
+ * @name    ChibiOS/RT version identification
  * @{
  */
+/**
+ * @brief   Kernel version string.
+ */
+#define CH_KERNEL_VERSION       "3.0.3"
+
 /**
  * @brief   Kernel version major number.
  */
@@ -59,7 +63,7 @@
 /**
  * @brief   Kernel version patch number.
  */
-#define CH_KERNEL_PATCH         0
+#define CH_KERNEL_PATCH         3
 /** @} */
 
 /* Core headers.*/

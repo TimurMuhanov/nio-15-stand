@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@
 #define STM32_PLLIN_MAX         24000000
 
 /**
- * @brief   Maximum PLLs input clock frequency.
+ * @brief   Minimum PLLs input clock frequency.
  */
 #define STM32_PLLIN_MIN         1000000
 
@@ -81,7 +81,7 @@
 #define STM32_PLLOUT_MAX        24000000
 
 /**
- * @brief   Maximum PLL output clock frequency.
+ * @brief   Minimum PLL output clock frequency.
  */
 #define STM32_PLLOUT_MIN        16000000
 
@@ -311,8 +311,9 @@
 #error "HSE not enabled, required by STM32_SW and STM32_PLLSRC"
 #endif
 
-#if (STM32_MCOSEL == STM32_MCOSEL_HSE) ||                                         \
-    ((STM32_MCOSEL == STM32_MCOSEL_PLL) && (STM32_PLLSRC == STM32_PLLSRC_HSE))
+#if (STM32_MCOSEL == STM32_MCOSEL_HSE) ||                                   \
+    ((STM32_MCOSEL == STM32_MCOSEL_PLLDIV2) &&                              \
+     (STM32_PLLSRC == STM32_PLLSRC_HSE))
 #error "HSE not enabled, required by STM32_MCOSEL"
 #endif
 

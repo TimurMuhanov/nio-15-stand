@@ -1,14 +1,14 @@
 /*
-    ChibiOS/NIL - Copyright (C) 2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/NIL.
+    This file is part of ChibiOS.
 
-    ChibiOS/NIL is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/NIL is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -51,13 +51,15 @@
 /* Module interrupt handlers.                                                */
 /*===========================================================================*/
 
-#if !CORTEX_ALTERNATE_SWITCH || defined(__DOXYGEN__)
+#if (CORTEX_ALTERNATE_SWITCH == FALSE) || defined(__DOXYGEN__)
 /**
  * @brief   NMI vector.
  * @details The NMI vector is used for exception mode re-entering after a
  *          context switch.
  */
+/*lint -save -e9075 [8.4] All symbols are invoked from asm context.*/
 void NMI_Handler(void) {
+/*lint -restore*/
 
   /* The port_extctx structure is pointed by the PSP register.*/
   struct port_extctx *ctxp = (struct port_extctx *)__get_PSP();
@@ -74,13 +76,15 @@ void NMI_Handler(void) {
 }
 #endif /* !CORTEX_ALTERNATE_SWITCH */
 
-#if CORTEX_ALTERNATE_SWITCH || defined(__DOXYGEN__)
+#if (CORTEX_ALTERNATE_SWITCH == TRUE) || defined(__DOXYGEN__)
 /**
  * @brief   PendSV vector.
  * @details The PendSV vector is used for exception mode re-entering after a
  *          context switch.
  */
+/*lint -save -e9075 [8.4] All symbols are invoked from asm context.*/
 void PendSV_Handler(void) {
+/*lint -restore*/
 
   /* The port_extctx structure is pointed by the PSP register.*/
   struct port_extctx *ctxp = (struct port_extctx *)__get_PSP();
@@ -105,7 +109,7 @@ void PendSV_Handler(void) {
  */
 void _port_irq_epilogue(regarm_t lr) {
 
-  if (lr != (regarm_t)0xFFFFFFF1) {
+  if (lr != (regarm_t)0xFFFFFFF1U) {
     struct port_extctx *ctxp;
 
     port_lock_from_isr();

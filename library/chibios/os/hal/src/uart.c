@@ -1,21 +1,17 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
-    This file is part of ChibiOS/HAL 
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -28,7 +24,7 @@
 
 #include "hal.h"
 
-#if HAL_USE_UART || defined(__DOXYGEN__)
+#if (HAL_USE_UART == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Driver local definitions.                                                 */
@@ -138,7 +134,7 @@ void uartStop(UARTDriver *uartp) {
  */
 void uartStartSend(UARTDriver *uartp, size_t n, const void *txbuf) {
 
-  osalDbgCheck((uartp != NULL) && (n > 0) && (txbuf != NULL));
+  osalDbgCheck((uartp != NULL) && (n > 0U) && (txbuf != NULL));
              
   osalSysLock();
   osalDbgAssert(uartp->state == UART_READY, "is active");
@@ -164,7 +160,7 @@ void uartStartSend(UARTDriver *uartp, size_t n, const void *txbuf) {
 void uartStartSendI(UARTDriver *uartp, size_t n, const void *txbuf) {
 
   osalDbgCheckClassI();
-  osalDbgCheck((uartp != NULL) && (n > 0) && (txbuf != NULL));
+  osalDbgCheck((uartp != NULL) && (n > 0U) && (txbuf != NULL));
   osalDbgAssert(uartp->state == UART_READY, "is active");
   osalDbgAssert(uartp->txstate != UART_TX_ACTIVE, "tx active");
 
@@ -196,9 +192,11 @@ size_t uartStopSend(UARTDriver *uartp) {
     n = uart_lld_stop_send(uartp);
     uartp->txstate = UART_TX_IDLE;
   }
-  else
+  else {
     n = 0;
+  }
   osalSysUnlock();
+
   return n;
 }
 
@@ -235,14 +233,14 @@ size_t uartStopSendI(UARTDriver *uartp) {
  *          or equal to 8 bits else it is organized as uint16_t arrays.
  *
  * @param[in] uartp     pointer to the @p UARTDriver object
- * @param[in] n         number of data frames to send
+ * @param[in] n         number of data frames to receive
  * @param[in] rxbuf     the pointer to the receive buffer
  *
  * @api
  */
 void uartStartReceive(UARTDriver *uartp, size_t n, void *rxbuf) {
 
-  osalDbgCheck((uartp != NULL) && (n > 0) && (rxbuf != NULL));
+  osalDbgCheck((uartp != NULL) && (n > 0U) && (rxbuf != NULL));
 
   osalSysLock();
   osalDbgAssert(uartp->state == UART_READY, "is active");
@@ -260,7 +258,7 @@ void uartStartReceive(UARTDriver *uartp, size_t n, void *rxbuf) {
  * @note    This function has to be invoked from a lock zone.
  *
  * @param[in] uartp     pointer to the @p UARTDriver object
- * @param[in] n         number of data frames to send
+ * @param[in] n         number of data frames to receive
  * @param[out] rxbuf    the pointer to the receive buffer
  *
  * @iclass
@@ -268,7 +266,7 @@ void uartStartReceive(UARTDriver *uartp, size_t n, void *rxbuf) {
 void uartStartReceiveI(UARTDriver *uartp, size_t n, void *rxbuf) {
 
   osalDbgCheckClassI();
-  osalDbgCheck((uartp != NULL) && (n > 0) && (rxbuf != NULL));
+  osalDbgCheck((uartp != NULL) && (n > 0U) && (rxbuf != NULL));
   osalDbgAssert(uartp->state == UART_READY, "is active");
   osalDbgAssert(uartp->rxstate != UART_RX_ACTIVE, "rx active");
 
@@ -300,9 +298,11 @@ size_t uartStopReceive(UARTDriver *uartp) {
     n = uart_lld_stop_receive(uartp);
     uartp->rxstate = UART_RX_IDLE;
   }
-  else
+  else {
     n = 0;
+  }
   osalSysUnlock();
+
   return n;
 }
 
@@ -333,6 +333,6 @@ size_t uartStopReceiveI(UARTDriver *uartp) {
   return 0;
 }
 
-#endif /* HAL_USE_UART */
+#endif /* HAL_USE_UART == TRUE */
 
 /** @} */

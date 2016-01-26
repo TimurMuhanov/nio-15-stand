@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -99,6 +99,13 @@
 #endif
 
 /**
+ * @brief   DMA use switch.
+ */
+#if !defined(STM32_I2C_USE_DMA) || defined(__DOXYGEN__)
+#define STM32_I2C_USE_DMA                   TRUE
+#endif
+
+/**
  * @brief   I2C1 DMA priority (0..3|lowest..highest).
  * @note    The priority level is used for both the TX and RX DMA streams but
  *          because of the streams ordering the RX stream has always priority
@@ -146,15 +153,16 @@
 #endif
 
 #if STM32_I2C_USE_I2C1 &&                                                   \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_I2C_I2C1_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_I2C_I2C1_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to I2C1"
 #endif
 
 #if STM32_I2C_USE_I2C2 &&                                                   \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_I2C_I2C2_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_I2C_I2C2_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to I2C2"
 #endif
 
+#if STM32_I2C_USE_DMA == TRUE
 #if STM32_I2C_USE_I2C1 &&                                                   \
     !STM32_DMA_IS_VALID_PRIORITY(STM32_I2C_I2C1_DMA_PRIORITY)
 #error "Invalid DMA priority assigned to I2C1"
@@ -208,8 +216,7 @@
 #if !defined(STM32_DMA_REQUIRED)
 #define STM32_DMA_REQUIRED
 #endif
-
-/* Check clock range. */
+#endif /* STM32_I2C_USE_DMA == TRUE */
 
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
@@ -279,10 +286,7 @@ struct I2CDriver {
    * @brief   Thread waiting for I/O completion.
    */
   thread_reference_t        thread;
-  /**
-   * @brief     Current slave address without R/W bit.
-   */
-  i2caddr_t                 addr;
+#if (STM32_I2C_USE_DMA == TRUE) || defined(__DOXYGEN__)
   /**
    * @brief RX DMA mode bit mask.
    */
@@ -299,6 +303,24 @@ struct I2CDriver {
    * @brief     Transmit DMA channel.
    */
   const stm32_dma_stream_t  *dmatx;
+#else /* STM32_I2C_USE_DMA == FALSE */
+  /**
+   * @brief     Pointer to the next TX buffer location.
+   */
+  const uint8_t             *txptr;
+  /**
+   * @brief     Number of bytes in TX phase.
+   */
+  size_t                    txbytes;
+  /**
+   * @brief     Pointer to the next RX buffer location.
+   */
+  uint8_t                   *rxptr;
+  /**
+   * @brief     Number of bytes in RX phase.
+   */
+  size_t                    rxbytes;
+#endif /* STM32_I2C_USE_DMA == FALSE */
   /**
    * @brief     Pointer to the I2Cx registers block.
    */

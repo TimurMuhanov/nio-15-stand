@@ -1,4 +1,5 @@
 #include "ls7366.h"
+#include "io.h"
 
 
 #define	LS7366_CHIP_SELECT(pin)		palClearPad(BOARD_LS7366R_ESS_PORT, pin)

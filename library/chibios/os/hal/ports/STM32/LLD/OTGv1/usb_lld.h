@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -34,15 +34,6 @@
 /*===========================================================================*/
 
 /**
- * @brief   Maximum endpoint address.
- */
-#if !STM32_USB_USE_OTG2 || defined(__DOXYGEN__)
-#define USB_MAX_ENDPOINTS                   3
-#else
-#define USB_MAX_ENDPOINTS                   5
-#endif
-
-/**
  * @brief   Status stage handling method.
  */
 #define USB_EP0_STATUS_STAGE                USB_EP0_STATUS_STAGE_SW
@@ -51,6 +42,11 @@
  * @brief   The address can be changed immediately upon packet reception.
  */
 #define USB_SET_ADDRESS_MODE                USB_EARLY_SET_ADDRESS
+
+/**
+ * @brief   Method for set address acknowledge.
+ */
+#define USB_SET_ADDRESS_ACK_HANDLING        USB_SET_ADDRESS_ACK_SW
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -141,6 +137,15 @@
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
 
+/**
+ * @brief   Maximum endpoint address.
+ */
+#if !STM32_USB_USE_OTG2 || defined(__DOXYGEN__)
+#define USB_MAX_ENDPOINTS                   3
+#else
+#define USB_MAX_ENDPOINTS                   5
+#endif
+
 #if STM32_USB_USE_OTG1 && !STM32_HAS_OTG1
 #error "OTG1 not present in the selected device"
 #endif
@@ -154,12 +159,12 @@
 #endif
 
 #if STM32_USB_USE_OTG1 &&                                                \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_USB_OTG1_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_USB_OTG1_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to OTG1"
 #endif
 
 #if STM32_USB_USE_OTG2 &&                                                \
-    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_USB_OTG2_IRQ_PRIORITY)
+    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_USB_OTG2_IRQ_PRIORITY)
 #error "Invalid IRQ priority assigned to OTG2"
 #endif
 
@@ -496,16 +501,14 @@ struct USBDriver {
  *
  * @api
  */
-//#define usb_lld_connect_bus(usbp) ((usbp)->otg->GCCFG |= GCCFG_VBUSBSEN)
-#define usb_lld_connect_bus(usbp) ((usbp)->otg->GCCFG |= GCCFG_NOVBUSSENS)
+#define usb_lld_connect_bus(usbp) ((usbp)->otg->GCCFG |= GCCFG_VBUSBSEN)
 
 /**
  * @brief   Disconnect the USB device.
  *
  * @api
  */
-//#define usb_lld_disconnect_bus(usbp) ((usbp)->otg->GCCFG &= ~GCCFG_VBUSBSEN)
-#define usb_lld_disconnect_bus(usbp) ((usbp)->otg->GCCFG &= ~GCCFG_NOVBUSSENS)
+#define usb_lld_disconnect_bus(usbp) ((usbp)->otg->GCCFG &= ~GCCFG_VBUSBSEN)
 
 /*===========================================================================*/
 /* External declarations.                                                    */
@@ -540,7 +543,7 @@ extern "C" {
   void usb_lld_stall_in(USBDriver *usbp, usbep_t ep);
   void usb_lld_clear_out(USBDriver *usbp, usbep_t ep);
   void usb_lld_clear_in(USBDriver *usbp, usbep_t ep);
-  msg_t usb_lld_pump(void *p);
+  void usb_lld_pump(void *p);
 #ifdef __cplusplus
 }
 #endif

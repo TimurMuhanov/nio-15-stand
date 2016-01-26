@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -32,7 +31,7 @@
 #ifndef _CHCOND_H_
 #define _CHCOND_H_
 
-#if CH_CFG_USE_CONDVARS || defined(__DOXYGEN__)
+#if (CH_CFG_USE_CONDVARS == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -46,7 +45,7 @@
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
 
-#if !CH_CFG_USE_MUTEXES
+#if CH_CFG_USE_MUTEXES == FALSE
 #error "CH_CFG_USE_CONDVARS requires CH_CFG_USE_MUTEXES"
 #endif
 
@@ -98,7 +97,7 @@ extern "C" {
   void chCondBroadcastI(condition_variable_t *cp);
   msg_t chCondWait(condition_variable_t *cp);
   msg_t chCondWaitS(condition_variable_t *cp);
-#if CH_CFG_USE_CONDVARS_TIMEOUT
+#if CH_CFG_USE_CONDVARS_TIMEOUT == TRUE
   msg_t chCondWaitTimeout(condition_variable_t *cp, systime_t time);
   msg_t chCondWaitTimeoutS(condition_variable_t *cp, systime_t time);
 #endif
@@ -110,7 +109,7 @@ extern "C" {
 /* Module inline functions.                                                  */
 /*===========================================================================*/
 
-#endif /* CH_CFG_USE_CONDVARS */
+#endif /* CH_CFG_USE_CONDVARS == TRUE */
 
 #endif /* _CHCOND_H_ */
 

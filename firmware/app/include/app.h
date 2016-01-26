@@ -7,6 +7,7 @@
 #define APP_H
 
 #include "imu.h"
+#include "nav.h"
 #include "encoder.h"
 #include "servo.h"
 

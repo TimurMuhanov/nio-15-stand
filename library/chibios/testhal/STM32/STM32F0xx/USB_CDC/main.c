@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -34,13 +34,6 @@
 #define USBD1_DATA_REQUEST_EP           1
 #define USBD1_DATA_AVAILABLE_EP         1
 #define USBD1_INTERRUPT_REQUEST_EP      2
-
-/*
- * DP resistor control is not possible on the STM32F3-Discovery, using stubs
- * for the connection macros.
- */
-#define usb_lld_connect_bus(usbp)
-#define usb_lld_disconnect_bus(usbp)
 
 /*
  * Serial over USB Driver structure.
@@ -445,15 +438,15 @@ static const ShellConfig shell_cfg1 = {
  * Red LED blinker thread, times are in milliseconds.
  */
 static THD_WORKING_AREA(waThread1, 128);
-static msg_t Thread1(void *arg) {
+static THD_FUNCTION(Thread1, arg) {
 
   (void)arg;
   chRegSetThreadName("blinker");
-  while (TRUE) {
+  while (true) {
     systime_t time = serusbcfg.usbp->state == USB_ACTIVE ? 250 : 500;
-    palClearPad(GPIOE, GPIOE_LED3_RED);
+    palClearPad(GPIOC, GPIOC_LED_RED);
     chThdSleepMilliseconds(time);
-    palSetPad(GPIOE, GPIOE_LED3_RED);
+    palSetPad(GPIOC, GPIOC_LED_RED);
     chThdSleepMilliseconds(time);
   }
 }
@@ -504,7 +497,7 @@ int main(void) {
    * Normal main() thread activity, in this demo it does nothing except
    * sleeping in a loop and check the button state.
    */
-  while (TRUE) {
+  while (true) {
     if (!shelltp && (SDU1.config->usbp->state == USB_ACTIVE))
       shelltp = shellCreate(&shell_cfg1, SHELL_WA_SIZE, NORMALPRIO);
     else if (chThdTerminatedX(shelltp)) {

@@ -10,22 +10,31 @@
 #define IO_H
 
 
-
-
-
 #include "ch.h"
 #include "hal.h"
 
 #include <stdarg.h>
+//#include <iostream>
 #include "chprintf.h"
 #include "usbcfg.h"
 #include "ff.h"
 
 
-
-
 #define IO_WRITE_BUFFER			100
 
+/*
+class Iterfaces {
+    private:
+                                            Iterfaces();
+                                           ~Iterfaces();
+    public:
+
+        static void                         init();
+        static std::iostream                terminal();
+        static std::iostream                telemethry();
+    private:
+};
+*/
 
 #ifdef __cplusplus
 extern "C" {

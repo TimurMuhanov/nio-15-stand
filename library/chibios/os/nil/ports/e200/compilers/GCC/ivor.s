@@ -1,14 +1,14 @@
 /*
-    ChibiOS/NIL - Copyright (C) 2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/NIL.
+    This file is part of ChibiOS.
 
-    ChibiOS/NIL is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/NIL is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -93,10 +93,13 @@ _IVOR10:
         lis         %r3, 0x0800             /* DIS bit mask.                */
         mtspr       336, %r3                /* TSR register.                */
 
-#if PPC_USE_IRQ_PREEMPTION
-        /* Allows preemption while executing the software handler.*/
-        wrteei      1
+        /* Restoring pre-IRQ MSR register value.*/
+        mfSRR1      %r0
+#if !PPC_USE_IRQ_PREEMPTION
+        /* No preemption, keeping EE disabled.*/
+        se_bclri    %r0, 16                 /* EE = bit 16.                 */
 #endif
+        mtMSR       %r0
 
         /* System tick handler invocation.*/
         bl          chSysTimerHandlerI
@@ -161,10 +164,13 @@ _IVOR4:
         lwz         %r3, 0(%r3)
         mtCTR       %r3                     /* Software handler address.    */
 
-#if PPC_USE_IRQ_PREEMPTION
-        /* Allows preemption while executing the software handler.*/
-        wrteei      1
+        /* Restoring pre-IRQ MSR register value.*/
+        mfSRR1      %r0
+#if !PPC_USE_IRQ_PREEMPTION
+        /* No preemption, keeping EE disabled.*/
+        se_bclri    %r0, 16                 /* EE = bit 16.                 */
 #endif
+        mtMSR       %r0
 
         /* Exectes the software handler.*/
         bctrl

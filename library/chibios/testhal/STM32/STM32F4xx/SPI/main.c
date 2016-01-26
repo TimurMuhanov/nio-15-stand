@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -47,11 +47,11 @@ static uint8_t rxbuf[512];
  * SPI bus contender 1.
  */
 static THD_WORKING_AREA(spi_thread_1_wa, 256);
-static msg_t spi_thread_1(void *p) {
+static THD_FUNCTION(spi_thread_1, p) {
 
   (void)p;
   chRegSetThreadName("SPI thread 1");
-  while (TRUE) {
+  while (true) {
     spiAcquireBus(&SPID2);              /* Acquire ownership of the bus.    */
     palSetPad(GPIOD, GPIOD_LED5);       /* LED ON.                          */
     spiStart(&SPID2, &hs_spicfg);       /* Setup transfer parameters.       */
@@ -61,18 +61,17 @@ static msg_t spi_thread_1(void *p) {
     spiUnselect(&SPID2);                /* Slave Select de-assertion.       */
     spiReleaseBus(&SPID2);              /* Ownership release.               */
   }
-  return 0;
 }
 
 /*
  * SPI bus contender 2.
  */
 static THD_WORKING_AREA(spi_thread_2_wa, 256);
-static msg_t spi_thread_2(void *p) {
+static THD_FUNCTION(spi_thread_2, p) {
 
   (void)p;
   chRegSetThreadName("SPI thread 2");
-  while (TRUE) {
+  while (true) {
     spiAcquireBus(&SPID2);              /* Acquire ownership of the bus.    */
     palClearPad(GPIOD, GPIOD_LED5);     /* LED OFF.                         */
     spiStart(&SPID2, &ls_spicfg);       /* Setup transfer parameters.       */
@@ -82,7 +81,6 @@ static msg_t spi_thread_2(void *p) {
     spiUnselect(&SPID2);                /* Slave Select de-assertion.       */
     spiReleaseBus(&SPID2);              /* Ownership release.               */
   }
-  return 0;
 }
 
 /*
@@ -131,7 +129,7 @@ int main(void) {
   /*
    * Normal main() thread activity, in this demo it does nothing.
    */
-  while (TRUE) {
+  while (true) {
     chThdSleepMilliseconds(500);
   }
   return 0;

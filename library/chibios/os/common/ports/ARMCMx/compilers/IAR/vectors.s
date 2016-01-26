@@ -1,6 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006,2007,2008,2009,2010,
-              2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -685,7 +684,7 @@ __vector_table:
 #endif
         PUBLIC  _unhandled_exception
 
-        SECTION .text:CODE:REORDER(1)
+        SECTION .text:CODE:NOROOT:REORDER(1)
         THUMB
 
 NMI_Handler

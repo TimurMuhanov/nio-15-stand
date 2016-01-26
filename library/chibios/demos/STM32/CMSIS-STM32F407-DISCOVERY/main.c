@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ static void Thread1(void const *arg) {
 
   (void)arg;
 
-  while (TRUE) {
+  while (true) {
     palSetPad(GPIOD, GPIOD_LED3);       /* Orange.  */
     osDelay(500);
     palClearPad(GPIOD, GPIOD_LED3);     /* Orange.  */
@@ -36,7 +36,7 @@ static void Thread1(void const *arg) {
 /*
  * Thread definition block.
  */
-osThreadDef(Thread1, osPriorityAboveNormal, 1, 128);
+osThreadDef(Thread1, osPriorityAboveNormal, 128);
 
 /*
  * Application entry point.
@@ -67,7 +67,7 @@ int main(void) {
 
   /* In the ChibiOS/RT CMSIS RTOS implementation the main() is an
      usable thread, here we just sleep in a loop printing a message.*/
-  while (TRUE) {
+  while (true) {
     sdWrite(&SD2, (uint8_t *)"Hello World!\r\n", 14);
     osDelay(500);
   }

@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -145,13 +144,12 @@
 #define CH_LICENSE_MAX_DEPLOY               CH_DEPLOY_UNLIMITED
 
 #elif CH_LICENSE == CH_LICENSE_COMMERCIAL_FREE
-#include "chcustomer.h"
 #define CH_LICENSE_TYPE_STRING              "Zero Cost Registered License"
-#define CH_LICENSE_ID_STRING                CH_CUSTOMER_ID_STRING
-#define CH_LICENSE_ID_CODE                  CH_CUSTOMER_ID_CODE
+#define CH_LICENSE_ID_STRING                "N/A"
+#define CH_LICENSE_ID_CODE                  "2015-0000"
 #define CH_LICENSE_MODIFIABLE_CODE          FALSE
 #define CH_LICENSE_FEATURES                 CH_FEATURES_INTERMEDIATE
-#define CH_LICENSE_MAX_DEPLOY               200
+#define CH_LICENSE_MAX_DEPLOY               500
 
 #elif CH_LICENSE == CH_LICENSE_COMMERCIAL_DEVELOPER
 #include "chcustomer.h"
@@ -160,7 +158,7 @@
 #define CH_LICENSE_ID_CODE                  CH_CUSTOMER_ID_CODE
 #define CH_LICENSE_MODIFIABLE_CODE          TRUE
 #define CH_LICENSE_FEATURES                 CH_FEATURES_FULL
-#define CH_LICENSE_DEPLOY_LIMIT             2000
+#define CH_LICENSE_DEPLOY_LIMIT             5000
 
 #elif CH_LICENSE == CH_LICENSE_COMMERCIAL_FULL
 #include "chcustomer.h"
@@ -195,12 +193,8 @@
     #error "CH_CFG_ST_TIMEDELTA > 2, High Resolution Time functionality restricted"
   #endif
 
-  #if CH_CFG_USE_TM
-    #error "CH_CFG_USE_TM == TRUE, Time Measurement functionality restricted"
-  #endif
-
-  #if CH_DBG_STATISTICS
-    #error "CH_DBG_STATISTICS == TRUE, Condition Variables functionality restricted"
+  #if CH_DBG_STATISTICS == TRUE
+    #error "CH_DBG_STATISTICS == TRUE, Statistics functionality restricted"
   #endif
 
   #if CH_LICENSE_FEATURES == CH_FEATURES_BASIC
@@ -209,15 +203,19 @@
       #error "CH_CFG_ST_TIMEDELTA > 0, Tick-Less functionality restricted"
     #endif
 
-    #if CH_CFG_USE_MUTEXES_RECURSIVE
+    #if CH_CFG_USE_TM == TRUE
+      #error "CH_CFG_USE_TM == TRUE, Time Measurement functionality restricted"
+    #endif
+
+    #if CH_CFG_USE_MUTEXES_RECURSIVE == TRUE
       #error "CH_CFG_USE_MUTEXES_RECURSIVE == TRUE, Recursive Mutexes functionality restricted"
     #endif
 
-    #if CH_CFG_USE_CONDVARS
+    #if CH_CFG_USE_CONDVARS == TRUE
       #error "CH_CFG_USE_CONDVARS == TRUE, Condition Variables functionality restricted"
     #endif
 
-    #if CH_CFG_USE_DYNAMIC
+    #if CH_CFG_USE_DYNAMIC == TRUE
       #error "CH_CFG_USE_DYNAMIC == TRUE, Dynamic Threads functionality restricted"
     #endif
   #endif /* CH_LICENSE_FEATURES == CH_FEATURES_BASIC */

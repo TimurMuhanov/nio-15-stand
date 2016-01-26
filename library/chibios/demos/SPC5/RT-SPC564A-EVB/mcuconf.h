@@ -1,5 +1,5 @@
 /*
-    SPC5 HAL - Copyright (C) 2013 STMicroelectronics
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+
+#ifndef _MCUCONF_H_
+#define _MCUCONF_H_
 
 /*
  * SPC564Axx drivers configuration.
@@ -181,3 +184,5 @@
 #define SPC5_CAN_USE_FLEXCAN2               FALSE
 #define SPC5_CAN_FLEXCAN2_USE_EXT_CLK       FALSE
 #define SPC5_CAN_FLEXCAN2_IRQ_PRIORITY      11
+
+#endif /* _MCUCONF_H_ */

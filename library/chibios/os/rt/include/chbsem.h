@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -24,7 +23,6 @@
  *
  * @addtogroup binary_semaphores
  * @details Binary semaphores related APIs and services.
- *
  *          <h2>Operation mode</h2>
  *          Binary semaphores are implemented as a set of inline functions
  *          that use the existing counting semaphores primitives. The
@@ -51,7 +49,7 @@
 #ifndef _CHBSEM_H_
 #define _CHBSEM_H_
 
-#if CH_CFG_USE_SEMAPHORES || defined(__DOXYGEN__)
+#if (CH_CFG_USE_SEMAPHORES == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -125,7 +123,7 @@ typedef struct  {
  */
 static inline void chBSemObjectInit(binary_semaphore_t *bsp, bool taken) {
 
-  chSemObjectInit(&bsp->bs_sem, taken ? 0 : 1);
+  chSemObjectInit(&bsp->bs_sem, taken ? (cnt_t)0 : (cnt_t)1);
 }
 
 /**
@@ -134,8 +132,8 @@ static inline void chBSemObjectInit(binary_semaphore_t *bsp, bool taken) {
  * @param[in] bsp       pointer to a @p binary_semaphore_t structure
  * @return              A message specifying how the invoking thread has been
  *                      released from the semaphore.
- * @retval RDY_OK       if the binary semaphore has been successfully taken.
- * @retval RDY_RESET    if the binary semaphore has been reset using
+ * @retval MSG_OK       if the binary semaphore has been successfully taken.
+ * @retval MSG_RESET    if the binary semaphore has been reset using
  *                      @p bsemReset().
  *
  * @api
@@ -151,8 +149,8 @@ static inline msg_t chBSemWait(binary_semaphore_t *bsp) {
  * @param[in] bsp       pointer to a @p binary_semaphore_t structure
  * @return              A message specifying how the invoking thread has been
  *                      released from the semaphore.
- * @retval RDY_OK       if the binary semaphore has been successfully taken.
- * @retval RDY_RESET    if the binary semaphore has been reset using
+ * @retval MSG_OK       if the binary semaphore has been successfully taken.
+ * @retval MSG_RESET    if the binary semaphore has been reset using
  *                      @p bsemReset().
  *
  * @sclass
@@ -175,10 +173,10 @@ static inline msg_t chBSemWaitS(binary_semaphore_t *bsp) {
  *                      .
  * @return              A message specifying how the invoking thread has been
  *                      released from the semaphore.
- * @retval RDY_OK       if the binary semaphore has been successfully taken.
- * @retval RDY_RESET    if the binary semaphore has been reset using
+ * @retval MSG_OK       if the binary semaphore has been successfully taken.
+ * @retval MSG_RESET    if the binary semaphore has been reset using
  *                      @p bsemReset().
- * @retval RDY_TIMEOUT  if the binary semaphore has not been signaled or reset
+ * @retval MSG_TIMEOUT  if the binary semaphore has not been signaled or reset
  *                      within the specified timeout.
  *
  * @sclass
@@ -202,10 +200,10 @@ static inline msg_t chBSemWaitTimeoutS(binary_semaphore_t *bsp,
  *                      .
  * @return              A message specifying how the invoking thread has been
  *                      released from the semaphore.
- * @retval RDY_OK       if the binary semaphore has been successfully taken.
- * @retval RDY_RESET    if the binary semaphore has been reset using
+ * @retval MSG_OK       if the binary semaphore has been successfully taken.
+ * @retval MSG_RESET    if the binary semaphore has been reset using
  *                      @p bsemReset().
- * @retval RDY_TIMEOUT  if the binary semaphore has not been signaled or reset
+ * @retval MSG_TIMEOUT  if the binary semaphore has not been signaled or reset
  *                      within the specified timeout.
  *
  * @api
@@ -220,7 +218,7 @@ static inline msg_t chBSemWaitTimeout(binary_semaphore_t *bsp,
  * @brief   Reset operation on the binary semaphore.
  * @note    The released threads can recognize they were waked up by a reset
  *          rather than a signal because the @p bsemWait() will return
- *          @p RDY_RESET instead of @p RDY_OK.
+ *          @p MSG_RESET instead of @p MSG_OK.
  * @note    This function does not reschedule.
  *
  * @param[in] bsp       pointer to a @p binary_semaphore_t structure
@@ -235,14 +233,14 @@ static inline void chBSemResetI(binary_semaphore_t *bsp, bool taken) {
 
   chDbgCheckClassI();
 
-  chSemResetI(&bsp->bs_sem, taken ? 0 : 1);
+  chSemResetI(&bsp->bs_sem, taken ? (cnt_t)0 : (cnt_t)1);
 }
 
 /**
  * @brief   Reset operation on the binary semaphore.
  * @note    The released threads can recognize they were waked up by a reset
  *          rather than a signal because the @p bsemWait() will return
- *          @p RDY_RESET instead of @p RDY_OK.
+ *          @p MSG_RESET instead of @p MSG_OK.
  *
  * @param[in] bsp       pointer to a @p binary_semaphore_t structure
  * @param[in] taken     new state of the binary semaphore
@@ -254,7 +252,7 @@ static inline void chBSemResetI(binary_semaphore_t *bsp, bool taken) {
  */
 static inline void chBSemReset(binary_semaphore_t *bsp, bool taken) {
 
-  chSemReset(&bsp->bs_sem, taken ? 0 : 1);
+  chSemReset(&bsp->bs_sem, taken ? (cnt_t)0 : (cnt_t)1);
 }
 
 /**
@@ -269,8 +267,9 @@ static inline void chBSemSignalI(binary_semaphore_t *bsp) {
 
   chDbgCheckClassI();
 
-  if (bsp->bs_sem.s_cnt < 1)
+  if (bsp->bs_sem.s_cnt < (cnt_t)1) {
     chSemSignalI(&bsp->bs_sem);
+  }
 }
 
 /**
@@ -302,10 +301,10 @@ static inline bool chBSemGetStateI(binary_semaphore_t *bsp) {
 
   chDbgCheckClassI();
 
-  return bsp->bs_sem.s_cnt > 0 ? false : true;
+  return (bsp->bs_sem.s_cnt > (cnt_t)0) ? false : true;
 }
 
-#endif /* CH_CFG_USE_SEMAPHORES */
+#endif /* CH_CFG_USE_SEMAPHORES == TRUE */
 
 #endif /* _CHBSEM_H_ */
 

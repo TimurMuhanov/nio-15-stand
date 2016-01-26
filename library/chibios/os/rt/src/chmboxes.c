@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -52,7 +51,7 @@
 
 #include "ch.h"
 
-#if CH_CFG_USE_MAILBOXES || defined(__DOXYGEN__)
+#if (CH_CFG_USE_MAILBOXES == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module exported variables.                                                */
@@ -86,12 +85,14 @@
  */
 void chMBObjectInit(mailbox_t *mbp, msg_t *buf, cnt_t n) {
 
-  chDbgCheck((mbp != NULL) && (buf != NULL) && (n > 0));
+  chDbgCheck((mbp != NULL) && (buf != NULL) && (n > (cnt_t)0));
 
-  mbp->mb_buffer = mbp->mb_wrptr = mbp->mb_rdptr = buf;
+  mbp->mb_buffer = buf;
+  mbp->mb_rdptr = buf;
+  mbp->mb_wrptr = buf;
   mbp->mb_top = &buf[n];
   chSemObjectInit(&mbp->mb_emptysem, n);
-  chSemObjectInit(&mbp->mb_fullsem, 0);
+  chSemObjectInit(&mbp->mb_fullsem, (cnt_t)0);
 }
 
 /**
@@ -125,9 +126,10 @@ void chMBResetI(mailbox_t *mbp) {
   chDbgCheckClassI();
   chDbgCheck(mbp != NULL);
 
-  mbp->mb_wrptr = mbp->mb_rdptr = mbp->mb_buffer;
-  chSemResetI(&mbp->mb_emptysem, mbp->mb_top - mbp->mb_buffer);
-  chSemResetI(&mbp->mb_fullsem, 0);
+  mbp->mb_wrptr = mbp->mb_buffer;
+  mbp->mb_rdptr = mbp->mb_buffer;
+  chSemResetI(&mbp->mb_emptysem, (cnt_t)(mbp->mb_top - mbp->mb_buffer));
+  chSemResetI(&mbp->mb_fullsem, (cnt_t)0);
 }
 
 /**
@@ -137,7 +139,7 @@ void chMBResetI(mailbox_t *mbp) {
  *
  * @param[in] mbp       the pointer to an initialized @p mailbox_t object
  * @param[in] msg       the message to be posted on the mailbox
- * @param[in] time      the number of ticks before the operation timeouts,
+ * @param[in] timeout   the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -149,12 +151,13 @@ void chMBResetI(mailbox_t *mbp) {
  *
  * @api
  */
-msg_t chMBPost(mailbox_t *mbp, msg_t msg, systime_t time) {
+msg_t chMBPost(mailbox_t *mbp, msg_t msg, systime_t timeout) {
   msg_t rdymsg;
 
   chSysLock();
-  rdymsg = chMBPostS(mbp, msg, time);
+  rdymsg = chMBPostS(mbp, msg, timeout);
   chSysUnlock();
+
   return rdymsg;
 }
 
@@ -165,7 +168,7 @@ msg_t chMBPost(mailbox_t *mbp, msg_t msg, systime_t time) {
  *
  * @param[in] mbp       the pointer to an initialized @p mailbox_t object
  * @param[in] msg       the message to be posted on the mailbox
- * @param[in] time      the number of ticks before the operation timeouts,
+ * @param[in] timeout   the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -177,20 +180,22 @@ msg_t chMBPost(mailbox_t *mbp, msg_t msg, systime_t time) {
  *
  * @sclass
  */
-msg_t chMBPostS(mailbox_t *mbp, msg_t msg, systime_t time) {
+msg_t chMBPostS(mailbox_t *mbp, msg_t msg, systime_t timeout) {
   msg_t rdymsg;
 
   chDbgCheckClassS();
   chDbgCheck(mbp != NULL);
 
-  rdymsg = chSemWaitTimeoutS(&mbp->mb_emptysem, time);
+  rdymsg = chSemWaitTimeoutS(&mbp->mb_emptysem, timeout);
   if (rdymsg == MSG_OK) {
     *mbp->mb_wrptr++ = msg;
-    if (mbp->mb_wrptr >= mbp->mb_top)
+    if (mbp->mb_wrptr >= mbp->mb_top) {
       mbp->mb_wrptr = mbp->mb_buffer;
+    }
     chSemSignalI(&mbp->mb_fullsem);
     chSchRescheduleS();
   }
+
   return rdymsg;
 }
 
@@ -213,13 +218,17 @@ msg_t chMBPostI(mailbox_t *mbp, msg_t msg) {
   chDbgCheckClassI();
   chDbgCheck(mbp != NULL);
 
-  if (chSemGetCounterI(&mbp->mb_emptysem) <= 0)
+  if (chSemGetCounterI(&mbp->mb_emptysem) <= (cnt_t)0) {
     return MSG_TIMEOUT;
+  }
+
   chSemFastWaitI(&mbp->mb_emptysem);
   *mbp->mb_wrptr++ = msg;
-  if (mbp->mb_wrptr >= mbp->mb_top)
-    mbp->mb_wrptr = mbp->mb_buffer;
+  if (mbp->mb_wrptr >= mbp->mb_top) {
+     mbp->mb_wrptr = mbp->mb_buffer;
+  }
   chSemSignalI(&mbp->mb_fullsem);
+
   return MSG_OK;
 }
 
@@ -230,7 +239,7 @@ msg_t chMBPostI(mailbox_t *mbp, msg_t msg) {
  *
  * @param[in] mbp       the pointer to an initialized @p mailbox_t object
  * @param[in] msg       the message to be posted on the mailbox
- * @param[in] time      the number of ticks before the operation timeouts,
+ * @param[in] timeout   the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -242,12 +251,13 @@ msg_t chMBPostI(mailbox_t *mbp, msg_t msg) {
  *
  * @api
  */
-msg_t chMBPostAhead(mailbox_t *mbp, msg_t msg, systime_t time) {
+msg_t chMBPostAhead(mailbox_t *mbp, msg_t msg, systime_t timeout) {
   msg_t rdymsg;
 
   chSysLock();
-  rdymsg = chMBPostAheadS(mbp, msg, time);
+  rdymsg = chMBPostAheadS(mbp, msg, timeout);
   chSysUnlock();
+
   return rdymsg;
 }
 
@@ -258,7 +268,7 @@ msg_t chMBPostAhead(mailbox_t *mbp, msg_t msg, systime_t time) {
  *
  * @param[in] mbp       the pointer to an initialized @p mailbox_t object
  * @param[in] msg       the message to be posted on the mailbox
- * @param[in] time      the number of ticks before the operation timeouts,
+ * @param[in] timeout   the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -270,20 +280,22 @@ msg_t chMBPostAhead(mailbox_t *mbp, msg_t msg, systime_t time) {
  *
  * @sclass
  */
-msg_t chMBPostAheadS(mailbox_t *mbp, msg_t msg, systime_t time) {
+msg_t chMBPostAheadS(mailbox_t *mbp, msg_t msg, systime_t timeout) {
   msg_t rdymsg;
 
   chDbgCheckClassS();
   chDbgCheck(mbp != NULL);
 
-  rdymsg = chSemWaitTimeoutS(&mbp->mb_emptysem, time);
+  rdymsg = chSemWaitTimeoutS(&mbp->mb_emptysem, timeout);
   if (rdymsg == MSG_OK) {
-    if (--mbp->mb_rdptr < mbp->mb_buffer)
+    if (--mbp->mb_rdptr < mbp->mb_buffer) {
       mbp->mb_rdptr = mbp->mb_top - 1;
+    }
     *mbp->mb_rdptr = msg;
     chSemSignalI(&mbp->mb_fullsem);
     chSchRescheduleS();
   }
+
   return rdymsg;
 }
 
@@ -306,13 +318,16 @@ msg_t chMBPostAheadI(mailbox_t *mbp, msg_t msg) {
   chDbgCheckClassI();
   chDbgCheck(mbp != NULL);
 
-  if (chSemGetCounterI(&mbp->mb_emptysem) <= 0)
+  if (chSemGetCounterI(&mbp->mb_emptysem) <= (cnt_t)0) {
     return MSG_TIMEOUT;
+  }
   chSemFastWaitI(&mbp->mb_emptysem);
-  if (--mbp->mb_rdptr < mbp->mb_buffer)
+  if (--mbp->mb_rdptr < mbp->mb_buffer) {
     mbp->mb_rdptr = mbp->mb_top - 1;
+  }
   *mbp->mb_rdptr = msg;
   chSemSignalI(&mbp->mb_fullsem);
+
   return MSG_OK;
 }
 
@@ -323,7 +338,7 @@ msg_t chMBPostAheadI(mailbox_t *mbp, msg_t msg) {
  *
  * @param[in] mbp       the pointer to an initialized @p mailbox_t object
  * @param[out] msgp     pointer to a message variable for the received message
- * @param[in] time      the number of ticks before the operation timeouts,
+ * @param[in] timeout   the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -335,12 +350,13 @@ msg_t chMBPostAheadI(mailbox_t *mbp, msg_t msg) {
  *
  * @api
  */
-msg_t chMBFetch(mailbox_t *mbp, msg_t *msgp, systime_t time) {
+msg_t chMBFetch(mailbox_t *mbp, msg_t *msgp, systime_t timeout) {
   msg_t rdymsg;
 
   chSysLock();
-  rdymsg = chMBFetchS(mbp, msgp, time);
+  rdymsg = chMBFetchS(mbp, msgp, timeout);
   chSysUnlock();
+
   return rdymsg;
 }
 
@@ -351,7 +367,7 @@ msg_t chMBFetch(mailbox_t *mbp, msg_t *msgp, systime_t time) {
  *
  * @param[in] mbp       the pointer to an initialized @p mailbox_t object
  * @param[out] msgp     pointer to a message variable for the received message
- * @param[in] time      the number of ticks before the operation timeouts,
+ * @param[in] timeout   the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -363,20 +379,22 @@ msg_t chMBFetch(mailbox_t *mbp, msg_t *msgp, systime_t time) {
  *
  * @sclass
  */
-msg_t chMBFetchS(mailbox_t *mbp, msg_t *msgp, systime_t time) {
+msg_t chMBFetchS(mailbox_t *mbp, msg_t *msgp, systime_t timeout) {
   msg_t rdymsg;
 
   chDbgCheckClassS();
   chDbgCheck((mbp != NULL) && (msgp != NULL));
 
-  rdymsg = chSemWaitTimeoutS(&mbp->mb_fullsem, time);
+  rdymsg = chSemWaitTimeoutS(&mbp->mb_fullsem, timeout);
   if (rdymsg == MSG_OK) {
     *msgp = *mbp->mb_rdptr++;
-    if (mbp->mb_rdptr >= mbp->mb_top)
+    if (mbp->mb_rdptr >= mbp->mb_top) {
       mbp->mb_rdptr = mbp->mb_buffer;
+    }
     chSemSignalI(&mbp->mb_emptysem);
     chSchRescheduleS();
   }
+
   return rdymsg;
 }
 
@@ -399,15 +417,18 @@ msg_t chMBFetchI(mailbox_t *mbp, msg_t *msgp) {
   chDbgCheckClassI();
   chDbgCheck((mbp != NULL) && (msgp != NULL));
 
-  if (chSemGetCounterI(&mbp->mb_fullsem) <= 0)
+  if (chSemGetCounterI(&mbp->mb_fullsem) <= (cnt_t)0) {
     return MSG_TIMEOUT;
+  }
   chSemFastWaitI(&mbp->mb_fullsem);
   *msgp = *mbp->mb_rdptr++;
-  if (mbp->mb_rdptr >= mbp->mb_top)
+  if (mbp->mb_rdptr >= mbp->mb_top) {
     mbp->mb_rdptr = mbp->mb_buffer;
+  }
   chSemSignalI(&mbp->mb_emptysem);
+
   return MSG_OK;
 }
-#endif /* CH_CFG_USE_MAILBOXES */
+#endif /* CH_CFG_USE_MAILBOXES == TRUE */
 
 /** @} */

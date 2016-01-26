@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -31,6 +31,12 @@
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
+
+/**
+ * @brief   CMSIS system core clock variable.
+ * @note    It is declared in system_stm32f0xx.h.
+ */
+uint32_t SystemCoreClock = STM32_SYSCLK;
 
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
@@ -185,8 +191,11 @@ void stm32_clock_init(void) {
   RCC->CFGR  = STM32_MCOSEL | STM32_PLLMUL | STM32_PLLSRC |
                STM32_ADCPRE | STM32_PPRE   | STM32_HPRE;
   RCC->CFGR2 = STM32_PREDIV;
-  RCC->CFGR3 = STM32_ADCSW  | STM32_CECSW  | STM32_I2C1SW |
-               STM32_USART1SW;
+#if STM32_CECSW == STM32_CECSW_OFF
+  RCC->CFGR3 = STM32_USBSW  | STM32_I2C1SW | STM32_USART1SW;
+#else
+  RCC->CFGR3 = STM32_USBSW  | STM32_CECSW  | STM32_I2C1SW | STM32_USART1SW;
+#endif
 
 #if STM32_ACTIVATE_PLL
   /* PLL activation.*/

@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -56,12 +56,11 @@
  * not find a fifth message waiting.
  */
 
-static msg_t thread(void *p) {
+static THD_FUNCTION(thread, p) {
 
   chMsgSend(p, 'A');
   chMsgSend(p, 'B');
   chMsgSend(p, 'C');
-  return 0;
 }
 
 static void msg1_execute(void) {

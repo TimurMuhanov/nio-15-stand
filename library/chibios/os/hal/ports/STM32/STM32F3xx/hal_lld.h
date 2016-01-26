@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@
 #define STM32_PLLOUT_MAX        72000000
 
 /**
- * @brief   Maximum PLL output clock frequency.
+ * @brief   Minimum PLL output clock frequency.
  */
 #define STM32_PLLOUT_MIN        16000000
 
@@ -588,14 +588,6 @@
 #error "HSI not enabled, required by STM32_I2C2SW"
 #endif
 
-#if STM32_TIM1SW == STM32_TIM1SW_HSI
-#error "HSI not enabled, required by STM32_TIM1SW"
-#endif
-
-#if STM32_TIM8SW == STM32_TIM8SW_HSI
-#error "HSI not enabled, required by STM32_TIM8SW"
-#endif
-
 #if (STM32_SW == STM32_SW_PLL) && (STM32_PLLSRC == STM32_PLLSRC_HSI)
 #error "HSI not enabled, required by STM32_SW and STM32_PLLSRC"
 #endif
@@ -905,7 +897,7 @@
 /**
  * @brief   ADC34 frequency.
  */
-#if (STM32_ADC43PRES == STM32_ADC34PRES_NOCLOCK) || defined(__DOXYGEN__)
+#if (STM32_ADC34PRES == STM32_ADC34PRES_NOCLOCK) || defined(__DOXYGEN__)
 #define STM32_ADC34CLK              0
 #elif STM32_ADC34PRES == STM32_ADC34PRES_DIV1
 #define STM32_ADC34CLK              (STM32_PLLCLKOUT / 1)
@@ -974,9 +966,9 @@
 #define STM32_USART1CLK             STM32_PCLK2
 #elif STM32_USART1SW == STM32_USART1SW_SYSCLK
 #define STM32_USART1CLK             STM32_SYSCLK
-#elif STM32_USART1SW == STM32_USART1SW_LSECLK
+#elif STM32_USART1SW == STM32_USART1SW_LSE
 #define STM32_USART1CLK             STM32_LSECLK
-#elif STM32_USART1SW == STM32_USART1SW_HSICLK
+#elif STM32_USART1SW == STM32_USART1SW_HSI
 #define STM32_USART1CLK             STM32_HSICLK
 #else
 #error "invalid source selected for USART1 clock"
@@ -989,9 +981,9 @@
 #define STM32_USART2CLK             STM32_PCLK1
 #elif STM32_USART2SW == STM32_USART2SW_SYSCLK
 #define STM32_USART2CLK             STM32_SYSCLK
-#elif STM32_USART2SW == STM32_USART2SW_LSECLK
+#elif STM32_USART2SW == STM32_USART2SW_LSE
 #define STM32_USART2CLK             STM32_LSECLK
-#elif STM32_USART2SW == STM32_USART2SW_HSICLK
+#elif STM32_USART2SW == STM32_USART2SW_HSI
 #define STM32_USART2CLK             STM32_HSICLK
 #else
 #error "invalid source selected for USART2 clock"
@@ -1004,9 +996,9 @@
 #define STM32_USART3CLK             STM32_PCLK1
 #elif STM32_USART3SW == STM32_USART3SW_SYSCLK
 #define STM32_USART3CLK             STM32_SYSCLK
-#elif STM32_USART3SW == STM32_USART3SW_LSECLK
+#elif STM32_USART3SW == STM32_USART3SW_LSE
 #define STM32_USART3CLK             STM32_LSECLK
-#elif STM32_USART3SW == STM32_USART3SW_HSICLK
+#elif STM32_USART3SW == STM32_USART3SW_HSI
 #define STM32_USART3CLK             STM32_HSICLK
 #else
 #error "invalid source selected for USART3 clock"
@@ -1019,9 +1011,9 @@
 #define STM32_UART4CLK             STM32_PCLK1
 #elif STM32_UART4SW == STM32_UART4SW_SYSCLK
 #define STM32_UART4CLK             STM32_SYSCLK
-#elif STM32_UART4SW == STM32_UART4SW_LSECLK
+#elif STM32_UART4SW == STM32_UART4SW_LSE
 #define STM32_UART4CLK             STM32_LSECLK
-#elif STM32_UART4SW == STM32_UART4SW_HSICLK
+#elif STM32_UART4SW == STM32_UART4SW_HSI
 #define STM32_UART4CLK             STM32_HSICLK
 #else
 #error "invalid source selected for UART4 clock"
@@ -1034,9 +1026,9 @@
 #define STM32_UART5CLK             STM32_PCLK1
 #elif STM32_UART5SW == STM32_UART5SW_SYSCLK
 #define STM32_UART5CLK             STM32_SYSCLK
-#elif STM32_UART5SW == STM32_UART5SW_LSECLK
+#elif STM32_UART5SW == STM32_UART5SW_LSE
 #define STM32_UART5CLK             STM32_LSECLK
-#elif STM32_UART5SW == STM32_UART5SW_HSICLK
+#elif STM32_UART5SW == STM32_UART5SW_HSI
 #define STM32_UART5CLK             STM32_HSICLK
 #else
 #error "invalid source selected for UART5 clock"
@@ -1046,7 +1038,11 @@
  * @brief   TIM1 frequency.
  */
 #if STM32_TIM1SW == STM32_TIM1SW_PCLK2
+#if STM32_PPRE2 == STM32_PPRE2_DIV1
 #define STM32_TIM1CLK               STM32_PCLK2
+#else
+#define STM32_TIM1CLK               (STM32_PCLK2 * 2)
+#endif
 
 #elif STM32_TIM1SW == STM32_TIM1SW_PLLX2
 #if (STM32_SW != STM32_SW_PLL) ||                                           \
@@ -1064,7 +1060,11 @@
  * @brief   TIM8 frequency.
  */
 #if STM32_TIM8SW == STM32_TIM8SW_PCLK2
+#if STM32_PPRE2 == STM32_PPRE2_DIV1
 #define STM32_TIM8CLK               STM32_PCLK2
+#else
+#define STM32_TIM8CLK               (STM32_PCLK2 * 2)
+#endif
 
 #elif STM32_TIM8SW == STM32_TIM8SW_PLLX2
 #if (STM32_SW != STM32_SW_PLL) ||                                           \

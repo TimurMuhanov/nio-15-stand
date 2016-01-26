@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@
  * @brief Heap header file
  */
 
-#if (CH_CFG_USE_HEAP && !CH_CFG_USE_MALLOC_HEAP) || defined(__DOXYGEN__)
+#if CH_CFG_USE_HEAP || defined(__DOXYGEN__)
 
 #define SIZE 16
 
@@ -152,7 +152,7 @@ ROMCONST struct testcase testheap1 = {
  * @brief   Test sequence for heap.
  */
 ROMCONST struct testcase * ROMCONST patternheap[] = {
-#if (CH_CFG_USE_HEAP && !CH_CFG_USE_MALLOC_HEAP) || defined(__DOXYGEN__)
+#if CH_CFG_USE_HEAP || defined(__DOXYGEN__)
   &testheap1,
 #endif
   NULL

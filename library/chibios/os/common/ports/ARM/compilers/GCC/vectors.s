@@ -1,6 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006,2007,2008,2009,2010,
-              2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
     This file is part of ChibiOS.
 
@@ -41,7 +40,7 @@ void _unhandled_exception(void) {}
 
 #if !defined(__DOXYGEN__)
 
-                .section vectors, "ax"
+                .section .vectors, "ax"
                 .code   32
                 .balign 4
 

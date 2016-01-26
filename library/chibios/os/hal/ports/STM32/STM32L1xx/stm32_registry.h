@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -47,8 +47,14 @@
 #define STM32_CAN_MAX_FILTERS               0
 
 /* DAC attributes.*/
-#define STM32_HAS_DAC1                      TRUE
-#define STM32_HAS_DAC2                      FALSE
+#define STM32_HAS_DAC1_CH1                  TRUE
+#define STM32_DAC_DAC1_CH1_DMA_STREAM       STM32_DMA_STREAM_ID(1, 2)
+
+#define STM32_HAS_DAC1_CH2                  TRUE
+#define STM32_DAC_DAC1_CH2_DMA_STREAM       STM32_DMA_STREAM_ID(1, 3)
+
+#define STM32_HAS_DAC2_CH1                  FALSE
+#define STM32_HAS_DAC2_CH2                  FALSE
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA                  FALSE
@@ -178,8 +184,24 @@
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       TRUE
+#define STM32_USB_ACCESS_SCHEME_2x16        FALSE
+#define STM32_USB_PMA_SIZE                  512
+#define STM32_USB_HAS_BCDR                  FALSE
 #define STM32_HAS_OTG1                      FALSE
 #define STM32_HAS_OTG2                      FALSE
+
+/* LTDC attributes.*/
+#define STM32_HAS_LTDC                      FALSE
+
+/* DMA2D attributes.*/
+#define STM32_HAS_DMA2D                     FALSE
+
+/* FSMC attributes.*/
+#define STM32_HAS_FSMC                      FALSE
+
+/* CRC attributes.*/
+#define STM32_HAS_CRC                       TRUE
+#define STM32_CRC_PROGRAMMABLE              FALSE
 
 #else /* STM32L1XX_HD */
 
@@ -195,8 +217,15 @@
 #define STM32_CAN_MAX_FILTERS               0
 
 /* DAC attributes.*/
-#define STM32_HAS_DAC1                      TRUE
-#define STM32_HAS_DAC2                      FALSE
+#define STM32_HAS_DAC1_CH1                  TRUE
+#define STM32_DAC_DAC1_CH1_DMA_STREAM       STM32_DMA_STREAM_ID(1, 2)
+
+#define STM32_HAS_DAC1_CH2                  TRUE
+#define STM32_DAC_DAC1_CH2_DMA_STREAM       STM32_DMA_STREAM_ID(1, 3)
+
+#define STM32_HAS_DAC2_CH1                  FALSE
+#define STM32_HAS_DAC2_CH2                  FALSE
+
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA                  FALSE
@@ -333,8 +362,24 @@
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       TRUE
+#define STM32_USB_ACCESS_SCHEME_2x16        FALSE
+#define STM32_USB_PMA_SIZE                  512
+#define STM32_USB_HAS_BCDR                  FALSE
 #define STM32_HAS_OTG1                      FALSE
 #define STM32_HAS_OTG2                      FALSE
+
+/* LTDC attributes.*/
+#define STM32_HAS_LTDC                      FALSE
+
+/* DMA2D attributes.*/
+#define STM32_HAS_DMA2D                     FALSE
+
+/* FSMC attributes.*/
+#define STM32_HAS_FSMC                      FALSE
+
+/* CRC attributes.*/
+#define STM32_HAS_CRC                       TRUE
+#define STM32_CRC_PROGRAMMABLE              FALSE
 
 #endif /* STM32L1XX_HD */
 

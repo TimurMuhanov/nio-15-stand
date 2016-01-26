@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -185,7 +185,6 @@ extern "C" {
                          rtcalarm_t alarm_number,
                          RTCAlarm *alarmspec);
   void rtc_lld_set_callback(RTCDriver *rtcp, rtccb_t callback);
-  uint32_t rtc_lld_get_time_fat(RTCDriver *rtcp);
   void rtcSTM32GetSecMsec(RTCDriver *rtcp, uint32_t *tv_sec, uint32_t *tv_msec);
   void rtcSTM32SetSec(RTCDriver *rtcp, uint32_t tv_sec);
 #ifdef __cplusplus

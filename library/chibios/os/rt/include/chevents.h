@@ -1,15 +1,14 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/RT.
+    This file is part of ChibiOS.
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
+    ChibiOS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
+    ChibiOS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -32,7 +31,7 @@
 #ifndef _CHEVENTS_H_
 #define _CHEVENTS_H_
 
-#if CH_CFG_USE_EVENTS || defined(__DOXYGEN__)
+#if (CH_CFG_USE_EVENTS == TRUE) || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
@@ -81,7 +80,7 @@ typedef struct event_source {
 /**
  * @brief   Event Handler callback function.
  */
-typedef void (*evhandler_t)(eventid_t);
+typedef void (*evhandler_t)(eventid_t id);
 
 /*===========================================================================*/
 /* Module macros.                                                            */
@@ -95,7 +94,7 @@ typedef void (*evhandler_t)(eventid_t);
 /**
  * @brief   Returns an event mask from an event identifier.
  */
-#define EVENT_MASK(eid) ((eventmask_t)(1 << (eid)))
+#define EVENT_MASK(eid) ((eventmask_t)1 << (eventmask_t)(eid))
 
 /**
  * @brief   Data part of a static event source initializer.
@@ -135,12 +134,12 @@ extern "C" {
   void chEvtBroadcastFlags(event_source_t *esp, eventflags_t flags);
   void chEvtBroadcastFlagsI(event_source_t *esp, eventflags_t flags);
   void chEvtDispatch(const evhandler_t *handlers, eventmask_t events);
-#if CH_CFG_OPTIMIZE_SPEED || !CH_CFG_USE_EVENTS_TIMEOUT
+#if (CH_CFG_OPTIMIZE_SPEED == TRUE) || (CH_CFG_USE_EVENTS_TIMEOUT == FALSE)
   eventmask_t chEvtWaitOne(eventmask_t events);
   eventmask_t chEvtWaitAny(eventmask_t events);
   eventmask_t chEvtWaitAll(eventmask_t events);
 #endif
-#if CH_CFG_USE_EVENTS_TIMEOUT
+#if CH_CFG_USE_EVENTS_TIMEOUT == TRUE
   eventmask_t chEvtWaitOneTimeout(eventmask_t events, systime_t time);
   eventmask_t chEvtWaitAnyTimeout(eventmask_t events, systime_t time);
   eventmask_t chEvtWaitAllTimeout(eventmask_t events, systime_t time);
@@ -149,7 +148,7 @@ extern "C" {
 }
 #endif
 
-#if !CH_CFG_OPTIMIZE_SPEED && CH_CFG_USE_EVENTS_TIMEOUT
+#if (CH_CFG_OPTIMIZE_SPEED == FALSE) && (CH_CFG_USE_EVENTS_TIMEOUT == TRUE)
 #define chEvtWaitOne(mask) chEvtWaitOneTimeout(mask, TIME_INFINITE)
 #define chEvtWaitAny(mask) chEvtWaitAnyTimeout(mask, TIME_INFINITE)
 #define chEvtWaitAll(mask) chEvtWaitAllTimeout(mask, TIME_INFINITE)
@@ -170,7 +169,7 @@ extern "C" {
  */
 static inline void chEvtObjectInit(event_source_t *esp) {
 
-  esp->es_next = (event_listener_t *)(void *)esp;
+  esp->es_next = (event_listener_t *)esp;
 }
 
 /**
@@ -189,7 +188,7 @@ static inline void chEvtObjectInit(event_source_t *esp) {
  */
 static inline void chEvtRegisterMask(event_source_t *esp,
                                      event_listener_t *elp,
-                                     eventflags_t events) {
+                                     eventmask_t events) {
 
   chEvtRegisterMaskWithFlags(esp, elp, events, (eventflags_t)-1);
 }
@@ -224,7 +223,7 @@ static inline void chEvtRegister(event_source_t *esp,
  */
 static inline bool chEvtIsListeningI(event_source_t *esp) {
 
-  return (bool)((void *)esp != (void *)esp->es_next);
+  return (bool)(esp != (event_source_t *)esp->es_next);
 }
 
 /**
@@ -237,7 +236,7 @@ static inline bool chEvtIsListeningI(event_source_t *esp) {
  */
 static inline void chEvtBroadcast(event_source_t *esp) {
 
-  chEvtBroadcastFlags(esp, 0);
+  chEvtBroadcastFlags(esp, (eventflags_t)0);
 }
 
 /**
@@ -254,10 +253,10 @@ static inline void chEvtBroadcast(event_source_t *esp) {
  */
 static inline void chEvtBroadcastI(event_source_t *esp) {
 
-  chEvtBroadcastFlagsI(esp, 0);
+  chEvtBroadcastFlagsI(esp, (eventflags_t)0);
 }
 
-#endif /* CH_CFG_USE_EVENTS */
+#endif /* CH_CFG_USE_EVENTS == TRUE */
 
 #endif /* _CHEVENTS_H_ */
 

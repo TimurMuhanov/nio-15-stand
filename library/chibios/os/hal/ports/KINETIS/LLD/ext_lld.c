@@ -1,5 +1,5 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2014 Derek Mulcahy
+    ChibiOS - Copyright (C) 2014 Derek Mulcahy
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -135,12 +135,13 @@ static void ext_lld_exti_irq_disable(void) {
  * Generic interrupt handler.
  */
 static inline void irq_handler(PORT_TypeDef * const port, const unsigned port_width, const uint8_t *channel_map) {
+  unsigned pin;
   uint32_t isfr = port->ISFR;
 
   /* Clear all pending interrupts on this port. */
   port->ISFR = 0xFFFFFFFF;
 
-  for (unsigned pin = 0; pin < port_width; pin++) {
+  for (pin = 0; pin < port_width; pin++) {
     if (isfr & (1 << pin)) {
       expchannel_t channel = channel_map[pin];
       EXTD1.config->channels[channel].cb(&EXTD1, channel);
@@ -214,7 +215,7 @@ OSAL_IRQ_HANDLER(KINETIS_PORTD_IRQ_VECTOR) {
  * @isr
  */
 #if defined(KINETIS_PORTE_IRQ_VECTOR) && KINETIS_EXT_PORTE_WIDTH > 0
-CH_IRQ_HANDLER(KINETIS_PORTE_IRQ_VECTOR) {
+OSAL_IRQ_HANDLER(KINETIS_PORTE_IRQ_VECTOR) {
   OSAL_IRQ_PROLOGUE();
 
   irq_handler(PORTE, KINETIS_EXT_PORTE_WIDTH, porte_channel_map);
@@ -246,12 +247,13 @@ void ext_lld_init(void) {
  * @notapi
  */
 void ext_lld_start(EXTDriver *extp) {
+  expchannel_t channel;
 
   if (extp->state == EXT_STOP)
     ext_lld_exti_irq_enable();
 
   /* Configuration of automatic channels.*/
-  for (expchannel_t channel = 0; channel < EXT_MAX_CHANNELS; channel++) {
+  for (channel = 0; channel < EXT_MAX_CHANNELS; channel++) {
 
     uint32_t mode = extp->config->channels[channel].mode;
     PORT_TypeDef *port = extp->config->channels[channel].port;

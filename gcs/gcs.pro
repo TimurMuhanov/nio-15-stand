@@ -16,46 +16,46 @@ TEMPLATE = app
 
 SOURCES += \
 	main.cpp\
-	mainwindow.cpp \
-	serial\serial.cpp \
-	visualisation\visualisation.cpp \
-	connection\connection.cpp \
-	../library/qcustomplot/qcustomplot.cpp \
-	plot\plot.cpp \
-	encoders/encoders.cpp \
-	servos/servos.cpp \
-	control/control.cpp \
-	loader/loader.cpp \
-	logger/logger.cpp
+    mainwindow.cpp \
+    board/control.cpp \
+    board/encoders.cpp \
+    board/loader.cpp \
+    board/servos.cpp \
+    board/settings.cpp \
+    connection/connection.cpp \
+    connection/logger.cpp \
+    connection/serial.cpp \
+    ui/visualisation.cpp \
+    ui/magnetometervisualiser.cpp \
+    ui/plot.cpp \
+    ../library/qcustomplot/qcustomplot.cpp
+
 
 HEADERS  += \
 	mainwindow.h \
-	serial\serial.h \
-	visualisation\visualisation.h \
-	connection\connection.h \
-	../library/qcustomplot/qcustomplot.h \
-	plot\plot.h \
-	encoders/encoders.h \
-	servos/servos.h \
-	control/control.h \
-	loader/loader.h \
-	logger/logger.h
+    board/include/control.h \
+    board/include/encoders.h \
+    board/include/loader.h \
+    board/include/servos.h \
+    board/include/settings.h \
+    connection/include/connection.h \
+    connection/include/logger.h \
+    connection/include/serial.h \
+    ui/include/visualisation.h \
+    ui/include/magnetometervisualiser.h \
+    ui/include/plot.h \
+    ../library/qcustomplot/qcustomplot.h
 
 FORMS    += mainwindow.ui
 
 
 INCLUDEPATH += \
+    board/include \
+    connection/include \
+    ui/include \
 	../library/mavlink/ \
-	../library/mavlink/nio15_1/ \
+    ../library/mavlink/nio15/ \
 	../library/qcustomplot/ \
-	encoders \
-	serial \
-	visualisation \
-	connection \
-	plot \
-	servos \
-	loader \
-	logger
 
 RESOURCES += \
     img.qrc

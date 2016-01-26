@@ -1,7 +1,9 @@
 #include "servo.h"
-
+#include "settings.h"
 
 static thread_t* updateThread;
+static THD_FUNCTION(servoUpdate, arg);
+static THD_WORKING_AREA(servoUpdateWorkingArea, 128);
 scalarData servo[SERVO_NUMBER];
 mutex_t servoReadData;
 static binary_semaphore_t dataAccess;
@@ -13,9 +15,6 @@ struct {
 	float		minAngle;
 	float		maxAngle;
 } servoConfig[SERVO_NUMBER];
-
-
-msg_t servoUpdate(void* arg);
 
 
 void servoInit(void) {
@@ -70,14 +69,12 @@ void servoInit(void) {
 	servoConfig[7].maxAngle = paramGet(PARAM_SERVO8_MAX_ANGLE);*/
 
 	int i;
-		for( i=0; i<SERVO_NUMBER; i++)
-			servoSet(i, 0);
+    for( i=0; i<SERVO_NUMBER; i++)
+        servoSet(i, 0);
 
-	updateThread = chThdCreateFromHeap(	NULL,
-										512,
-										NORMALPRIO,
-										servoUpdate,
-										NULL );
+    updateThread = chThdCreateStatic(   servoUpdateWorkingArea,
+                                        sizeof(servoUpdateWorkingArea),
+                                        NORMALPRIO, servoUpdate, NULL);
 }
 
 void servoPower(u8 state) {
@@ -143,7 +140,7 @@ void servoSet(u32 id, float angle) {
 }
 
 
-msg_t servoUpdate(void* arg) {
+THD_FUNCTION(servoUpdate, arg) {
 	systime_t chibios_time = chVTGetSystemTime();
 
 	while(1) {
@@ -156,6 +153,5 @@ msg_t servoUpdate(void* arg) {
 		chBSemSignal(&dataAccess);
 
 		chThdSleepUntil(chibios_time);
-	}
-	return 0;
+    }
 }
