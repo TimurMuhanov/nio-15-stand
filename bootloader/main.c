@@ -4,6 +4,9 @@
 #include "io.h"
 #include "flash.h"
 
+thread_t* blinkerThread;
+static THD_FUNCTION(blinkerUpdate, arg);
+static THD_WORKING_AREA(blinkerUpdateWorkingArea, 256);
 u8 rx_buffer[5];
 u8 tx_buffer[1];
 u32 begin;
@@ -102,27 +105,30 @@ bool	get(u8 num) {
 }
 
 
-thread_t* b;
-msg_t blinker( void* arg ) {
-	while( !chThdShouldTerminateX() ) {
-		palTogglePad(GPIOC, 15);
-		chThdSleepMilliseconds(50);
-	}
-	return 0;
+THD_FUNCTION(blinkerUpdate, arg) {
+    while( !chThdShouldTerminateX() ) {
+        palTogglePad(GPIOC, 15);
+        chThdSleepMilliseconds(50);
+    }
+    chThdExit( 0 );
 }
 
 int main(void) {
 	halInit();
 	chSysInit();
 
-	palSetPadMode(GPIOC, 15, PAL_MODE_OUTPUT_PUSHPULL);
-	b = chThdCreateFromHeap(	NULL,
-								THD_WORKING_AREA_SIZE(128),
-								NORMALPRIO,
-								blinker,
-								NULL );
+    palSetPadMode(GPIOC, 15, PAL_MODE_OUTPUT_PUSHPULL);         // blue
+    palClearPad(GPIOC, 15);
+    palSetPadMode(GPIOC, 13, PAL_MODE_OUTPUT_PUSHPULL);         // red
+    palClearPad(GPIOC, 13);
+    palSetPadMode(GPIOC, 0, PAL_MODE_OUTPUT_PUSHPULL);          // orange
+    palClearPad(GPIOC, 0);
 
-	ioInit();
+    blinkerThread = chThdCreateStatic(  blinkerUpdateWorkingArea,
+                                        sizeof(blinkerUpdateWorkingArea),
+                                        NORMALPRIO, blinkerUpdate, NULL);
+
+    ioInit();
 
 	// waiting for connection
 	if( getConnection() ) {
@@ -140,13 +146,13 @@ int main(void) {
 						print("command erase: complete\n\r");
 						while( sdAsynchronousRead( &BOARD_BLUETOOTH_DEVICE, rx_buffer, 1) );
 						print("command erase: ack\n\r");
-						SEND_ACK
+                        SEND_ACK
 					}
 					break;
 				case CMD_WRITE:
 					//print("command write\n\r");
 					if( get(4) ) {
-						SEND_ACK
+                        SEND_ACK
 						u32 address =	((rx_buffer[0]<<24) & 0xFF000000) |
 										((rx_buffer[1]<<16) & 0x00FF0000) |
 										((rx_buffer[2]<<8) & 0x0000FF00) |
@@ -176,10 +182,10 @@ int main(void) {
 							} else {
 								flashWrite( address, (u32*)data, len/4 );
 							}
-							SEND_ACK
+                            SEND_ACK
 							//print("command write: ack\n\r");
 						} else {
-							SEND_NACK
+                            SEND_NACK
 							//print("command write: nack\n\r");
 						}
 						//print("command write: complete\n\r");
@@ -188,19 +194,20 @@ int main(void) {
 				case CMD_GO:
 					flashWrite( BOARD_FLASH_FIRMWARE, (u32*)&begin, 1 );
 					flashLock();
-					chThdTerminate( b );
+                    chThdTerminate( blinkerThread );
 					chThdSleepMilliseconds(100);
 					JUMP_TO(BOARD_FLASH_FIRMWARE);
 					break;
 			}
 		}
-	}
+    }
 
-	chThdTerminate( b );
+    chThdTerminate( blinkerThread );
 	chThdSleepMilliseconds(100);
 	JUMP_TO(BOARD_FLASH_FIRMWARE);
 
 	while(1) {
 		chThdSleepMilliseconds(1000);
+        palTogglePad(GPIOC, 0);
 	}
 }

@@ -9,36 +9,47 @@ static THD_FUNCTION(connectionReceive, arg);
 static THD_WORKING_AREA(connectionReceiveWorkingArea, 1024);
 
 static THD_FUNCTION(connectionUpdate1Hz, arg);
-static THD_WORKING_AREA(connectionUpdate1HzWorkingArea, 256);
+static THD_WORKING_AREA(connectionUpdate1HzWorkingArea, 1024);
 
 static THD_FUNCTION(connectionUpdate40Hz, arg);
-static THD_WORKING_AREA(connectionUpdate40HzWorkingArea, 512);
+static THD_WORKING_AREA(connectionUpdate40HzWorkingArea, 1024);
 
 static THD_FUNCTION(connectionSendSettings, arg);
 static THD_WORKING_AREA(connectionSendSettingsWorkingArea, 256);
 
-
+float cpuUsage = 0;
+u32 usageTime = 0;
+u32 systemTime = 0;
+u32 threadCount = 0;
+static binary_semaphore_t messageSendAccess;
 
 void connectionInit(void) {
+    chBSemObjectInit(&messageSendAccess, false);
+
     mavlink_system.sysid = 0;
 	mavlink_system.compid = MAV_COMP_ID_IMU;
 
-    chThdCreateStatic(  connectionUpdate1HzWorkingArea,
+    thread_t* tread;
+
+    tread = chThdCreateStatic(  connectionUpdate1HzWorkingArea,
                         sizeof(connectionUpdate1HzWorkingArea),
                         NORMALPRIO, connectionUpdate1Hz, NULL);
-    chThdCreateStatic(  connectionUpdate40HzWorkingArea,
+    Thread::addThread( tread, string("cnct_upd_1") );
+    tread = chThdCreateStatic(  connectionUpdate40HzWorkingArea,
                         sizeof(connectionUpdate40HzWorkingArea),
                         NORMALPRIO, connectionUpdate40Hz, NULL);
-    chThdCreateStatic(  connectionReceiveWorkingArea,
+    Thread::addThread( tread, string("cnct_upd_40") );
+    tread = chThdCreateStatic(  connectionReceiveWorkingArea,
                         sizeof(connectionReceiveWorkingArea),
                         NORMALPRIO, connectionReceive, NULL);
+    Thread::addThread( tread, string("cnct_rcv") );
 }
 
 THD_FUNCTION(connectionUpdate1Hz, arg) {
     systime_t time = chVTGetSystemTime();
     u8 mav_mode;
 
-    while (1) {
+    while( !chThdShouldTerminateX() ) {
         time += MS2ST(1000);
 
         if( controlStatus() & CONTROL_MODE_RUN )
@@ -46,6 +57,7 @@ THD_FUNCTION(connectionUpdate1Hz, arg) {
         else
             mav_mode = MAV_MODE_FLAG_SAFETY_ARMED;
 
+        chBSemWait(&messageSendAccess);
         mavlink_msg_heartbeat_send(
             MAVLINK_DEFAULT_COMM,
             MAV_TYPE_FIXED_WING,
@@ -54,6 +66,15 @@ THD_FUNCTION(connectionUpdate1Hz, arg) {
             0,
             MAV_STATE_STANDBY
         );
+
+        mavlink_msg_system_info_send(
+            MAVLINK_DEFAULT_COMM, //mavlink_channel_t chan,
+            cpuUsage, //float cpu_usage,
+            usageTime, //uint32_t usage_time,
+            systemTime, //uint32_t system_time,
+            threadCount //uint32_t thread_count
+        );
+        chBSemSignal(&messageSendAccess);
 
         chThdSleepUntil(time);
     }
@@ -64,13 +85,14 @@ THD_FUNCTION(connectionUpdate1Hz, arg) {
 THD_FUNCTION(connectionUpdate40Hz, arg) {
 	systime_t time = chVTGetSystemTime();
 
-	while (1) {
-		time += MS2ST(25);
+    while( !chThdShouldTerminateX() ) {
+        time += MS2ST(250);
 
 		vectorData accel = imuAccelGet();
         vectorData gyro = imuGyroGet();
 		vectorData mag = imuMagGet();
 
+        chBSemWait(&messageSendAccess);
         mavlink_msg_scaled_imu_send(
 			MAVLINK_DEFAULT_COMM,
 			gyro.time,
@@ -141,8 +163,11 @@ THD_FUNCTION(connectionUpdate40Hz, arg) {
 				(180.0f+servoGet(6).val)*100,
                 (180.0f+servoGet(7).val)*100);
 
+        chBSemSignal(&messageSendAccess);
+
 		chThdSleepUntil(time);
     }
+    chThdExit(0);
 }
 
 THD_FUNCTION(connectionSendSettings, arg) {
@@ -153,6 +178,7 @@ THD_FUNCTION(connectionSendSettings, arg) {
     ) {
         mavlink_msg_settings_item_send( MAVLINK_DEFAULT_COMM, it->first.substr(0,50).c_str(), it->second.substr(0,50).c_str() );
     }
+    chThdExit(0);
 }
 
 THD_FUNCTION(connectionReceive, arg) {
@@ -161,7 +187,7 @@ THD_FUNCTION(connectionReceive, arg) {
 	mavlink_mcu_jump_to_t mcu_jump_to;
 	char c;
  
-	while(1) {
+    while( !chThdShouldTerminateX() ) {
 		receiveFromTelemethry((u8*)&c, 1);
 		if( mavlink_parse_char(MAVLINK_DEFAULT_COMM, (uint8_t)c, &mavlink_message, &mavlink_status) ) {
 			switch(mavlink_message.msgid) {
@@ -223,5 +249,12 @@ THD_FUNCTION(connectionReceive, arg) {
 			}
 		}
     }
+    chThdExit(0);
 }
 
+void connectionSetCpuInfo(float usage, u32 uTime, u32 sTime, u32 tCount) {
+    cpuUsage = usage;
+    usageTime = uTime;
+    systemTime = sTime;
+    threadCount = tCount;
+}

@@ -10,6 +10,7 @@
 #include "ch.h"
 #include "hal.h"
 #include "imu.h"
+#include "thread.h"
 
 
 #define SERVO_UPDATE_PERIOD_MS			50

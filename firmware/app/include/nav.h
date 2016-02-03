@@ -8,8 +8,10 @@
 
 #include "ch.h"
 #include "imu.h"
+#include "thread.h"
 
-#define NAV_UPDATE_PERIOD_MS 10
+#define NAV_UPDATE_PERIOD_MS 100
+#define M_PI 3.1415
 
 typedef struct {
 	float w;
@@ -18,6 +20,7 @@ typedef struct {
 	float z;
 	u32 time;			// us
 } quaternionData;
+
 
 #ifdef __cplusplus
 extern "C" {

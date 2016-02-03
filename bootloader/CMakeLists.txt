@@ -10,19 +10,21 @@ set( BOARD servo-1 )
 
 set( SOURCES
 	main.c
-	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/system/io.c
-	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/system/usbcfg.c
-	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/driver/flash.c
-	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/board/${BOARD}/board.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/io.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/usbcfg.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/driver/flash.c
+	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/board/${BOARD}/board.c
 )
 set( INCLUDE
-	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/system/include
-	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/driver/include
-	${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/board/${BOARD}
+	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/driver/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/board/${BOARD}
 )
 include( ../library/chibios.cmake )
 
-set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--script=\"${CMAKE_CURRENT_SOURCE_DIR}/../nio15-firmware/board/${BOARD}/STM32F405xG.ld\"" )
+set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--script=\"${CMAKE_CURRENT_SOURCE_DIR}/../firmware/board/${BOARD}/STM32F405xG_bootloader.ld\"" )
+#set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--script=\"${CMAKE_CURRENT_SOURCE_DIR}/../firmware/board/${BOARD}/STM32F405xG.ld\"" )
+#add_definitions(-DCORTEX_VTOR_INIT=BOARD_FLASH_FIRMWARE)
 
 
 include_directories( ${INCLUDE} )

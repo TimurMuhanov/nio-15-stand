@@ -47,5 +47,12 @@
 			<field type="uint8_t" name="target_system">System ID</field>
 			<field type="uint8_t" name="target_component">Component ID</field>
 		</message>
+		<message id="155" name="SYSTEM_INFO">
+			<description>System info.</description>
+			<field type="float" name="cpu_usage">CPU usage in rage in 0..1</field>
+			<field type="uint32_t" name="usage_time">Thread running time in systime</field>
+			<field type="uint32_t" name="system_time">System running time in systime</field>
+			<field type="uint32_t" name="thread_count">Number of running threads</field>
+		</message>
 	</messages>
 </mavlink>

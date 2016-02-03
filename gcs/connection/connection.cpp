@@ -99,29 +99,29 @@ void Connection::userCodeRun(bool status) {
 }
 
 void Connection::jumpToBootloader() {
-	mavlink_msg_mcu_jump_to_send(MAVLINK_COMM_0, MCU_JUMP_TO_BOOTLOADER);
+    mavlink_msg_mcu_jump_to_send(MAVLINK_DEFAULT_COMM, MCU_JUMP_TO_BOOTLOADER);
 }
 
 void Connection::settingsRequest() {
-    mavlink_msg_settings_request_send( MAVLINK_COMM_0, 0, 0 );
+    mavlink_msg_settings_request_send( MAVLINK_DEFAULT_COMM, 0, 0 );
 //    qDebug() << "Connection::settingsRequest()";
 }
 
 void Connection::settingsSend(std::string key, std::string value) {
-    mavlink_msg_settings_item_send( MAVLINK_COMM_0, key.substr(0,50).c_str(), value.substr(0,50).c_str() );
+    mavlink_msg_settings_item_send( MAVLINK_DEFAULT_COMM, key.substr(0,50).c_str(), value.substr(0,50).c_str() );
     //    qDebug() << "Connection::settingsSend()" << QString::fromStdString( key.substr(0,50) ) <<  QString::fromStdString( value.substr(0,50) );
 }
 
 void Connection::settingsRemove(std::string key) {
-    mavlink_msg_settings_remove_send( MAVLINK_COMM_0, key.substr(0,50).c_str() );
+    mavlink_msg_settings_remove_send( MAVLINK_DEFAULT_COMM, key.substr(0,50).c_str() );
 }
 
 void Connection::parseSerial(const QByteArray& data) {
     foreach(char c, data) {
-		if(mavlink_parse_char(MAVLINK_COMM_0, c, &mavlink_message, &mavlink_status)) {
-			switch(mavlink_message.msgid) {
+        if(mavlink_parse_char(MAVLINK_DEFAULT_COMM, c, &mavlink_message, &mavlink_status)) {
+            switch(mavlink_message.msgid) {
 				case MAVLINK_MSG_ID_HEARTBEAT: {
-                    //qDebug() << "heartbeat";
+//                    qDebug() << "heartbeat";
 					timer->start();					// reset connection timer
 
 					if(!isConnected()) firmwareConnect();
@@ -132,6 +132,14 @@ void Connection::parseSerial(const QByteArray& data) {
 						emit userCodeRunStatusReceived(true);
 					}
 				} break;
+
+                case MAVLINK_MSG_ID_SYSTEM_INFO: {
+//                    qDebug() << "status";
+                    mavlink_system_info_t mavlink_system_info;
+                    mavlink_msg_system_info_decode(&mavlink_message, &mavlink_system_info);
+//                    qDebug() << "system info " << mavlink_system_info.cpu_usage << mavlink_system_info.usage_time << mavlink_system_info.system_time << mavlink_system_info.thread_count;
+                    Plot::instance().addData( "cpuLoad", (double)mavlink_system_info.system_time/10e3, (double)mavlink_system_info.cpu_usage*100 );
+                } break;
 
 				case MAVLINK_MSG_ID_SCALED_IMU: {
 					mavlink_scaled_imu_t scaled_imu;

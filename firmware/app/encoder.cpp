@@ -63,6 +63,7 @@ void encoderInit(void) {
     updateThread = chThdCreateStatic(   encoderUpdateWorkingArea,
                                         sizeof(encoderUpdateWorkingArea),
                                         NORMALPRIO, encoderUpdate, NULL);
+    Thread::addThread( updateThread, string("enc") );
 }
 
 

@@ -6,9 +6,14 @@ u32 len;
 SerialUSBDriver SDU1;
 FATFS sd_filesystem;
 bool sd_accessibility = false;
+static binary_semaphore_t telemethrySendAccess;
+static binary_semaphore_t telemethryReadAccess;
 
 
 void ioInit(void){
+    chBSemObjectInit(&telemethrySendAccess, false);
+    chBSemObjectInit(&telemethryReadAccess, false);
+
 	// com port over usb init
 	sduObjectInit(&SDU1);
 	sduStart(&SDU1, &serusbcfg);
@@ -66,18 +71,22 @@ u32 availableFromTerminal() {
 
 
 
-void sendToTelemethry(const u8* buf, const u32 len) { 
-	sdWrite( &BOARD_BLUETOOTH_DEVICE, buf, len );
-	//sdWrite( &BOARD_USB_DEVICE, buf, len );
+void sendToTelemethry(const u8* buf, const u32 len) {
+    chBSemWait(&telemethrySendAccess);
+    sdWrite( &BOARD_BLUETOOTH_DEVICE, buf, len );
+    //sdWrite( &BOARD_USB_DEVICE, buf, len );
+    chBSemSignal(&telemethrySendAccess);
 }
 
 void receiveFromTelemethry(u8* buf, const u32 len) {
-	sdRead( &BOARD_BLUETOOTH_DEVICE, buf, len );
+    chBSemWait(&telemethryReadAccess);
+    sdRead( &BOARD_BLUETOOTH_DEVICE, buf, len );
 	//sdRead( &BOARD_USB_DEVICE, buf, len );
+    chBSemWait(&telemethryReadAccess);
 }
 
 u32 availableFromTelemethry(void) {
-	return chQSpaceI( &BOARD_BLUETOOTH_DEVICE.oqueue );
+    return chQSpaceI( &BOARD_BLUETOOTH_DEVICE.oqueue );
 	//return chQSpaceI( &BOARD_USB_DEVICE.oqueue );
 }
 

@@ -5,7 +5,6 @@
 #include "driver.h"
 #include "app.h"
 
-
 int main(void) {
 	halInit();
 	chSysInit();
@@ -22,8 +21,9 @@ int main(void) {
 
     ioInit();
     Settings::init();
+    Log::init();
 
-    imuInit();
+//    imuInit();
     navInit();
     encoderInit();
 	servoInit();
@@ -32,9 +32,5 @@ int main(void) {
     connectionInit();
     controlInit();
 
-	while(1) {
-		palTogglePad(GPIOC, 15);
-		chThdSleepMilliseconds(500);
-		//print("as");
-	}
+    Thread::loop();
 }

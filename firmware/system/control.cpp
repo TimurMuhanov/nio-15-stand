@@ -5,8 +5,8 @@ static u32 status;
 thread_t* userCodeThread;
 static THD_FUNCTION(userCodeUpdate, arg);
 static THD_WORKING_AREA(userCodeUpdateWorkingArea, 128);
-extern void process( void );
-extern void processInit( void );
+extern "C" void process( void );
+extern "C" void processInit( void );
 
 
 void controlInit() {
@@ -28,6 +28,7 @@ void controlStart() {
     userCodeThread = chThdCreateStatic( userCodeUpdateWorkingArea,
                                         sizeof(userCodeUpdateWorkingArea),
                                         NORMALPRIO, userCodeUpdate, NULL);
+    Thread::addThread( userCodeThread, string("control") );
 
 }
 

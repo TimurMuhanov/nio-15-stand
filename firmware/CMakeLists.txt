@@ -10,19 +10,21 @@ set( BOARD servo-1 )
 
 set( SOURCES
     main.cpp
-	app/imu.c
-	app/nav.c
-	app/encoder.c
-	app/servo.c
+    app/imu.c
+    app/nav.cpp
+    app/encoder.cpp
+    app/servo.cpp
 	app/user_func_RBF_127_150819.c
-	system/control.c
+    system/io.c
+    system/thread.cpp
+    system/control.cpp
     system/connection.cpp
-	system/io.c
 	system/usbcfg.c
     system/settings.cpp
+    system/log.cpp
 	driver/led.c
 	driver/ls7366.c
-	driver/adis16488.c
+    driver/adis16488.cpp
 	board/${BOARD}/board.c
 )
 set( INCLUDE
@@ -36,6 +38,8 @@ set( INCLUDE
 include( ../library/chibios.cmake )
 
 set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--script=\"${CMAKE_CURRENT_SOURCE_DIR}/board/${BOARD}/STM32F405xG.ld\"" )
+add_definitions(-DCORTEX_VTOR_INIT=BOARD_FLASH_FIRMWARE)
+#set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--script=\"${CMAKE_CURRENT_SOURCE_DIR}/board/${BOARD}/STM32F405xG_bootloader.ld\"" )
 
 
 include_directories( ${INCLUDE} )

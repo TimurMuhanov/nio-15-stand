@@ -17,6 +17,7 @@
 #include "ch.h"
 #include "hal.h"
 
+#include "thread.h"
 #include "io.h"
 #include "control.h"
 #include "imu.h"
@@ -24,10 +25,8 @@
 #include "encoder.h"
 #include "servo.h"
 
-
 #include "mavlink_bridge_header.h"
 #include "mavlink.h"
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,10 +35,13 @@ extern "C" {
 	/**	init module */
     void connectionInit(void);
 
+    /**	set cpu udage
+    @param      usage       cpu usage in range 0..1 */
+    void connectionSetCpuInfo(float usage, u32 usageTime, u32 systemTime, u32 threadCount);
+
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif
 

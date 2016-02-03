@@ -9,10 +9,12 @@
 
 #include "ch.h"
 #include "math.h"
-#include "imu.h"
+#include "thread.h"
+#include "ls7366.h"
+#include "imu.h"        // for data types
 
 
-#define ENCODER_PERIOD_MS			20
+#define ENCODER_PERIOD_MS			2
 #define ENCODER_NUMBER				9
 
 // PPR = pulses per revolution

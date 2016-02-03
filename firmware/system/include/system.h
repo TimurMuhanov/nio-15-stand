@@ -9,6 +9,7 @@
 #include "io.h"
 #include "connection.h"
 #include "settings.h"
+#include "log.h"
 #include "control.h"
 
 #endif

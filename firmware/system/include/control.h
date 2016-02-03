@@ -7,13 +7,9 @@
 #define CONTROL_H
 
 
-
-
 #include "ch.h"
+#include "thread.h"
 #include "servo.h"
-
-
-
 
 
 #define	CONTROL_CONNECTED			1

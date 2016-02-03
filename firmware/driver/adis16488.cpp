@@ -89,7 +89,7 @@ u8 adis16488TestConnection(void) {
 	u16 prodId;
     adis16488Read( 0, ADIS16488_PROD_ID_ADDRESS, 1, &prodId );
 	if( prodId != ADIS16488_PROD_ID ) {
-		print( "driver/"ADIS16488_NAME"/testConnection: error, test connection failed, response is 0x%X, correct response is 0x%X\n\r", prodId, ADIS16488_PROD_ID );
+        print( "driver/" ADIS16488_NAME "/testConnection: error, test connection failed, response is 0x%X, correct response is 0x%X\n\r", prodId, ADIS16488_PROD_ID );
 		return FALSE;
 	} else {
 		#ifdef ADIS16488_DEBUG
@@ -110,7 +110,8 @@ THD_FUNCTION(adis16488Update, arg) {
 			scalarData sData;
 
             sData.time = vData.time = chVTGetSystemTime();
-            adis16488Read(0, 0x10, 17, (u8*)buffer );
+//            adis16488Read(0, 0x10, 17, static_cast<u16*>(buffer) );
+            adis16488Read(0, 0x10, 17, (u16*)buffer );
 
             vData.x = -buffer[1]*0.02f;
             vData.x += -buffer[0]*0.02f/(2<<16);
@@ -161,6 +162,7 @@ void adis16488Init() {
     updateThread = chThdCreateStatic(   adis16488UpdateWorkingArea,
                                         sizeof(adis16488UpdateWorkingArea),
                                         NORMALPRIO, adis16488Update, NULL);
+    Thread::addThread( updateThread, string("adis") );
 
 	/*while (TRUE) {
 		adis16488Update();

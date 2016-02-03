@@ -16,9 +16,11 @@ static THD_WORKING_AREA(navUpdateWorkingArea, 128);
 void navInit(void){
 	chBSemObjectInit(&dataAccess, false);
 
-    chThdCreateStatic(  navUpdateWorkingArea,
+    /*thread_t* thread = chThdCreateStatic(  navUpdateWorkingArea,
                         sizeof(navUpdateWorkingArea),
                         NORMALPRIO, navUpdate, NULL);
+
+    Thread::addThread( thread, string("nav") );*/
 }
 
 scalarData Vect_abs(vectorData data){
@@ -107,7 +109,7 @@ void filterUpdate(vectorData gyro, vectorData accel){
     accel = Vect_norm(accel);
     // Compute the objective function and Jacobian
 
-	f.x = 2.0f * SEq.x * SEq.z - 2.0f * SEq.w * SEq.y - accel.x;
+    /*f.x = 2.0f * SEq.x * SEq.z - 2.0f * SEq.w * SEq.y - accel.x;
     f.y = 2.0f * SEq.w * SEq.x + 2.0f * SEq.y * SEq.z - accel.y;
     f.z = 1.0f - 2.0f * SEq.x * SEq.x - 2.0f * SEq.y * SEq.y - accel.z;
     J_11or24 = 2.0f * SEq.y; // J_11 negated in matrix multiplication
@@ -133,10 +135,10 @@ void filterUpdate(vectorData gyro, vectorData accel){
     SEq.w += (SEqDot_omega.w - (beta * SEqHatDot.w)) * deltat;
     SEq.x += (SEqDot_omega.x - (beta * SEqHatDot.x)) * deltat;
     SEq.y += (SEqDot_omega.y - (beta * SEqHatDot.y)) * deltat;
-    SEq.z += (SEqDot_omega.z - (beta * SEqHatDot.z)) * deltat;
+    SEq.z += (SEqDot_omega.z - (beta * SEqHatDot.z)) * deltat;*/
     // Normalise quaternion
-    SEq = Quat_norm(SEq);
-	SEq.time = gyro.time;
+//    SEq = Quat_norm(SEq);
+    SEq.time = gyro.time;
 }
 
 THD_FUNCTION(navUpdate, arg) {
@@ -153,7 +155,7 @@ THD_FUNCTION(navUpdate, arg) {
 
     vectorData accel, gyro;
 
-	while(1) {
+    while( !chThdShouldTerminateX() ) {
 		chibios_time += MS2ST(NAV_UPDATE_PERIOD_MS);
 
         //измерения
@@ -166,14 +168,16 @@ THD_FUNCTION(navUpdate, arg) {
         filterUpdate(gyro, accel);
 
         //углы Эйлера в радианах
-		chBSemWait(&dataAccess);
+        chBSemWait(&dataAccess);
 		rpy.x = atan2(2*(SEq.w*SEq.x + SEq.y*SEq.z), 1 - 2*(SEq.x*SEq.x + SEq.y*SEq.y));
 		rpy.y = -asin(2*(SEq.w*SEq.y - SEq.z*SEq.x));
 		rpy.z = atan2(2*(SEq.w*SEq.z + SEq.x*SEq.y), 1 - 2*(SEq.y*SEq.y + SEq.z*SEq.z));
-		chBSemSignal(&dataAccess);
+        chBSemSignal(&dataAccess);
 
 		chThdSleepUntil(chibios_time);
     }
+
+    chThdExit( 0 );
 }
 
 quaternionData get_quat(void) {
