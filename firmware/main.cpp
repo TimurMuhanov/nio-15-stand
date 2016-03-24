@@ -10,9 +10,9 @@ int main(void) {
 	chSysInit();
 
     ioInit();
-    FileSystem::init();
-    Settings::init();
-    Log::init();
+//    FileSystem::init();
+//    Settings::init();
+//    Log::init();
 
     imuInit();
     navInit();

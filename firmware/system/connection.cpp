@@ -180,13 +180,13 @@ THD_FUNCTION(connectionUpdate40Hz, arg) {
 }
 
 THD_FUNCTION(connectionSendSettings, arg) {
-    for(
-        map<string, string>::iterator it = Settings::settings().begin();
-        it != Settings::settings().end();
-        it++
-    ) {
-        mavlink_msg_settings_item_send( MAVLINK_DEFAULT_COMM, it->first.substr(0,50).c_str(), it->second.substr(0,50).c_str() );
-    }
+//    for(
+//        map<string, string>::iterator it = Settings::settings().begin();
+//        it != Settings::settings().end();
+//        it++
+//    ) {
+//        mavlink_msg_settings_item_send( MAVLINK_DEFAULT_COMM, it->first.substr(0,50).c_str(), it->second.substr(0,50).c_str() );
+//    }
     chThdExit(0);
 }
 
@@ -235,23 +235,23 @@ THD_FUNCTION(connectionReceive, arg) {
                                         NORMALPRIO, connectionSendSettings, NULL);
                 } break;
 
-                case MAVLINK_MSG_ID_SETTINGS_ITEM: {
-                    mavlink_settings_item_t mavlink_settings_item;
-                    mavlink_msg_settings_item_decode(&mavlink_message, &mavlink_settings_item);
-                    std::string key = std::string(mavlink_settings_item.name);
-                    std::string value = std::string(mavlink_settings_item.value);
-                    Settings::set( key, value );
-                    Settings::sync();
-                    mavlink_msg_settings_item_send( MAVLINK_DEFAULT_COMM, key.substr(0,50).c_str(), value.substr(0,50).c_str() );
-                } break;
+//                case MAVLINK_MSG_ID_SETTINGS_ITEM: {
+//                    mavlink_settings_item_t mavlink_settings_item;
+//                    mavlink_msg_settings_item_decode(&mavlink_message, &mavlink_settings_item);
+//                    std::string key = std::string(mavlink_settings_item.name);
+//                    std::string value = std::string(mavlink_settings_item.value);
+//                    Settings::set( key, value );
+//                    Settings::sync();
+//                    mavlink_msg_settings_item_send( MAVLINK_DEFAULT_COMM, key.substr(0,50).c_str(), value.substr(0,50).c_str() );
+//                } break;
 
-                case MAVLINK_MSG_ID_SETTINGS_REMOVE: {
-                    mavlink_settings_remove_t mavlink_settings_remove;
-                    mavlink_msg_settings_remove_decode(&mavlink_message, &mavlink_settings_remove);
-                    std::string key = std::string(mavlink_settings_remove.name);
-                    Settings::remove( key );
-                    Settings::sync();
-                } break;
+//                case MAVLINK_MSG_ID_SETTINGS_REMOVE: {
+//                    mavlink_settings_remove_t mavlink_settings_remove;
+//                    mavlink_msg_settings_remove_decode(&mavlink_message, &mavlink_settings_remove);
+//                    std::string key = std::string(mavlink_settings_remove.name);
+//                    Settings::remove( key );
+//                    Settings::sync();
+//                } break;
 
 				default:
 				break;

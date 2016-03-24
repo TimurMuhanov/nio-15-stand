@@ -20,8 +20,8 @@ set( SOURCES
     system/control.cpp
     system/connection.cpp
 	system/usbcfg.c
-    system/settings.cpp
-    system/log.cpp
+#    system/settings.cpp
+#    system/log.cpp
 	driver/led.c
 	driver/ls7366.c
     driver/adis16488.cpp

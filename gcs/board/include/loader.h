@@ -3,6 +3,7 @@
 
 
 #include <QObject>
+#include <QMap>
 #include <QFile>
 #include <QMutex>
 #include <QWaitCondition>
@@ -10,42 +11,41 @@
 
 class Loader : public QObject {
     Q_OBJECT
-                                Loader();
-                               ~Loader();
 
     public:
-        static Loader&          instance();
+        static Loader&		instance();
+
+    signals:
+		void					success();
+		void					error();
+
+    private slots:
+        void                    start();
+		void                    selectFile();
+        void                    process();
+        void                    end();
+        void                    receive(const QByteArray& data);
+		void                    test();
 
     private:
-        void                    start();
-        void                    selectFile();
-        void                    receive(const QByteArray& data);
-        bool                    send(uint8_t cmd);
-        bool                    send(const QByteArray& data);
-        bool                    get(uint8_t cmd);
-        QByteArray              int2array(int number);
+                                Loader();
+                               ~Loader();
+                                //Loader(Loader const&);
+                                //Loader& operator= (Loader const&);
 
-        QFile                  _firmwareFile;
-        static const uint8_t   _begin = 0xFE;
-        static const uint8_t   _connect = 0x7F;
-        static const uint8_t   _go = 0x21;
-        static const uint8_t   _write = 0x31;
-        static const uint8_t   _erase = 0x44;
-        static const uint8_t   _ack = 0x79;
-        static const uint8_t   _nack = 0x1F;
-        static const uint8_t   _unknown = 0x55;
+        /* intel hex parser */
+        bool                    parse();
 
-        static const uint32_t  _addressBase = 0x08040000;
-        static QByteArray      _pack;
-        static const int       _packLength = 128;
-
-//        static QMutex          _mutex;
-//        static QByteArray      _responce;
-//        static QWaitCondition  _responceReceived;
-
-        static qint64           bg;
-
-        static QThread         _thread;
+        /* add checksum to data and send it, block until response */
+        bool                    send(std::initializer_list<char>, bool addChecksum = false);
+        bool                    send(QByteArray, bool addChecksum = false);
+        QThread*                _thread;
+        bool                    _threadRunning;
+        QMap<uint,QByteArray>   _firmwareImage;
+        QFile*                  _firmwareFile;
+        QMutex                  _mutex;
+        QWaitCondition          _response;
+        bool                    _acknowledgement;
 };
 
 

@@ -6,7 +6,6 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
 #include <QOpenGLTexture>
-#include <QQuaternion>
 #include "connection.h"
 
 
@@ -30,7 +29,9 @@ class Visualisation : public QOpenGLWidget, protected QOpenGLFunctions {
 		void            paintCircle();
 		void            generateTextures();
 
-        QQuaternion     _quaternion;
+		float			roll;
+		float			pitch;
+		float			yaw;
 		QTimer*			repaintTimer;
 		QOpenGLTexture* texture;
 		GLuint          verticesBuffer;

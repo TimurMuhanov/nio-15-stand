@@ -13,7 +13,6 @@ class Serial : public QObject {
 	public:
 		static Serial&			instance();
         bool                    isOpened();
-        static QByteArray       readBlocking(int bytes);
 
 	signals:
 		void					opened();
@@ -42,7 +41,7 @@ class Serial : public QObject {
 		void					addPort(const QString& portName);
 		void					removePort(const QString& portName);
 
-        QSerialPort*			port;
+		QSerialPort*			port;
 		QActionGroup*			portActionGroup;
 		QActionGroup*			baudActionGroup;
 		QAction*				disconnectAction;
