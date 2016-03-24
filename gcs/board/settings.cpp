@@ -100,11 +100,11 @@ Qt::ItemFlags Settings::flags(const QModelIndex& index) const {
     }
 }
 
-int Settings::rowCount(const QModelIndex &parent) const {
+int Settings::rowCount(const QModelIndex&) const {
     return _settings.size();
 }
 
-int Settings::columnCount(const QModelIndex &parent) const {
+int Settings::columnCount(const QModelIndex&) const {
     return 2;
 }
 

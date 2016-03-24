@@ -146,6 +146,7 @@ void Connection::parseSerial(const QByteArray& data) {
 					mavlink_scaled_imu_t scaled_imu;
 					mavlink_msg_scaled_imu_decode(&mavlink_message, &scaled_imu);
 //                    qDebug() << "scaled imu" << scaled_imu.xacc << scaled_imu.yacc << scaled_imu.zacc;
+//                    qDebug() << "scaled imu" << scaled_imu.time_boot_ms/10e3;
                     Plot::instance().addData( "ax", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.xacc/1000.0 );
                     Plot::instance().addData( "ay", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.yacc/1000.0 );
                     Plot::instance().addData( "az", (double)scaled_imu.time_boot_ms/10e3, (double)scaled_imu.zacc/1000.0 );
@@ -161,18 +162,20 @@ void Connection::parseSerial(const QByteArray& data) {
 				case MAVLINK_MSG_ID_ATTITUDE: {
 					mavlink_attitude_t attitude;
 					mavlink_msg_attitude_decode(&mavlink_message, &attitude);
-					//qDebug() << "Connection::parseSerial() attitude" << attitude.roll << attitude.pitch << attitude.yaw;
-					emit valueReceived( Value::Roll, attitude.roll );
+//                    qDebug() << "attitude" << attitude.time_boot_ms;
+//                    qDebug() << "Connection::parseSerial() attitude" << attitude.time_boot_ms/1000.0 << attitude.roll << attitude.pitch << attitude.yaw;
+//					emit valueReceived( Value::Roll, attitude.roll );
 					MainWindow::ui().imuRollIndicateLabel->setText( QString::number(RAD_DEG(attitude.roll), 'f', 2) );
-					emit valueReceived( Value::Pitch, attitude.pitch );
+//					emit valueReceived( Value::Pitch, attitude.pitch );
 					MainWindow::ui().imuPitchIndicateLabel->setText( QString::number(RAD_DEG(attitude.pitch), 'f', 2) );
-					emit valueReceived( Value::Yaw, attitude.yaw );
+//					emit valueReceived( Value::Yaw, attitude.yaw );
 					MainWindow::ui().imuYawIndicateLabel->setText( QString::number(RAD_DEG(attitude.yaw), 'f', 2) );
 				} break;
 
                 case MAVLINK_MSG_ID_SCALED_PRESSURE: {
                     mavlink_scaled_pressure_t mavlink_scaled_pressure;
                     mavlink_msg_scaled_pressure_decode(&mavlink_message, &mavlink_scaled_pressure);
+//                    qDebug() << "sc pr" << mavlink_scaled_pressure.time_boot_ms;
                     emit valueReceived( Value::Pressure, mavlink_scaled_pressure.press_abs );
                     Plot::instance().addData( "pressure", mavlink_scaled_pressure.time_boot_ms/1000.0, mavlink_scaled_pressure.press_abs );
                     Plot::instance().addData( "temperature", mavlink_scaled_pressure.time_boot_ms/1000.0, mavlink_scaled_pressure.temperature/100.0-273.15 );
@@ -181,7 +184,7 @@ void Connection::parseSerial(const QByteArray& data) {
 				case MAVLINK_MSG_ID_ATTITUDE_QUATERNION: {
 					mavlink_attitude_quaternion_t quaternion;
 					mavlink_msg_attitude_quaternion_decode(&mavlink_message, &quaternion);
-					//qDebug() << "Connection::parseSerial() quaternion" << quaternion.q1 << quaternion.q2 << quaternion.q3 << quaternion.q4;
+                    qDebug() << "Connection::parseSerial() quaternion" << quaternion.q1 << quaternion.q2 << quaternion.q3 << quaternion.q4;
 					emit valueReceived( Value::Q0, quaternion.q1);
 					emit valueReceived( Value::Q1, quaternion.q2);
 					emit valueReceived( Value::Q2, quaternion.q3);
@@ -200,7 +203,7 @@ void Connection::parseSerial(const QByteArray& data) {
                     //qDebug() << "encoder";
 					mavlink_encoder_output_raw_t raw_encoder;
 					mavlink_msg_encoder_output_raw_decode(&mavlink_message, &raw_encoder);
-					//qDebug() << "encoder" << raw_encoder.encoder1_raw;
+//                    qDebug() << "encoder" << raw_encoder.time_usec;
                     Encoders::instance().encoder(1)->addData( (double)raw_encoder.time_usec/10e3, raw_encoder.encoder1_raw);
                     Encoders::instance().encoder(2)->addData( (double)raw_encoder.time_usec/10e3, raw_encoder.encoder2_raw);
                     Encoders::instance().encoder(3)->addData( (double)raw_encoder.time_usec/10e3, raw_encoder.encoder3_raw);
@@ -218,12 +221,12 @@ void Connection::parseSerial(const QByteArray& data) {
                     //qDebug() << "servo";
 					mavlink_servo_output_raw_t raw_servo;
 					mavlink_msg_servo_output_raw_decode(&mavlink_message, &raw_servo);
-                    //qDebug() << (double)raw_servo.time_usec/10e3 << ((float)raw_servo.servo1_raw)/100.0-180.0;
-                    Servos::instance().servo(1)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo1_raw)/100.0-180.0 );
-                    Servos::instance().servo(2)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo2_raw)/100.0-180.0 );
-                    Servos::instance().servo(3)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo3_raw)/100.0-180.0 );
-                    Servos::instance().servo(4)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo4_raw)/100.0-180.0 );
-                    Servos::instance().servo(5)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo5_raw)/100.0-180.0 );
+//                    qDebug() <<  "servo" << (double)raw_servo.time_usec;
+//                    Servos::instance().servo(1)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo1_raw)/100.0-180.0 );
+//                    Servos::instance().servo(2)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo2_raw)/100.0-180.0 );
+//                    Servos::instance().servo(3)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo3_raw)/100.0-180.0 );
+//                    Servos::instance().servo(4)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo4_raw)/100.0-180.0 );
+//                    Servos::instance().servo(5)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo5_raw)/100.0-180.0 );
 //                    Servos::instance().servo(6)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo6_raw)/100.0-180.0 );
 //                    Servos::instance().servo(7)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo7_raw)/100.0-180.0 );
 //                    Servos::instance().servo(8)->addData( (double)raw_servo.time_usec/10e3, ((float)raw_servo.servo8_raw)/100.0-180.0 );

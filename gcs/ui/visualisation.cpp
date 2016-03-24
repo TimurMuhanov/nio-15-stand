@@ -4,10 +4,10 @@
 #include <QMouseEvent>
 
 
-#define BOX_HEIGHT				3
-#define BOX_WIDTH				4
-#define BOX_THICK				1
-#define BOUNDING_RADIUS			(sqrt( BOX_HEIGHT*BOX_HEIGHT + BOX_WIDTH*BOX_WIDTH + BOX_THICK*BOX_THICK )/2*1.2)
+#define BOX_HEIGHT				1
+#define BOX_WIDTH				3
+#define BOX_LENGTH				4
+#define BOUNDING_RADIUS			(sqrt( BOX_HEIGHT*BOX_HEIGHT + BOX_WIDTH*BOX_WIDTH + BOX_LENGTH*BOX_LENGTH )/2*1.2)
 #define CAMERA_LIFT				5
 #define DISTANCE                30
 #define VERTEX_NUMBER			8
@@ -35,10 +35,6 @@ Visualisation::Visualisation(QWidget *parent) : QOpenGLWidget(parent) {
 		SLOT(update()) );
 	repaintTimer->start(40);
 
-	roll = 0.0;
-	pitch = 0.0;
-	yaw = 0.0;
-
 	xAxisRotation = 0;
 	yAxisRotation = 0;
 }
@@ -53,17 +49,20 @@ Visualisation::~Visualisation() {
 }
 
 void Visualisation::parameterReceive( Value parameter, double value ) {
-	switch( parameter ) {
-		case Value::Roll: {
-			Visualisation::roll = value;
-		} break;
-		case Value::Pitch: {
-			Visualisation::pitch = value;
-		} break;
-		case Value::Yaw: {
-			Visualisation::yaw = value;
-		} break;
-	}
+    switch( parameter ) {
+        case Value::Q0:
+            _quaternion.setScalar(value);
+            break;
+        case Value::Q1:
+            _quaternion.setX(value);
+            break;
+        case Value::Q3:
+            _quaternion.setY(value);
+            break;
+        case Value::Q2:
+            _quaternion.setZ(-value);
+            break;
+    }
 }
 
 void Visualisation::initializeGL() {
@@ -91,14 +90,15 @@ void Visualisation::initializeGL() {
 
 	// prepare board buffers
 	Vertex verticies[VERTEX_NUMBER] = {
-		{ { BOX_WIDTH/2.0, BOX_THICK/2.0,-BOX_HEIGHT/2.0},   { 1, 1,-1} },
-		{ {-BOX_WIDTH/2.0, BOX_THICK/2.0,-BOX_HEIGHT/2.0},   {-1, 1,-1} },
-		{ {-BOX_WIDTH/2.0, BOX_THICK/2.0, BOX_HEIGHT/2.0},   {-1, 1, 1} },
-		{ { BOX_WIDTH/2.0, BOX_THICK/2.0, BOX_HEIGHT/2.0},   { 1, 1, 1} },
-		{ { BOX_WIDTH/2.0,-BOX_THICK/2.0,-BOX_HEIGHT/2.0},   { 1,-1,-1} },
-		{ {-BOX_WIDTH/2.0,-BOX_THICK/2.0,-BOX_HEIGHT/2.0},   {-1,-1,-1} },
-		{ {-BOX_WIDTH/2.0,-BOX_THICK/2.0, BOX_HEIGHT/2.0},   {-1,-1, 1} },
-		{ { BOX_WIDTH/2.0,-BOX_THICK/2.0, BOX_HEIGHT/2.0},   { 1,-1, 1} }
+        { {-BOX_LENGTH/2.0, BOX_HEIGHT/2.0, BOX_WIDTH/2.0},   {-1, 1, 1} },
+        { { BOX_LENGTH/2.0, BOX_HEIGHT/2.0, BOX_WIDTH/2.0},   { 1, 1, 1} },
+        { { BOX_LENGTH/2.0, BOX_HEIGHT/2.0,-BOX_WIDTH/2.0},   { 1, 1,-1} },
+        { {-BOX_LENGTH/2.0, BOX_HEIGHT/2.0,-BOX_WIDTH/2.0},   {-1, 1,-1} },
+
+        { {-BOX_LENGTH/2.0,-BOX_HEIGHT/2.0, BOX_WIDTH/2.0},   {-1,-1, 1} },
+        { { BOX_LENGTH/2.0,-BOX_HEIGHT/2.0, BOX_WIDTH/2.0},   { 1,-1, 1} },
+        { { BOX_LENGTH/2.0,-BOX_HEIGHT/2.0,-BOX_WIDTH/2.0},   { 1,-1,-1} },
+        { {-BOX_LENGTH/2.0,-BOX_HEIGHT/2.0,-BOX_WIDTH/2.0},   {-1,-1,-1} },
 	};
 
 	GLuint indices[6][4] = {
@@ -143,18 +143,17 @@ void Visualisation::paintGL() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslatef( 0, -CAMERA_LIFT, -DISTANCE);
-	glRotatef(yAxisRotation, 0.0, 1.0, 0.0);
+    glRotatef(90, 0.0, 1.0, 0.0);
+    glRotatef(90, 1.0, 0.0, 0.0);
+//    glRotatef(yAxisRotation, 0.0, 1.0, 0.0);
 	//glRotatef(xAxisRotation, 1.0, 0.0, 0.0);
 
-	glRotatef(RAD_DEG(yaw), 0.0, 1.0, 0.0);
-	glRotatef(RAD_DEG(pitch), 0.0, 0.0, 1.0);
-	glRotatef(RAD_DEG(roll), 1.0, 0.0, 0.0);
+    double sinAlpha = sqrt( 1-_quaternion.scalar()*_quaternion.scalar() );
+    glRotatef(RAD_DEG(2*acos(_quaternion.scalar())), _quaternion.x()/sinAlpha, _quaternion.y()/sinAlpha, _quaternion.z()/sinAlpha);
 
 	// paint board
 	GLfloat whiteColor[4] = {0.5, 0.5, 0.5, 1};
-	GLfloat redColor[4] = {0.5, 0, 0, 1};
-	//glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, whiteColor);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, redColor);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, whiteColor);
 
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, indicesBuffer );
 	glBindBuffer( GL_ARRAY_BUFFER, verticesBuffer );

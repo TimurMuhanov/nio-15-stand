@@ -751,7 +751,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget->setCurrentIndex(4);
+        tabWidget->setCurrentIndex(3);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -789,7 +789,8 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Magnetometer", 0));
         firmwareLabel->setText(QApplication::translate("MainWindow", "Status:", 0));
         firmwareStatusLabel->setText(QApplication::translate("MainWindow", "select firmware file", 0));
-        firmwareChooseButton->setText(QApplication::translate("MainWindow", "Choose file...", 0));
+        firmwareChooseButton->setText(QApplication::translate("MainWindow", "Select file...", 0));
+        firmwareUploadProgressBar->setFormat(QApplication::translate("MainWindow", "%v/%mKB, %p%", 0));
         firmwareUploadButton->setText(QApplication::translate("MainWindow", "Upload", 0));
         tabWidget->setTabText(tabWidget->indexOf(loader), QApplication::translate("MainWindow", "Loader", 0));
         tabWidget->setTabText(tabWidget->indexOf(settings), QApplication::translate("MainWindow", "Settings", 0));
