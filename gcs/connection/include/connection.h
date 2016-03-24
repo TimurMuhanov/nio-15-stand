@@ -17,6 +17,7 @@
 
 
 enum class Value : uint {
+    Pressure,
 	Roll,
 	Pitch,
 	Yaw,

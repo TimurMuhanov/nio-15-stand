@@ -97,9 +97,6 @@ set( SOURCES
     # cpp wrappers
     ${CMAKE_CURRENT_LIST_DIR}/chibios/os/various/cpp_wrappers/syscalls_cpp.cpp 
     ${CMAKE_CURRENT_LIST_DIR}/chibios/os/various/cpp_wrappers/ch.cpp 
-
-    # test
-    ${CMAKE_CURRENT_LIST_DIR}/chibios/os/various/cpp_wrappers/ch.cpp 
 )
 
 set( INCLUDE 

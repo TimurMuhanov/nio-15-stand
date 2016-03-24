@@ -11,7 +11,7 @@
 using namespace std;
 
 
-#define LOG_PERIOD_MS   200
+#define LOG_PERIOD_MS   100
 
 
 class Log {
@@ -25,7 +25,7 @@ class Log {
 };
 
 /*
- * #include <vector>
+ * #include <vector>tmpName
 #include <initializer_list>
 template< int elements, typename Type = double >
 class Parameter {

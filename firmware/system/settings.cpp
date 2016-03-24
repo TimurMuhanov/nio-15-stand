@@ -15,63 +15,55 @@ Settings::~Settings() {
 
 void Settings::init() {
     // open file
-    if( sdCardInited() ) {
-        FRESULT res;
+    if( !FileSystem::isAvailable() )
+        return;
 
-        if( (res = f_open(&_file, "/parameters.txt", FA_READ | FA_WRITE | FA_OPEN_ALWAYS )) != FR_OK )
-            return;
+    if( !FileSystem::open( _file, string("/parameters.txt"), FA_READ | FA_WRITE | FA_OPEN_ALWAYS ) )
+        return;
 
-        // read _parameters
-        vector<char> separators;
-        separators.push_back( ' ' );
-        separators.push_back( '=' );
-        separators.push_back( ':' );
-        separators.push_back( '\t' );
-        separators.push_back( '\n' );
-        separators.push_back( '\r' );
+    // read _parameters
+    vector<char> separators;
+    separators.push_back( ' ' );
+    separators.push_back( '=' );
+    separators.push_back( ':' );
+    separators.push_back( '\t' );
+    separators.push_back( '\n' );
+    separators.push_back( '\r' );
 
-        char buffer[PARAMETER_MAX_RECORD_LENGTH];
-        while( f_gets( (TCHAR*) buffer, PARAMETER_MAX_RECORD_LENGTH, &_file ) != NULL ) {
-            string record(buffer);
-            string name, value;
-            unsigned int i=0;
+    string record;
+    while( FileSystem::readLine( _file, record ) ) {
+        string name, value;
+        unsigned int i=0;
 
-            while( find( separators.begin(), separators.end(), record[i] ) != separators.end() && i<record.length() )
-                i++;
-            while( find( separators.begin(), separators.end(), record[i] ) == separators.end() && i<record.length() )
-                name += record[i++];
-            while( find( separators.begin(), separators.end(), record[i] ) != separators.end() && i<record.length() )
-                i++;
-            while( find( separators.begin(), separators.end(), record[i] ) == separators.end() && i<record.length() )
-                value += record[i++];
+        while( find( separators.begin(), separators.end(), record[i] ) != separators.end() && i<record.length() )
+            i++;
+        while( find( separators.begin(), separators.end(), record[i] ) == separators.end() && i<record.length() )
+            name += record[i++];
+        while( find( separators.begin(), separators.end(), record[i] ) != separators.end() && i<record.length() )
+            i++;
+        while( find( separators.begin(), separators.end(), record[i] ) == separators.end() && i<record.length() )
+            value += record[i++];
 
-            if( !( name.empty() || value.empty() ) )
-                set(name, value);
-        }
+        if( !( name.empty() || value.empty() ) )
+            set(name, value);
     }
-
-    //sync();
 }
 
 void Settings::sync() {
-    if( !sdCardInited() )
+    if( !FileSystem::isAvailable() )
         return;
 
-    f_lseek(&_file, 0);
-    f_truncate(&_file);
+    FileSystem::erase( _file );
 
-    UINT len;
-    UINT res;
-    char record[PARAMETER_MAX_RECORD_LENGTH];
     for(
         map<string, string>::iterator it = _settings.begin();
         it != _settings.end();
         it++
     ) {
-        len = sprintf(record, "%s %s\r\n", it->first.c_str(), it->second.c_str() );
-        f_write( &_file, record, len, &res );
+        FileSystem::write( _file, it->first + " " + it->second + "\n" );
     }
-    f_sync( &_file );
+
+    FileSystem::sync( _file );
 }
 
 void Settings::set( const string& name, const string& value ) {

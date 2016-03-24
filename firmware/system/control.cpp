@@ -4,7 +4,7 @@
 static u32 status;
 thread_t* userCodeThread;
 static THD_FUNCTION(userCodeUpdate, arg);
-static THD_WORKING_AREA(userCodeUpdateWorkingArea, 128);
+static THD_WORKING_AREA(userCodeUpdateWorkingArea, 1024);
 extern "C" void process( void );
 extern "C" void processInit( void );
 

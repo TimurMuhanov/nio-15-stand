@@ -26,6 +26,7 @@ extern "C" {
 
     /**	init ADIS16488 - set default counfiguration */
     void adis16488Init(void);
+    void adis16488Update(void);
 
 #ifdef __cplusplus
 }

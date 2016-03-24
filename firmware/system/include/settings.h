@@ -8,10 +8,6 @@
 #include <map>
 #include <string>
 
-
-#define PARAMETER_MAX_RECORD_LENGTH     255
-
-
 using namespace std;
 
 

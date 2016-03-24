@@ -58,6 +58,16 @@ bool Serial::isOpened() {
     return port->isOpen();
 }
 
+QByteArray Serial::readBlocking(int bytes) {
+    do {
+        if( instance().port->waitForReadyRead( -1 ) == false ) {
+            return QByteArray();
+        }
+    } while( instance().port->bytesAvailable() < bytes );
+
+    return instance().port->read( bytes );
+}
+
 void Serial::readData() {
     QByteArray data = port->readAll();
 	//qDebug() << "Serial::readData" << data.toHex();

@@ -10,12 +10,12 @@ set( BOARD servo-1 )
 
 set( SOURCES
     main.cpp
-    app/imu.c
+    app/imu.cpp
     app/nav.cpp
     app/encoder.cpp
     app/servo.cpp
-	app/user_func_RBF_127_150819.c
-    system/io.c
+    app/user_func_RBF_127_150819.c
+    system/io.cpp
     system/thread.cpp
     system/control.cpp
     system/connection.cpp
@@ -32,6 +32,7 @@ set( INCLUDE
 	system/include
 	driver/include
 	board/${BOARD}
+    ../library/g_matrix
 	../library/mavlink
     ../library/mavlink/nio15
 )

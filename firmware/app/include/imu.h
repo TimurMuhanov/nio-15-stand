@@ -10,6 +10,9 @@
 #include "ch.h"
 
 
+#define IMU_UPDATE_PERIOD     20
+
+
 typedef struct {
 	float x;
 	float y;

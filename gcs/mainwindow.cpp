@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <functional>
 
 
 MainWindow* MainWindow::_instance;
@@ -13,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	_ui = new Ui::MainWindow;
 	_ui->setupUi(this);
+
+//    std::bind();
 }
 
 MainWindow::~MainWindow() {

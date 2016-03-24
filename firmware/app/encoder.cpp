@@ -3,7 +3,7 @@
 
 static thread_t* updateThread;
 static THD_FUNCTION(encoderUpdate, arg);
-static THD_WORKING_AREA(encoderUpdateWorkingArea, 128);
+static THD_WORKING_AREA(encoderUpdateWorkingArea, 1024);
 scalarData encoder[ENCODER_NUMBER];
 float encoderOffset[ENCODER_NUMBER];
 static binary_semaphore_t dataAccess;
@@ -11,9 +11,16 @@ static binary_semaphore_t dataAccess;
 
 
 THD_FUNCTION(encoderUpdate, arg) {
+    int i;
+    for( i=0; i<ENCODER_NUMBER; i++) {
+        encoder[i].time = ST2US(chVTGetSystemTime());
+        encoder[i].val = 0;
+        ls7366Init(i+1);
+    }
+
 	systime_t chibios_time = chVTGetSystemTime();
 
-	while(1) {
+    while( !chThdShouldTerminateX() ) {
 		chibios_time += MS2ST(ENCODER_PERIOD_MS);
 
 		chBSemWait(&dataAccess);
@@ -38,18 +45,13 @@ THD_FUNCTION(encoderUpdate, arg) {
 
 		chThdSleepUntil(chibios_time);
     }
+    chThdExit( 0 );
 }
 
 
 void encoderInit(void) {
 	chBSemObjectInit(&dataAccess, false);
 
-	int i;
-	for( i=0; i<ENCODER_NUMBER; i++) {
-		encoder[i].time = ST2US(chVTGetSystemTime());
-		encoder[i].val = 0;
-		ls7366Init(i+1);
-	}
 	/*encoderOffset[0] = paramGet(PARAM_ENCODER1_OFFSET);
 	encoderOffset[1] = paramGet(PARAM_ENCODER2_OFFSET);
 	encoderOffset[2] = paramGet(PARAM_ENCODER3_OFFSET);

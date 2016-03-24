@@ -73,10 +73,32 @@
 *** Releases and Change Log                                               ***
 *****************************************************************************
 
+*** 3.0.6 ***
+- HAL: Fixed shift of signed constant causes warnings with IAR compiler
+       (bug #709).
+- NIL: Fixed ARM errata 752419 (bug #706).
+- RT:  Fixed ARM errata 752419 (bug #706).
+- HAL: Fixed chDbgAssert() still called from STM32 SPIv1 driver (bug #704).
+- RT:  Fixed useless call to chTMStartMeasurementX() in _thread_init()
+       (bug #697).
+- VAR: Fixed missing time conversion in lwIP arch module (bug #696, again).
+
 *** 3.0.5 ***
+- VAR: Fixed missing time conversion in lwIP arch module (bug #696).
+- NIL: NIL_CFG_USE_EVENTS not properly checked in NIL (bug #694).
+- RT:  Fixed ISR statistics are not updated from a critical zone in RT
+       (bug #693).
+- NIL: Fixed NIL test suite calls I and S functions outside critical zone
+       (bug #692).
+- NIL: Fixed protocol violation in NIL OSAL (bug #691).
+- HAL: Fixed STM32 CAN driver always broadcasts tx complete for mailbox 1
+       (bug #690).
+- RT:  Fixed tm_stop - best case bug (bug #688).
+- RT:  Fixed ARM port enforcing THUMB mode (bug #687).
 - HAL: Fixed HAL drivers still calling RT functions (bug #686).
 - HAL: Fixed Serial_USB improperly resets queues on stop (bug #685).
 - HAL: Fixed chprintf() still calling RT functions (bug #684).
+- ALL: Several minor documentation/formatting-related fixes.
 
 *** 3.0.4 ***
 - HAL: Fixed STM32 ICU driver uses chSysLock and chSysUnlock (bug #681).

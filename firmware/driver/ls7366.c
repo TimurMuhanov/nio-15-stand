@@ -285,7 +285,7 @@ u32 ls7366Fix() {
 	spiAcquireBus(&BOARD_LS7366R_DEVICE);
 	txBuffer[0] = REG_OTR | CMD_LOAD;
 	spiSend( &BOARD_LS7366R_DEVICE, 1, txBuffer );
-	u32 time = chVTGetSystemTime();
+    u32 time = chVTGetSystemTime();
 	spiReleaseBus(&BOARD_LS7366R_DEVICE);
 	LS7366_CHIP_DESELECT( ls7366NumberToPin( 1 ) );
 	LS7366_CHIP_DESELECT( ls7366NumberToPin( 2 ) );

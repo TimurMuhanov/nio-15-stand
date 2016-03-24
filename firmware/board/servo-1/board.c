@@ -168,15 +168,15 @@ void boardInit(void) {
 	#endif
 
 
-	#if STM32_SERIAL_USE_USART2 || STM32_UART_USE_USART2
-	palSetPadMode(BOARD_USART2_CTS_PORT, BOARD_USART2_CTS_PIN, PAL_MODE_ALTERNATE(7));
-	palSetPadMode(BOARD_USART2_RTS_PORT, BOARD_USART2_RTS_PIN, PAL_MODE_ALTERNATE(7));
-	palSetPadMode(BOARD_USART2_TX_PORT, BOARD_USART2_TX_PIN, PAL_MODE_ALTERNATE(7));
-	palSetPadMode(BOARD_USART2_RX_PORT, BOARD_USART2_RX_PIN, PAL_MODE_ALTERNATE(7));
+    #if STM32_SERIAL_USE_USART2 || STM32_UART_USE_USART2
+    palSetPadMode(BOARD_USART2_CTS_PORT, BOARD_USART2_CTS_PIN, PAL_MODE_ALTERNATE(7));
+    palSetPadMode(BOARD_USART2_RTS_PORT, BOARD_USART2_RTS_PIN, PAL_MODE_ALTERNATE(7));
+    palSetPadMode(BOARD_USART2_TX_PORT, BOARD_USART2_TX_PIN, PAL_MODE_ALTERNATE(7));
+    palSetPadMode(BOARD_USART2_RX_PORT, BOARD_USART2_RX_PIN, PAL_MODE_ALTERNATE(7));
 
-	usartConfig.speed = BOARD_USART2_BAUD;
-	sdStart(&SD2, &usartConfig);
-	#endif
+//	usartConfig.speed = BOARD_USART2_BAUD;
+//	sdStart(&SD2, &usartConfig);
+    #endif
 
 
 
@@ -376,6 +376,15 @@ void boardInit(void) {
 
 	sdcStart(&SDCD1, NULL);
 	#endif
+
+    palSetPadMode(GPIOC, 15, PAL_MODE_OUTPUT_PUSHPULL);         // blue
+    palClearPad(GPIOC, 15);
+    palSetPadMode(GPIOC, 13, PAL_MODE_OUTPUT_PUSHPULL);         // red
+    palClearPad(GPIOC, 13);
+    palSetPadMode(GPIOC, 0, PAL_MODE_OUTPUT_PUSHPULL);          // orange
+    palClearPad(GPIOC, 0);
+    palSetPadMode(GPIOC, 14, PAL_MODE_OUTPUT_PUSHPULL);         // external?
+    palClearPad(GPIOC, 14);
 }
 
 
@@ -390,9 +399,9 @@ void boardStop(void) {
 	sdStop(&SD1);
 	#endif
 
-	#if STM32_SERIAL_USE_USART2 || STM32_UART_USE_USART2
-	sdStop(&SD2);
-	#endif
+//	#if STM32_SERIAL_USE_USART2 || STM32_UART_USE_USART2
+//	sdStop(&SD2);
+//	#endif
 
 	#if STM32_SPI_USE_SPI1
 	spiStop(&SPID1);

@@ -60,6 +60,13 @@ typedef volatile int16_t    vint16_t;       /**< Volatile signed 16 bits.   */
 typedef volatile uint16_t   vuint16_t;      /**< Volatile unsigned 16 bits. */
 typedef volatile int32_t    vint32_t;       /**< Volatile signed 32 bits.   */
 typedef volatile uint32_t   vuint32_t;      /**< Volatile unsigned 32 bits. */
+
+typedef int8_t     s8;
+typedef uint8_t    u8;
+typedef int16_t    s16;
+typedef uint16_t   u16;
+typedef int32_t    s32;
+typedef uint32_t   u32;
 /** @} */
 
 /**
@@ -80,20 +87,6 @@ typedef uint32_t            eventmask_t;    /**< Mask of event identifiers. */
 typedef uint32_t            eventflags_t;   /**< Mask of event flags.       */
 typedef int32_t             cnt_t;          /**< Generic signed counter.    */
 typedef uint32_t            ucnt_t;         /**< Generic unsigned counter.  */
-/** @} */
-
-/**
- * @name    User types
- * @{
- */
-typedef uint64_t            u64;
-typedef int64_t             s64;
-typedef uint32_t            u32;
-typedef int32_t             s32;
-typedef uint16_t            u16;
-typedef int16_t             s16;
-typedef uint8_t             u8;
-typedef int8_t              s8;
 /** @} */
 
 /**

@@ -15,9 +15,6 @@
 static u16 txBuffer[ADIS_BUFFER_SIZE];
 static u16 rxBuffer[ADIS_BUFFER_SIZE];
 static u32 i;
-static thread_t* updateThread;
-static THD_FUNCTION(adis16488Update, arg);
-static THD_WORKING_AREA(adis16488UpdateWorkingArea, 128);
 
 void adis16488Read( u8 page, u8 address, u32 length, u16* buffer ) {
 	// if length > ADIS_BUFFER_SIZE
@@ -25,8 +22,8 @@ void adis16488Read( u8 page, u8 address, u32 length, u16* buffer ) {
 	//ADIS_CHIP_SELECT;
 
 	// first change page
-//	txBuffer[0] = 0x8000 | page;
-//	spiExchange( &BOARD_ADIS16488_DEVICE, 1, txBuffer, rxBuffer );
+    txBuffer[0] = 0x8000 | page;
+    spiExchange( &BOARD_ADIS16488_DEVICE, 1, txBuffer, rxBuffer );
 
     for( i=0; i<length; i++ )
         txBuffer[i] = ( (( address + 2*i ) & 0x7F) << 8) & 0xFF00;
@@ -55,8 +52,8 @@ void adis16488Write( u8 page, u8 address, u32 length, const u16* buffer ) {
 	//ADIS_CHIP_SELECT;
 
 	// first change page
-//	txBuffer[0] = 0x8000 | page;
-//	spiExchange( &BOARD_ADIS16488_DEVICE, 1, txBuffer, rxBuffer );
+    txBuffer[0] = 0x8000 | page;
+    spiExchange( &BOARD_ADIS16488_DEVICE, 1, txBuffer, rxBuffer );
 
 	// write data by 8 blocks
 	for( i=0; i<length; i++ ) {
@@ -99,73 +96,53 @@ u8 adis16488TestConnection(void) {
 	}
 }
 
-THD_FUNCTION(adis16488Update, arg) {
-	systime_t chibios_time = chVTGetSystemTime();
+void adis16488Update(void) {
+    s16 buffer[18];
+    vectorData vData;
+    scalarData sData;
 
-	while (1) {
-		chibios_time += MS2ST(ADIS16488_UPDATE_PERIOD);
-		{
-            s16 buffer[17];
-			vectorData vData;
-			scalarData sData;
+    sData.time = vData.time = chVTGetSystemTime();
+    adis16488Read(0, 0x0E, 18, (u16*)buffer );
 
-            sData.time = vData.time = chVTGetSystemTime();
-//            adis16488Read(0, 0x10, 17, static_cast<u16*>(buffer) );
-            adis16488Read(0, 0x10, 17, (u16*)buffer );
+    sData.val = buffer[0]*0.00565f + 25 + 273.15;
+    imuTempSet(sData);
 
-            vData.x = -buffer[1]*0.02f;
-            vData.x += -buffer[0]*0.02f/(2<<16);
-            vData.y = -buffer[3]*0.02f;
-            vData.y += -buffer[2]*0.02f/(2<<16);
-            vData.z = buffer[5]*0.02f;
-            vData.z += buffer[4]*0.02f/(2<<16);
-			imuGyroSet(vData);
+    vData.x = -buffer[2]*0.02f;
+    vData.x += -buffer[1]*0.02f/(2<<16);
+    vData.y = -buffer[4]*0.02f;
+    vData.y += -buffer[3]*0.02f/(2<<16);
+    vData.z = buffer[6]*0.02f;
+    vData.z += buffer[5]*0.02f/(2<<16);
+    imuGyroSet(vData);
 
-            vData.x = buffer[7]*0.0008f;
-            vData.x += buffer[6]*0.0008f/(2<<16);
-            vData.y = buffer[9]*0.0008f;
-            vData.y += buffer[8]*0.0008f/(2<<16);
-            vData.z = buffer[11]*0.0008f;
-            vData.z += buffer[10]*0.0008f/(2<<16);
-            imuAccelSet(vData);
+    vData.x = -buffer[8]*0.0008f;
+    vData.x += -buffer[7]*0.0008f/(2<<16);
+    vData.y = -buffer[10]*0.0008f;
+    vData.y += -buffer[9]*0.0008f/(2<<16);
+    vData.z = buffer[12]*0.0008f;
+    vData.z += buffer[11]*0.0008f/(2<<16);
+    imuAccelSet(vData);
 
-            vData.x = -buffer[12]*0.0001f;
-            vData.y = -buffer[13]*0.0001f;
-            vData.z = buffer[14]*0.0001f;
-			imuMagSet(vData);
+    vData.x = -buffer[13]*0.0001f;
+    vData.y = -buffer[14]*0.0001f;
+    vData.z = buffer[15]*0.0001f;
+    imuMagSet(vData);
 
-            sData.val = buffer[16]*0.00004f;
-            sData.val += buffer[15]*0.00004f/(2<<16);
-			imuPressureSet(sData);
+    sData.val = buffer[17]*0.00004f;
+    sData.val += buffer[16]*0.00004f/(2<<16);
+    imuPressureSet(sData);
 
-			#ifdef ADIS16488_DEBUG
-            /*print( "gyro: %.3f %.3f %.3f\n\raccel: %.3f %.3f %.3f\n\rmag: %.3f %.3f %.3f\n\rbaro: %.3f\n\rtemp: %.3f\n\r",
-				   imu.g.x,imu.g.y,imu.g.z,
-				   imu.a.x,imu.a.y,imu.a.z,
-				   imu.m.x,imu.m.y,imu.m.z,
-                   imu.p.val, imu.T.val );*/
-			#endif
-		}
-
-		/*if( chThdShouldTerminateX() )
-			chThdExit( 0 );*/
-		chThdSleepUntil(chibios_time);
-    }
+    #ifdef ADIS16488_DEBUG
+    print( "gyro: %.3f %.3f %.3f\n\raccel: %.3f %.3f %.3f\n\rmag: %.3f %.3f %.3f\n\rbaro: %.3f\n\rtemp: %.3f\n\r",
+           imu.g.x,imu.g.y,imu.g.z,
+           imu.a.x,imu.a.y,imu.a.z,
+           imu.m.x,imu.m.y,imu.m.z,
+           imu.p.val, imu.T.val );
+    #endif
 }
 
 void adis16488Init() {
-	ADIS_CHIP_SELECT;
-
-	if( !adis16488TestConnection() )
-		return;
-
-    updateThread = chThdCreateStatic(   adis16488UpdateWorkingArea,
-                                        sizeof(adis16488UpdateWorkingArea),
-                                        NORMALPRIO, adis16488Update, NULL);
-    Thread::addThread( updateThread, string("adis") );
-
-	/*while (TRUE) {
-		adis16488Update();
-		chThdSleepMilliseconds(500);
-	}*/
+    ADIS_CHIP_SELECT;
+    if( !adis16488TestConnection() )
+        return;
 }

@@ -85,7 +85,9 @@ void _unhandled_exception(void) {
 extern uint32_t __main_stack_end__;
 void Reset_Handler(void) __attribute__((weak, alias("_unhandled_exception")));
 void NMI_Handler(void) __attribute__((weak, alias("_unhandled_exception")));
-void HardFault_Handler(void) __attribute__((weak, alias("_unhandled_exception")));
+void HardFault_Handler(void) {
+    while (1);
+}
 void MemManage_Handler(void) __attribute__((weak, alias("_unhandled_exception")));
 void BusFault_Handler(void) __attribute__((weak, alias("_unhandled_exception")));
 void UsageFault_Handler(void) __attribute__((weak, alias("_unhandled_exception")));

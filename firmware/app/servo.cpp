@@ -3,7 +3,7 @@
 
 static thread_t* updateThread;
 static THD_FUNCTION(servoUpdate, arg);
-static THD_WORKING_AREA(servoUpdateWorkingArea, 128);
+static THD_WORKING_AREA(servoUpdateWorkingArea, 1024);
 scalarData servo[SERVO_NUMBER];
 mutex_t servoReadData;
 static binary_semaphore_t dataAccess;
@@ -67,10 +67,6 @@ void servoInit(void) {
 	servoConfig[7].angle20Pwm = paramGet(PARAM_SERVO8_ANGLE_20_PWM);
 	servoConfig[7].minAngle = paramGet(PARAM_SERVO8_MIN_ANGLE);
 	servoConfig[7].maxAngle = paramGet(PARAM_SERVO8_MAX_ANGLE);*/
-
-	int i;
-    for( i=0; i<SERVO_NUMBER; i++)
-        servoSet(i, 0);
 
     updateThread = chThdCreateStatic(   servoUpdateWorkingArea,
                                         sizeof(servoUpdateWorkingArea),
@@ -142,9 +138,12 @@ void servoSet(u32 id, float angle) {
 
 
 THD_FUNCTION(servoUpdate, arg) {
+    for( int i=0; i<SERVO_NUMBER; i++)
+        servoSet(i, 0);
+
 	systime_t chibios_time = chVTGetSystemTime();
 
-	while(1) {
+    while( !chThdShouldTerminateX() ) {
 		chibios_time += MS2ST(SERVO_UPDATE_PERIOD_MS);
 
 		chBSemWait(&dataAccess);
@@ -155,4 +154,6 @@ THD_FUNCTION(servoUpdate, arg) {
 
 		chThdSleepUntil(chibios_time);
     }
+
+    chThdExit( 0 );
 }

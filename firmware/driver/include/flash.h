@@ -1,24 +1,53 @@
 /**	@defgroup	FLASH
-	@brief		Function to use internal flash
+    @brief		Module to read/write internal flash
 	@{ */
 
 #ifndef FLASH_H
 #define FLASH_H
 
-#include "ch.h"
-#include "hal.h"
+#include "ch.hpp"
 
 
-void 	flashLock( void );
+using namespace chibios_rt;
 
-void	flashUnlock( void );
 
-/** erase firmware */
-void	flashEraseFirmware( void );
+#define BUFFER_SIZE         256
 
-/** write 32bit word to flash */
-void	flashWrite( u32 beginAddress, u32* buffer, u32 len );
 
+class Flash : public BaseStaticThread<512> {
+                                        Flash();
+                                       ~Flash();
+
+    public:
+        inline static Flash&            instance();
+        static void                     write( u32 address, u8* buffer, u32 length );
+        static u8                       sector( u32 address );
+        static void                     erase( u32 begin, u32 length );
+        static void                     eraseBegin();
+        static void                     eraseEnd();
+        static bool                     eraseSector( u8 sector );
+        static bool                     isLocked();
+        static void                     lock();
+        static void                     unlock();
+
+    private:
+        virtual void                    main(void);
+
+        const u32                       bufferSize = BUFFER_SIZE;
+        u8                              dataBuffer[BUFFER_SIZE];
+        u32                             addressBuffer[BUFFER_SIZE];
+
+        u32                             beginIndex = 0;
+        u32                             endIndex = 0;
+        CounterSemaphore                freeBytes{ bufferSize };
+        CounterSemaphore                usedBytes{ 0 };
+};
+
+
+Flash& Flash::instance() {
+    static Flash instance;
+    return instance;
+}
 
 #endif
 

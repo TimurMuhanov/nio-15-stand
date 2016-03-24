@@ -82,8 +82,11 @@
 												(address < BOARD_FLASH_SECTOR_END) ? (11) : ( 11 ) \
 											) ) ) ) ) ) ) ) ) ) ) ) : (11) )
 
+#define BOARD_IS_ADRESS_CORRECT(address)	( ( (address)>=BOARD_FLASH_FIRMWARE ) && ((address)<BOARD_FLASH_SECTOR_END) ? true : false )
+
+
 #define BOARD_FLASH_BOOTLOADER		0x08000000
-#define BOARD_FLASH_FIRMWARE		0x08020000
+#define BOARD_FLASH_FIRMWARE		0x08040000
 /** estimating up flash size */
 #define BOARD_FLASH_FIRMWARE_SIZE	0x00050000
 
@@ -102,7 +105,7 @@
 #define BOARD_RADIO_DEVICE			SD1
 #define BOARD_RS422_DEVICE			SD3
 #define BOARD_USB_DEVICE			SDU1
-#define BOARD_BLUETOOTH_DEVICE		SD2
+#define BOARD_BLUETOOTH_DEVICE		UARTD2
 
 #define BOARD_PITE_PORT				GPIOC
 #define BOARD_PITE_PIN				13

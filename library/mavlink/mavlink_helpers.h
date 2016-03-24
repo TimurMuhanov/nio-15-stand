@@ -657,7 +657,7 @@ void comm_send_ch(mavlink_channel_t chan, uint8_t ch)
 }
  */
 
-MAVLINK_HELPER void _mavlink_send_uart(mavlink_channel_t chan, const char *buf, uint16_t len)
+MAVLINK_HELPER void _mavlink_send_uart(mavlink_channel_t, const char *buf, uint16_t len)
 {
 #ifdef MAVLINK_SEND_UART_BYTES
 	/* this is the more efficient approach, if the platform

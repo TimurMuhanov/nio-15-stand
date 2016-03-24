@@ -9,10 +9,12 @@ set(ASM arm-none-eabi-gcc)
 set( BOARD servo-1 )
 
 set( SOURCES
-	main.c
-	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/io.c
+    main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/io.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/telemetry.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/thread.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/usbcfg.c
-	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/driver/flash.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/driver/Flash.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/board/${BOARD}/board.c
 )
 set( INCLUDE
