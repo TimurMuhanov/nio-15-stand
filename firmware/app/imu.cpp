@@ -15,7 +15,7 @@ struct {
 binary_semaphore_t dataAccess;
 static thread_t* updateThread;
 static THD_FUNCTION(update, arg);
-static THD_WORKING_AREA(updateWorkingArea, 1024);
+static THD_WORKING_AREA(updateWorkingArea, 4096);
 
 THD_FUNCTION(update, arg) {
 
