@@ -5,7 +5,7 @@
 
 static thread_t* updateThread;
 static THD_FUNCTION(update, arg);
-static THD_WORKING_AREA(updateWorkingArea, 4096);
+static THD_WORKING_AREA(updateWorkingArea, 8192);
 
 #define gyroMeasError (6.0f / 180.0f) * M_PI // gyroscope measurement error in rad/s (shown as 6 deg/s)
 #define gyroMeasDrift (0.3f / 180.0f) * M_PI// gyroscope measurement error in rad/s/s (shown as 0.3f deg/s/s)
@@ -121,7 +121,8 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
         Vector<3> gyroError;
 
         float zeta, beta;
-        static int count = 0;
+        static int count = 0, count1 = 0,state=0;
+        static Quaternion<> q_av{0,0,0,0}, q_i[200]; float q_res[20];
 
         static systime_t oldTime = chVTGetSystemTime();
 
@@ -131,6 +132,7 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
         accel.normalize();
         mag.normalize();
         Me.normalize();
+        printf("%f", Me(2));
 
         if(count<25){
             zeta = 30.0f * c_zeta;
@@ -138,8 +140,40 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
             count++;
         }
         else{
-            zeta = c_zeta * 0.5f;
+            if(count1>200 && count1 < 500 && state > 0) count1++;
+            if(count1==500 && state > 0) count1=0;
+            if(count1<500 && state == 0){
+            zeta = c_zeta * 1.5f;
             beta = c_beta * 0.8f;
+            count1++;
+            }
+            if(count1==500 && state == 0){
+            count1=0;
+            state=1;
+            zeta = c_zeta * 0.1f;
+            beta = c_beta * 0.1f;
+            }
+            if(state>0){
+                if(count1<200){
+                q_av = q_av + q;
+                q_i[count1] = q;
+                count1++;
+                }
+                if(count1==200){
+                    q_av = q_av/200.0f;
+                    for(int i =0; i<200; i++)
+                    q_res[state] = q_res[state] + ((q_av - q_i[i]).norm() * (q_av - q_i[i]).norm());
+                    q_res[state] = sqrt(q_res[state]/199.0f);
+                    printf("%d /n/r", state);
+                    if(state<20){
+                    state++;
+                    beta += c_beta * 0.1f;
+                    q_av={0,0,0,0};
+                    count1++;
+                    }
+                    if(state == 20) {for(int i =0; i<20; i++) printf("%f /n/r", q_res[i]); state++; count1=501;}
+                }
+            }
         }
 
     //    // compute the quaternion from gravity field oreentation
