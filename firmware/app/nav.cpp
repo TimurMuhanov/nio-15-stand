@@ -132,49 +132,57 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
         accel.normalize();
         mag.normalize();
         Me.normalize();
-        printf("%f", Me(2));
 
         if(count<25){
             zeta = 30.0f * c_zeta;
             beta = 30.0f * c_beta;
             count++;
         }
-        else{
-            if(count1>200 && count1 < 500 && state > 0) count1++;
-            if(count1==500 && state > 0) count1=0;
-            if(count1<500 && state == 0){
-            zeta = c_zeta * 1.5f;
-            beta = c_beta * 0.8f;
-            count1++;
-            }
-            if(count1==500 && state == 0){
-            count1=0;
-            state=1;
-            zeta = c_zeta * 0.1f;
-            beta = c_beta * 0.1f;
-            }
-            if(state>0){
-                if(count1<200){
-                q_av = q_av + q;
-                q_i[count1] = q;
-                count1++;
-                }
-                if(count1==200){
-                    q_av = q_av/200.0f;
-                    for(int i =0; i<200; i++)
-                    q_res[state] = q_res[state] + ((q_av - q_i[i]).norm() * (q_av - q_i[i]).norm());
-                    q_res[state] = sqrt(q_res[state]/199.0f);
-                    printf("%d /n/r", state);
-                    if(state<20){
-                    state++;
-                    beta += c_beta * 0.1f;
-                    q_av={0,0,0,0};
-                    count1++;
-                    }
-                    if(state == 20) {for(int i =0; i<20; i++) printf("%f /n/r", q_res[i]); state++; count1=501;}
-                }
-            }
+        else {
+            zeta = c_zeta * 2.7f;
+            beta = c_beta * .28f;
         }
+//        else{
+//            if(count1>200 && count1 < 500 && state > 0) {
+//                zeta = 30.0f * c_zeta;
+//                beta = 30.0f * c_beta;
+//                count1++;
+//            }
+//            if(count1==500 && state > 0) count1=0;
+//            if(count1<500 && state == 0){
+//            zeta = c_zeta * 1.7f;
+//            beta = c_beta * 0.3f;
+//            count1++;
+//            }
+//            if(count1==500 && state == 0){
+//            count1=0;
+//            state=1;
+//            zeta = c_zeta * 0.1f;
+//            beta = c_beta * 0.1f;
+//            }
+//            if(state>0){
+//                if(count1<200){
+//                q_av = q_av + q;
+//                q_i[count1] = q;
+//                count1++;
+//                //print("%d stop \n\r", state);
+//                }
+//                if(count1==200){
+//                    q_av = q_av/200.0f;
+//                    for(int i =0; i<200; i++)
+//                    q_res[state] = q_res[state] + ((q_av - q_i[i]).norm() * (q_av - q_i[i]).norm());
+//                    q_res[state] = sqrt(q_res[state]/199.0f);
+//                    print("%d \n\r", state);
+//                    if(state<20){
+//                    state++;
+//                    beta += c_beta * 0.1f;
+//                    q_av={0,0,0,0};
+//                    count1++;
+//                    }
+//                    if(state == 20) {for(int i =0; i<20; i++) print("%f ", q_res[i]); state++; count1=501;}
+//                }
+//            }
+//        }
 
     //    // compute the quaternion from gravity field oreentation
     //    std::function< Vector<3>( Vector<4>) > fAccel = ([&] (Vector<4> q) -> Vector<3> {
