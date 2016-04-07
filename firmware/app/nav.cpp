@@ -139,8 +139,10 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
             count++;
         }
         else {
-            zeta = c_zeta * 2.7f;
-            beta = c_beta * .28f;
+            //zeta = c_zeta * 2.7f;
+            //beta = c_beta * .28f;
+            zeta = c_zeta * 3.1f;
+            beta = c_beta * 0.35f;
         }
 //        else{
 //            if(count1>200 && count1 < 500 && state > 0) {
@@ -199,6 +201,7 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
     //    qFromAccelMag = qFromAccel + qFromMag;
 
         // compute the quaternion from gravity field oreentation
+        //for(int i = 0; i<2; i++){
         std::function< Vector<6>( Vector<4>) > f = ([&] (Vector<4> q) -> Vector<6> {
             Vector<3> fromAccel = (Quaternion<>(q).conjugated() * Ae * Quaternion<>(q)).vector() - accel;
             Vector<3> fromMag = (Quaternion<>(q).conjugated() * Me * Quaternion<>(q)).vector() - mag;
@@ -209,9 +212,12 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
 
         // compute angular estimated direction of the gyroscope error
         gyroError = (q.conjugated() * qFromAccelMag).vector()*2.0f;
+        //print("gyro %f %f %f \n\r", gyro(0),gyro(1),gyro(2));
         // compute and remove the gyroscope baises
         gyroB = gyroB + gyroError * dt * zeta;
+        //print("B %f %f %f \n\r", gyroB(0),gyroB(1),gyroB(2));
         gyro = gyro - gyroB;
+        //print("res %f %f %f \n\r", gyro(0),gyro(1),gyro(2));
 
         // compute the quaternion rate measured by gyroscopes
         qFromGyro = (q * Quaternion<>(0,gyro))*0.5f;
@@ -222,6 +228,8 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
         q.normalize();
         // compute flux in the earth frame
         Me = (q * mag * q.conjugated()).vector();
+        Me(2) = 0;
+        Me(1) = s
 
 }
 
