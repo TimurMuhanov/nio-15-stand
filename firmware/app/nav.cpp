@@ -133,7 +133,7 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
         mag.normalize();
         Me.normalize();
 
-        if(count<25){
+        if(count<100){
             zeta = 30.0f * c_zeta;
             beta = 30.0f * c_beta;
             count++;
@@ -228,8 +228,9 @@ void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag) {
         q.normalize();
         // compute flux in the earth frame
         Me = (q * mag * q.conjugated()).vector();
-        Me(2) = 0;
-        Me(1) = s
+        //Me(0) = sqrt(Me(0)*Me(0) + Me(2)*Me(2));
+        //Me(1) *= 1.0f;
+        //Me(2) = 0;
 
 }
 
