@@ -9,23 +9,21 @@
 #include "ch.h"
 #include "imu.h"
 
-#define NAV_UPDATE_PERIOD_MS 5
-#define M_PI 3.141592f
-
-typedef struct {
-	float w;
-	float x;
-	float y;
-	float z;
-	u32 time;			// us
-} quaternionData;
+#define NAV_UPDATE_PERIOD_MS    2
+#define M_PI                    3.141592f
+#define CALIBRATE_STEPS         100
 
 #ifdef __cplusplus
+#include "ch.hpp"
 #include "g_matrix.h"
 #include "g_vector.h"
 #include "g_quaternion.h"
+
 using namespace geometry;
+
 void filterUpdate(Vector<3> gyro, Vector<3> accel, Vector<3> mag);
+
+
 extern "C" {
 #endif
 

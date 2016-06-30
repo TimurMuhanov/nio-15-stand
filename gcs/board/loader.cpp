@@ -8,23 +8,20 @@
 
 
 QByteArray Loader::_pack;
+QMutex Loader::_mutex;
+QByteArray Loader::_responce;
+QWaitCondition Loader::_responceReceived;
 QThread Loader::_thread;
-qint64 Loader::bg;
 
 
 Loader::Loader() {
 
-//    connect(
-//        MainWindow::ui().firmwareChooseButton,
-//        &QPushButton::clicked,
-//        this,
-//        &Loader::selectFile );
-
     moveToThread(&_thread);
     _thread.start();
 
+    connect( MainWindow::ui().firmwareChooseButton, &QPushButton::clicked, this, &Loader::selectFile, Qt::DirectConnection );
     connect( MainWindow::ui().firmwareUploadButton, &QPushButton::clicked, this, &Loader::start );
-    MainWindow::ui().firmwareUploadButton->setEnabled(true);
+    connect( &Serial::instance(), &Serial::available, this, &Loader::receive, Qt::DirectConnection );
 }
 
 Loader::~Loader() {
@@ -39,26 +36,15 @@ Loader& Loader::instance() {
 }
 
 void Loader::start() {
-//	Connection::instance().jumpToBootloader();
-    qDebug() << "Loader::start()" << thread() << QThread::currentThread() << QApplication::instance()->thread();
-
-    _firmwareFile.setFileName("C:/nio15/bootloader/firmware.bin");
-
-    if( !_firmwareFile.open(QIODevice::ReadOnly) ) {
-        qDebug() << "File open error" << _firmwareFile.errorString();
-        return;
-    }
-    QByteArray data = _firmwareFile.readAll();
-    _firmwareFile.close();
-
-    QMetaObject::invokeMethod( MainWindow::ui().firmwareUploadProgressBar, "setMaximum", Q_ARG(int, data.length()/1024));
+    Connection::instance().jumpToBootloader();
 
     // get connection
-    if( !get( _connect ) ) {
+    QMetaObject::invokeMethod( MainWindow::ui().firmwareStatusLabel, "setText", Q_ARG(QString, "Connecting..." ) );
+    if( !get( _connect, 10000 ) ) {
         qDebug() << "can't connected";
         return;
     }
-    qDebug() << "connected";
+//    qDebug() << "connected";
     QMetaObject::invokeMethod( MainWindow::ui().firmwareStatusLabel, "setText", Q_ARG(QString, "Connected" ) );
 
     // erase
@@ -67,58 +53,85 @@ void Loader::start() {
         return;
     }
     QMetaObject::invokeMethod( MainWindow::ui().firmwareStatusLabel, "setText", Q_ARG(QString, "Erasing..." ) );
-    send( int2array(data.length()) );
-    if( !get( _ack ) ) {
+    send( int2array(_firmwareData.length()) );
+    if( !get( _ack, 20000 ) ) {
         qDebug() << "can't erase";
         return;
     }
-    qDebug() << "erased";
+//    qDebug() << "erased";
 
+    QMetaObject::invokeMethod( MainWindow::ui().firmwareUploadProgressBar, "setMaximum", Q_ARG(int, _firmwareData.length()/1024));
     QMetaObject::invokeMethod( MainWindow::ui().firmwareStatusLabel, "setText", Q_ARG(QString, "Flashing..." ) );
 
     // write data
     int index = 0;
-    _pack.clear();
-    while( index < data.length() ) {
+    while( index < _firmwareData.length() ) {
+//        qDebug() << "send write";
         if( !send(_write) ) {
             qDebug() << "can't send write";
             continue;
         }
         char checksum = 0;
+        _pack.clear();
         _pack.append( int2array( _addressBase+index ) );
-        _pack.append( data.mid(index, _packLength) );
+        _pack.append( _firmwareData.mid(index, _packLength) );
+        if( _pack.count() < _packLength+4 ) {
+            _pack.append( QByteArray( _packLength+4-_pack.count(), 0xFF ) );
+        }
         for( auto c : _pack ) {
             checksum ^= c;
         }
         _pack.append( QByteArray(1,checksum) );
+//        qDebug() << "send pack";
         send( _pack );
+        _pack.clear();
         if( !get( _ack ) ) {
             qDebug() << "can't send pack";
             continue;
         }
-        _pack.clear();
         index += _packLength;
-//        qDebug() << "written" << _addressBase+index;
+//        qDebug() << "written" << QString::number(_addressBase+index, 16);
         QMetaObject::invokeMethod( MainWindow::ui().firmwareUploadProgressBar, "setValue", Q_ARG(int, index/1024));
     }
+
+    // jump
+    if( !send(_go) ) {
+        qDebug() << "can't jump";
+        QMetaObject::invokeMethod( MainWindow::ui().firmwareStatusLabel, "setText", Q_ARG(QString, "Error!" ) );
+        return;
+    }
+    QMetaObject::invokeMethod( MainWindow::ui().firmwareStatusLabel, "setText", Q_ARG(QString, "Success!" ) );
 }
 
-//void Loader::selectFile() {
-////	qDebug() << "select file";
-//    // open file
-//    _firmwareFile.setFileName( QFileDialog::getOpenFileName(
-//                                    &MainWindow::instance(),
-//                                    tr("Open Firmware"),
-//                                    "",
-//                                    tr("Firmware File (*.bin)") ) );
+void Loader::selectFile() {
+    QString lastPath( MainWindow::settings().value("loader/lastPath").toString() );
+    QFile file;
+    file.setFileName(  QFileDialog::getOpenFileName(
+                                &MainWindow::instance(),
+                                tr("Open Firmware"),
+                                lastPath,
+                                tr("Firmware File (*.bin)") ) );
 
-//    if( !_firmwareFile.open(QIODevice::ReadOnly) ) {
-//        return;
-//    }
+    if( !file.open(QIODevice::ReadOnly) ) {
+        qDebug() << "File open error" << file.errorString();
+        return;
+    }
 
-//    MainWindow::ui().firmwareStatusLabel->setText("Ready to upload");
-//    MainWindow::ui().firmwareUploadButton->setEnabled(true);
-//}
+    MainWindow::settings().setValue("loader/lastPath", QFileInfo(file).absolutePath() );
+
+    _firmwareData = file.readAll();
+
+    MainWindow::ui().firmwareStatusLabel->setText("Ready to upload");
+    MainWindow::ui().firmwareUploadButton->setEnabled(true);
+}
+
+void Loader::receive(const QByteArray& data) {
+//    qDebug() << "rc" << data.toHex();
+    _mutex.lock();
+    _responce = data;
+    _responceReceived.wakeAll();
+    _mutex.unlock();
+}
 
 bool Loader::send(uint8_t cmd) {
     switch( cmd ){
@@ -139,33 +152,45 @@ bool Loader::send(uint8_t cmd) {
     }
 }
 
-bool Loader::send(const QByteArray& data) {
-    QMetaObject::invokeMethod( &Serial::instance(), "write", Q_ARG(QByteArray, data));
-    qDebug() << "send" << data.toHex();
+void Loader::send(const QByteArray& data) {
+    QMetaObject::invokeMethod( &Serial::instance(), "write", Q_ARG(QByteArray, QByteArray(data)));
+//    Serial::instance().port->flush();
+//    Serial::instance().port->waitForBytesWritten(-1);
+//    bg = QDateTime::currentMSecsSinceEpoch();
+//    qDebug() << "tm" << data.toHex();
 }
 
-bool Loader::get(uint8_t cmd) {
-    QByteArray responce = Serial::readBlocking(1);
+bool Loader::get(uint8_t cmd, unsigned long timeout ) {
     switch( cmd ){
         case _erase:
         case _write:
         case _go:
             return false;
         case _connect: {
-            qDebug() << "get connect" << responce.toHex() << QDateTime::currentMSecsSinceEpoch() - bg;
-            if( responce[0] == cmd ) {
-                send(_ack);
-                return true;
-            } else {
-                send(_nack);
-                return false;
+            while( 1 ) {
+                _mutex.lock();
+                if( _responceReceived.wait(&_mutex, timeout) ) {
+                    if( _responce[0] == cmd ) {
+                        send(_ack);
+                        _mutex.unlock();
+                        return true;
+                    }
+                }
+                _mutex.unlock();
             }
         }
         case _ack:
         case _nack: {
-            bg = QDateTime::currentMSecsSinceEpoch();
-            bool returnValue = responce[0] == cmd;
-            qDebug() << "get ack" << responce.toHex() << QDateTime::currentMSecsSinceEpoch() - bg;
+//            bg = QDateTime::currentMSecsSinceEpoch();
+            _mutex.lock();
+            if( !_responceReceived.wait(&_mutex, timeout) ) {
+                qDebug() << "Loader::get() timeout";
+                _mutex.unlock();
+                return false;
+            }
+            bool returnValue = _responce[0] == cmd;
+            _mutex.unlock();
+//            qDebug() << "get ack" << QDateTime::currentMSecsSinceEpoch() - bg;
             return returnValue;
         }
     }

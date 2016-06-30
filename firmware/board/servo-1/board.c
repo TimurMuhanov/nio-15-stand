@@ -117,11 +117,22 @@ bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
 #endif
 
 #if HAL_USE_SERIAL || HAL_USE_UART
-SerialConfig usartConfig = {
+SerialConfig serialConfig = {
 	9600,
 	0,
 	0,
 	0
+};
+#endif
+
+#if HAL_USE_UART || HAL_USE_UART
+UARTConfig uartConfig = {
+    telemetryTransmitCallback,
+    NULL,
+    NULL,
+    telemetryCharReceiveCallback,
+    NULL,
+    BOARD_USART2_BAUD,0,0,0
 };
 #endif
 
@@ -159,23 +170,23 @@ SPIConfig spi2Config = {
  */
 void boardInit(void) {
 	// peripheral inint
-	#if STM32_SERIAL_USE_USART1 || STM32_UART_USE_USART1
+    #if STM32_SERIAL_USE_USART1
 	palSetPadMode(BOARD_USART1_TX_PORT, BOARD_USART1_TX_PIN, PAL_MODE_ALTERNATE(7));
 	palSetPadMode(BOARD_USART1_RX_PORT, BOARD_USART1_RX_PIN, PAL_MODE_ALTERNATE(7));
 
-	usartConfig.speed = BOARD_USART1_BAUD;
-	sdStart(&SD1, &usartConfig);
+    serialConfig.speed = BOARD_USART1_BAUD;
+    sdStart(&SD1, &serialConfig);
 	#endif
 
 
-	#if STM32_SERIAL_USE_USART2 || STM32_UART_USE_USART2
+    #if STM32_SERIAL_USE_USART2
 	palSetPadMode(BOARD_USART2_CTS_PORT, BOARD_USART2_CTS_PIN, PAL_MODE_ALTERNATE(7));
 	palSetPadMode(BOARD_USART2_RTS_PORT, BOARD_USART2_RTS_PIN, PAL_MODE_ALTERNATE(7));
 	palSetPadMode(BOARD_USART2_TX_PORT, BOARD_USART2_TX_PIN, PAL_MODE_ALTERNATE(7));
 	palSetPadMode(BOARD_USART2_RX_PORT, BOARD_USART2_RX_PIN, PAL_MODE_ALTERNATE(7));
-
-	usartConfig.speed = BOARD_USART2_BAUD;
-	sdStart(&SD2, &usartConfig);
+    serialConfig.speed = BOARD_USART2_BAUD;
+    sdStart(&SD2, &serialConfig);
+//    uartStart( &UARTD2, &uartConfig );
 	#endif
 
 
@@ -392,15 +403,15 @@ void boardInit(void) {
  * @brief   Disable all enabled interfaces
  */
 void boardStop(void) {
-	//sduStop(&SDU1);
+//    sduStop(&SDU1);
 
 	// peripheral inint
-	#if STM32_SERIAL_USE_USART1 || STM32_UART_USE_USART1
+    #if STM32_SERIAL_USE_USART1
 	sdStop(&SD1);
 	#endif
 
-	#if STM32_SERIAL_USE_USART2 || STM32_UART_USE_USART2
-	sdStop(&SD2);
+    #if STM32_UART_USE_USART2
+    uartStop( &UARTD2 );
 	#endif
 
 	#if STM32_SPI_USE_SPI1

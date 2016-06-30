@@ -71,7 +71,6 @@ void servoInit(void) {
     updateThread = chThdCreateStatic(   servoUpdateWorkingArea,
                                         sizeof(servoUpdateWorkingArea),
                                         NORMALPRIO, servoUpdate, NULL);
-    Thread::addThread( updateThread, string("servo") );
 }
 
 void servoPower(u8 state) {

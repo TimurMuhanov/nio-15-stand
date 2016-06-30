@@ -15,12 +15,12 @@ Settings::Settings() {
         this,
         &Settings::clear
     );
-	connect(
-		&Connection::instance(),
-		&Connection::connected,
-		&Connection::instance(),
+    connect(
+        &Connection::instance(),
+        &Connection::connected,
+        &Connection::instance(),
         &Connection::settingsRequest
-	);
+    );
 	connect(
 		&Connection::instance(),
 		&Connection::settingReceived,
@@ -56,11 +56,11 @@ int Settings::getIndex(const string& key) {
 }
 
 void Settings::set( const string& key, const string& value ) {
-    qDebug() << "Settings::set()" << QString::fromStdString(key) << QString::fromStdString(value);
+//    qDebug() << "Settings::set()" << QString::fromStdString(key) << QString::fromStdString(value);
     if( _settings.find(key) == _settings.end() ) {
         instance().beginInsertRows( QModelIndex(), _settings.size(), _settings.size() );
-        instance().endInsertRows();
         _settings[ key ] = value;
+        instance().endInsertRows();
     } else {
         _synchronizingIndices.remove( getIndex(key) );
         _settings[ key ] = value;

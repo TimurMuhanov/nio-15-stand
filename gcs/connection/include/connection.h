@@ -96,12 +96,16 @@ class Connection : public QObject {
 					   ~Connection();
 						Connection(Connection const&);
 						Connection& operator= (Connection const&);
+
+        void			startStopCalibration();
 		mavlink_message_t	mavlink_message;
 		mavlink_status_t	mavlink_status;
 		QTimer*			timer;
 
 		/** connection status. true if there is connection with firmware, false otherwise */
 		bool			status;
+
+        bool			_magCalibrationStatus = false;
 };
 
 

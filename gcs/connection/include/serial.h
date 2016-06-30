@@ -5,48 +5,46 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QActionGroup>
+#include <QThread>
+#include <QMutex>
 
 
 class Serial : public QObject {
     Q_OBJECT
 
-	public:
-		static Serial&			instance();
-        bool                    isOpened();
-        static QByteArray       readBlocking(int bytes);
+    public:
+        static Serial&			instance();
+        static bool             isOpened();
 
-	signals:
-		void					opened();
-		void					closed();
-		void					available(const QByteArray& data);
+        /** Open @p port at @p baud.
+        @note Non thread safe!
+        @param      port        system serial port name (COM1, /dev/tty1, etc)
+        @param      baud        serial port baud rate */
+        Q_INVOKABLE
+        static bool             open(const QString& port, int baud=9600);
 
-	public slots:
-		void					write(const QByteArray& data);
+        /** Send @p data from serial port.
+        @note Non thread safe!
+        @param      data        data to send */
+        Q_INVOKABLE
+        static void             write(const QByteArray& data);
 
-	private slots:
-		bool					open();
-		void					close();
-		void					readData();
+    signals:
+        void					opened();
+        void					closed();
+        void					available(const QByteArray& data);
 
-		void					updatePorts();
-		void					updateBauds();
-		void					menuChanged(QAction* action);
-		void					checkPorts();
-
-	private:
-								Serial(QObject *parent = 0);
-							   ~Serial();
-								Serial(Serial const&);
-								Serial& operator= (Serial const&);
-
-		void					addPort(const QString& portName);
-		void					removePort(const QString& portName);
+    private:
+                                Serial(QObject *parent = 0);
+                               ~Serial();
+                                Serial(Serial const&);
+                                Serial& operator= (Serial const&);
+        void					close();
+        void					readData();
 
         QSerialPort*			port;
-		QActionGroup*			portActionGroup;
-		QActionGroup*			baudActionGroup;
-		QAction*				disconnectAction;
-		QTimer*					updater;
+        static QThread         _thread;
+        static QMutex          _mutex;
 };
 
 

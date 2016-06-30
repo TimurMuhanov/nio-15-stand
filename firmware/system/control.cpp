@@ -1,12 +1,12 @@
-#include "control.h"
+#include "Control.h"
 
 
 static u32 status;
 thread_t* userCodeThread;
 static THD_FUNCTION(userCodeUpdate, arg);
 static THD_WORKING_AREA(userCodeUpdateWorkingArea, 1024);
-extern "C" void process( void );
-extern "C" void processInit( void );
+void process( void );
+void processInit( void );
 
 
 void controlInit() {
@@ -28,7 +28,6 @@ void controlStart() {
     userCodeThread = chThdCreateStatic( userCodeUpdateWorkingArea,
                                         sizeof(userCodeUpdateWorkingArea),
                                         NORMALPRIO, userCodeUpdate, NULL);
-    Thread::addThread( userCodeThread, string("control") );
 
 }
 

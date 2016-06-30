@@ -17,6 +17,7 @@ class Logger : public QObject {
         void					addData(const QString& name, const double time, std::initializer_list<double> data);
 
     private slots:
+        void                    reset();
         void                    loggingPathChange();
 
     private:
@@ -25,6 +26,7 @@ class Logger : public QObject {
                                 Logger(Logger const&);
                                 Logger& operator= (Logger const&);
 
+        QString					_rootPath;
         QString					_path;
         QHash<QString, QFile*>  _logs;
 };

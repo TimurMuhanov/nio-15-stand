@@ -7,7 +7,7 @@
 
 extern mavlink_system_t mavlink_system;
 
-#define	MAVLINK_SEND_UART_BYTES(chan, buf, len)		Serial::instance().write(QByteArray((const char*)buf, (int)len))
+#define	MAVLINK_SEND_UART_BYTES(chan, buf, len)		QMetaObject::invokeMethod( &Serial::instance(), "write", Q_ARG(QByteArray, QByteArray((const char*)buf, (int)len)) )
 
 #endif /* MAVLINK_BRIDGE_HEADER_H */
 

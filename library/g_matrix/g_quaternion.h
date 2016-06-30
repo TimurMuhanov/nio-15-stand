@@ -29,9 +29,6 @@ namespace geometry {
                 _scalar = vector(0);
                 _vector = {vector(1), vector(2), vector(3)};
             }
-            Quaternion( const Vector<3, Type>& originVector, const Vector<3, Type>& resultVector ) {
-                ;
-            }
 
             Quaternion( std::initializer_list<Type> list ) {
                 int i=0;
@@ -88,15 +85,15 @@ namespace geometry {
             }
 
             inline void angle(Type angle) {
-                vector() = sin(angle/2)*axis();
-                scalar() = cos(angle/2);
+                vector() = sinf(angle/2)*axis();
+                scalar() = cosf(angle/2);
             }
             inline const Type angle() const {
-                return acos(_scalar)*2;
+                return acosf(_scalar)*2;
             }
 
             inline void axis(const Vector<3, Type>& axis) {
-                vector() = axis*sin(angle()/2);
+                vector() = axis*sinf(angle()/2);
             }
             inline const Vector<3, Type> axis() const {
                 if( _scalar != 1 )
@@ -129,7 +126,7 @@ namespace geometry {
 
             inline
             Type                                        norm() const {
-                return sqrt(  w()*w() + x()*x() + y()*y() + z()*z() );
+                return sqrtf(  w()*w() + x()*x() + y()*y() + z()*z() );
             }
 
             inline

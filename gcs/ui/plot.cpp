@@ -5,15 +5,13 @@
 
 PlotItem::PlotItem(QObject *parent, const QString& name, const QString &color) : QObject(parent), name(name) {
 	QColor plotColor( color );
-	QGridLayout* parametersLayout = (QGridLayout*) MainWindow::ui().plotGroupBox->layout();
+    QGridLayout* parametersLayout = (QGridLayout*) MainWindow::ui().plotValuesScrollAreaWidgetContents->layout();
 
     // create ui to graph control
 	QCheckBox* checkBox = new QCheckBox();
 	parametersLayout->addWidget( checkBox, Plot::instance().plots.length(), 0 );
-	QObject::connect(
-				checkBox,
-				SIGNAL(clicked(bool)),
-				SLOT(setVisible(bool)) );
+    connect( checkBox, &QCheckBox::clicked, this, PlotItem::setVisible );
+    connect( checkBox, &QCheckBox::clicked, &Plot::instance(), Plot::replot );
 	QLabel* label = new QLabel(name);
 	QPalette palette = label->palette();
 	palette.setColor(label->foregroundRole(), plotColor);
@@ -46,7 +44,7 @@ Plot::Plot(QObject *parent) : QObject(parent) {
 	// set colors
 	QList<QString> colorNameList = QColor::colorNames();
 	foreach( QString colorName, colorNameList ) {
-		if( QColor( colorName ).value() < 200 ) {
+        if( QColor( colorName ).value() < 200 && QColor( colorName ).alphaF() != 0 ) {
 			colors[colorName] = false;
 		}
 	}
@@ -73,12 +71,8 @@ Plot::Plot(QObject *parent) : QObject(parent) {
 		SLOT(replot()));
 	replotTimer->start();
 
-    connect(
-        &Connection::instance(),
-        &Connection::connected,
-        this,
-        &Plot::clear
-    );
+    connect( &Connection::instance(), &Connection::connected, this, &Plot::reset );
+    connect( MainWindow::ui().plotClearButton, &QPushButton::clicked,this, &Plot::reset );
 
 	MainWindow::ui().plotWidget->xAxis->setLabel("Time, sec");
     MainWindow::ui().plotWidget->setInteraction(QCP::iRangeDrag, true);
@@ -94,10 +88,6 @@ Plot& Plot::instance() {
 	return instance;
 }
 
-void Plot::clear() {
-    for(auto item : plots)
-        item->clear();
-}
 
 void Plot::addData(const QString& name, const double key, const double data) {
 	foreach(PlotItem* plot, plots) {
@@ -109,6 +99,12 @@ void Plot::addData(const QString& name, const double key, const double data) {
 
 	plots.append(new PlotItem(this, name, getNewColor()));
     plots.last()->addData(key, data);
+}
+
+void Plot::reset() {
+    for(auto item : plots) {
+        item->clear();
+    }
 }
 
 void Plot::replot() {
@@ -152,5 +148,6 @@ const QString& Plot::getNewColor() {
 			return it.key();
 		}
 	}
+    return "black";
 }
 

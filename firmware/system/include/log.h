@@ -1,52 +1,50 @@
 #ifndef LOG_H
 #define LOG_H
 
-#ifdef __cplusplus
-
-#include "ch.h"
+#include "ch.hpp"
 #include "ff.h"
 #include <string>
+#include "imu.h"
 
 
 using namespace std;
+using namespace chibios_rt;
 
 
-#define LOG_PERIOD_MS   100
+#define LOG_PERIOD_MS   10
+#define LOG_BUFFER_SIZE 512
 
 
-class Log {
+class Log : public BaseStaticThread<2048> {
     private:
                                             Log();
                                            ~Log();
     public:
 
-        static void                         init();
-        static FIL                          _file;
+        static Log&                         instance() {
+            static Log instance;
+            return instance;
+        }
+
+        void                                write();
+
+    private:
+        FIL                                 _file;
+        char                                _buffer[LOG_BUFFER_SIZE];
+        vectorData                          _accel;
+        vectorData                          _gyro;
+        vectorData                          _mag;
+        vectorData                          _rpy;
+        scalarData                          _encoder0{0,0};
+        scalarData                          _encoder1{0,0};
+        scalarData                          _encoder2{0,0};
+        scalarData                          _servo0{0,0};
+        scalarData                          _servo1{0,0};
+        scalarData                          _servo2{0,0};
+        scalarData                          _servo3{0,0};
+        scalarData                          _servo4{0,0};
+        virtual void                        main(void);
 };
 
-/*
- * #include <vector>tmpName
-#include <initializer_list>
-template< int elements, typename Type = double >
-class Parameter {
-    private:
-                                            Parameter();
-                                           ~Parameter();
-    public:
-
-        void                                update( std::initializer_list<Type> list );
-    private:
-        static RingBuffer< vector<Type> >          _settings;
-};
-
-
-template <typename Type = double>
-using ScalarParameter = Parameter<1, Type>;
-
-template <typename Type = double>
-using VectorParameter = Parameter<3, Type>;
-*/
-
-#endif
 
 #endif // LOG_H

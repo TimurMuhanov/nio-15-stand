@@ -31,12 +31,12 @@ Encoder::Encoder(QObject* parent, int id) : QObject(parent) {
 
     switch(id) {
         case 1:
-            _indicateLabel = MainWindow::ui().encoderPitchIndicateLabel;
-            _name = QString("Encoder Pitch");
-            break;
-        case 2:
             _indicateLabel = MainWindow::ui().encoderRollIndicateLabel;
             _name = QString("Encoder Roll");
+            break;
+        case 2:
+            _indicateLabel = MainWindow::ui().encoderPitchIndicateLabel;
+            _name = QString("Encoder Pitch");
             break;
         case 3:
             _indicateLabel = MainWindow::ui().encoderYawIndicateLabel;

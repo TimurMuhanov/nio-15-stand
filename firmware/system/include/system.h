@@ -6,11 +6,12 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-#include "io.h"
-#include "connection.h"
-#include "settings.h"
-#include "log.h"
-#include "control.h"
+#include "Terminal.h"
+#include "FileSystem.h"
+#include "Connection.h"
+#include "Settings.h"
+#include "Log.h"
+#include "Control.h"
 
 #endif
 

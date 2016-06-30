@@ -1,12 +1,13 @@
 #include "ch.hpp"
 #include "hal.h"
 
-#include "io.h"
-#include "flash.h"
-#include "thread.h"
+#include "Terminal.h"
+#include "Telemetry.h"
+#include "Flash.h"
+#include "Thread.h"
 
 
-#define TIMEOUT				0.0010
+#define TIMEOUT				0.1
 #define TRIES				3
 
 using namespace chibios_rt;
@@ -39,7 +40,6 @@ using namespace chibios_rt;
 */
 
 
-
 class Loader {
                     Loader() {}
                    ~Loader() {}
@@ -51,11 +51,12 @@ class Loader {
         }
 
         static bool             connect() {
-            u32 tries = 0xFFFFFFFF;
+            u32 i = 0;
 
-            while(tries--) {
+            while(i++ < 0x4) {
                 Telemetry::put( _connect );
-                if( Telemetry::get(TIMEOUT) == _ack ) {
+//                Telemetry::put( 'a' );
+                if( Telemetry::get(TIMEOUT*2) == _ack ) {
                     return true;
                 }
             }
@@ -63,6 +64,7 @@ class Loader {
         }
 
         static void             jump(u32 address) {
+            boardStop();
             for( int h=0; h<8; h++ )
                NVIC->ICER[h] = NVIC->IABR[h];
             SCB->VTOR = address;
@@ -74,56 +76,57 @@ class Loader {
 
         static bool             parseCommands() {
             Flash::unlock();
-            u8 buffer[4+128+1];
-
             while( 1 ) {
                 switch( instance().getCommand() ) {
                     case _erase: {
+//                        print("erase begin\n\r");
+                        chThdSleepMilliseconds(10);
                         u32 len = instance().receiveU32();
-                        print("erase 0x%08x bytes\n\r", len);
+//                        print("erase 0x%08x bytes\n\r", len);
                         chThdSleepMilliseconds(3);
-//                        Flash::eraseBegin();
-//                        for( u8 sector = Flash::sector( BOARD_FLASH_FIRMWARE ); sector <= Flash::sector( BOARD_FLASH_FIRMWARE+len ); sector++ ) {
-//                            Flash::eraseSector( sector );
+                        Flash::eraseBegin();
+                        for( u8 sector = Flash::sector( BOARD_FLASH_FIRMWARE ); sector <= Flash::sector( BOARD_FLASH_FIRMWARE+len ); sector++ ) {
+//                            print("begin erase %u sector\n\r", sector );
+                            chThdSleepMilliseconds(10);
+                            Flash::eraseSector( sector );
 //                            print("erased %u sector\n\r", sector );
-//                            chThdSleepMilliseconds(10);
-//                        }
-//                        Flash::eraseEnd();
+                            chThdSleepMilliseconds(10);
+                        }
+                        Flash::eraseEnd();
                         instance().sendAck();
                     }
                     break;
                     case _write: {
                         print("command write received\n\r");
 
-                        // receive block 8+128+1 bytes
-                        systime_t bg = System::getTime();
+                        // receive block 8+_packLength+1 bytes
+//                        systime_t bg = System::getTime();
 //                        print("av %u\n\r", chQSpaceI( &BOARD_BLUETOOTH_DEVICE.iqueue ) );
-                        u32 bytesRed = Telemetry::read( buffer, 4+128+1, TIMEOUT );
-                        print("test %u\n\r", ST2MS(System::getTime() - bg) );
-                        u32 address = ((buffer[0] << 24)&0xff000000 ) | ((buffer[1] << 16)&0x00ff0000 ) | ((buffer[2] << 8)&0x0000ff00 ) | ((buffer[3] << 00)&0x000000ff );
-                        u8 sendedChecksum = buffer[4+128+0];
+                        u32 bytesRed = Telemetry::read( _buffer, 4+_packLength+1, TIMEOUT );
+//                        print("test %u\n\r", ST2MS(System::getTime() - bg) );
+                        u32 address = ((_buffer[0] << 24)&0xff000000 ) | ((_buffer[1] << 16)&0x00ff0000 ) | ((_buffer[2] << 8)&0x0000ff00 ) | ((_buffer[3] << 00)&0x000000ff );
+                        u8 sendedChecksum = _buffer[4+_packLength+0];
                         u8 calculatedChecksum = 0;
-                        for(u32 i=0; i<132; i++) {
-                            calculatedChecksum ^= buffer[i];
+                        for(u32 i=0; i<4+_packLength; i++) {
+                            calculatedChecksum ^= _buffer[i];
                         }
-                        if( bytesRed != 4+128+1 || sendedChecksum != calculatedChecksum ) {
+                        if( bytesRed != 4+_packLength+1 || sendedChecksum != calculatedChecksum ) {
                             instance().sendNack();
-                            print("command write: error checksum 0x%02x  0x%02x %u\n\r", sendedChecksum, calculatedChecksum, bytesRed );
+//                            print("command write: error 0x%08x checksum 0x%02x  0x%02x %u\n\r", address, sendedChecksum, calculatedChecksum, bytesRed );
                             break;
                         } else {
                             instance().sendAck();
-//                            Flash::write( address, buffer+4, 128 );
-//                            print("command write: success 0x%08x, %u, %u\n\r", address, ST2MS(end-bg), ST2MS(System::getTime()-time) );
+                            Flash::write( address, _buffer+4, _packLength );
+//                            static systime_t time = System::getTime();
+//                            print("command write: success 0x%08x checksum 0x%02x  0x%02x %u, %u\n\r", address, sendedChecksum, calculatedChecksum, bytesRed, ST2MS(System::getTime()-time) );
+//                            time = System::getTime();
                         }
                     }
                     break;
-                    /*case CMD_GO:
-                        flashWrite( BOARD_FLASH_FIRMWARE, (u32*)&begin, 1 );
-                        flashLock();
-                        chThdTerminate( blinkerThread );
-                        chThdSleepMilliseconds(100);
-                        JUMP_TO(BOARD_FLASH_FIRMWARE);
-                        break;*/
+                    case _go:
+//                        flashWrite( BOARD_FLASH_FIRMWARE, (u32*)&begin, 1 );
+                        Flash::lock();
+                        return true;
                 }
             }
         }
@@ -131,12 +134,15 @@ class Loader {
     private:
         u32                     receiveU32() {
             u8 buffer[4];
+//            print("receiveU32: rc begin\n\r" );
+//            chThdSleepMilliseconds(10);
             u32 bytesRed = Telemetry::read( buffer, 4, TIMEOUT );
+//            print("receiveU32: rc end\n\r" );
             if( bytesRed == 4 ) {
                 return ((buffer[0] << 24)&0xff000000 ) | ((buffer[1] << 16)&0x00ff0000 ) | ((buffer[2] << 8)&0x0000ff00 ) | ((buffer[3] << 00)&0x000000ff );
             } else {
-                print("receiveU32: error read %u\n\r", bytesRed );
-                chThdSleepMilliseconds(3);
+//                print("receiveU32: error read %u\n\r", bytesRed );
+//                chThdSleepMilliseconds(3);
                 return 0;
             }
         }
@@ -146,7 +152,7 @@ class Loader {
             if( bytesRed == 1 ) {
                 return buffer;
             } else {
-                print("receiveU8: error read %u\n\r", bytesRed );
+//                print("receiveU8: error read %u\n\r", bytesRed );
                 chThdSleepMilliseconds(3);
                 return 0;
             }
@@ -163,16 +169,10 @@ class Loader {
         }
 
         u8                      getCommand() {
+//            print("get cmd\n\r");
             u8 command[2];
-
-            print("get cmd\n\r" );
-            BaseThread::sleep(MS2ST(10));
             while( Telemetry::get() != _begin );
-            print("get bg\n\r" );
-             BaseThread::sleep(MS2ST(10));
             u32 bytesRed = Telemetry::read( command, 2, TIMEOUT );
-            print("get cmd %u 0x%02x 0x%02x\n\r", bytesRed, command[0], command[1] );
-             BaseThread::sleep(MS2ST(10));
             if( bytesRed == 2 && command[0] + command[1] == 0x100 ) {
                 switch( command[0] ) {
                     case _erase:
@@ -198,7 +198,11 @@ class Loader {
         static const u8                _nack = 0x1F;
         static const u8                _unknown = 0x55;
 
+        static const int               _packLength = 1024;
+        static u8                      _buffer[4+_packLength+1];
 };
+
+u8 Loader::_buffer[];
 
 class BlinkerThread : public BaseStaticThread<128> {
     public:
@@ -216,6 +220,8 @@ class BlinkerThread : public BaseStaticThread<128> {
 
 };
 
+BlinkerThread blinkerThread;
+
 class LoaderThread : public BaseStaticThread<512> {
     public:
         LoaderThread() : BaseStaticThread<512>() {}
@@ -224,35 +230,26 @@ class LoaderThread : public BaseStaticThread<512> {
         virtual void main(void) {
             setName( "loader" );
 
-            while(1) {
-                Telemetry::send((const u8*)"abcdefgh\n\r", 10);
-                BaseThread::sleep(MS2ST(100));
-//                BaseThread::sleep(MS2ST(500));
-//                Telemetry::send((const u8*)"blah2\n\r", 6);
-//                BaseThread::sleep(MS2ST(1000));
-            }
-
             if( !Loader::connect() ) {
-//                blinkerThread.requestTerminate();
-//                blinkerThread.wait();
-//                Loader::jump(BOARD_FLASH_FIRMWARE);
-                print("not connected\n\r");
-                BaseThread::sleep(MS2ST(10));
-                exit( 0 );
+                blinkerThread.requestTerminate();
+                blinkerThread.wait();
+                Loader::jump(BOARD_FLASH_FIRMWARE);
                 return;
             }
-            print("connected\n\r");
-            BaseThread::sleep(MS2ST(10));
-            Loader::parseCommands();
+//            print("connected\n\r");
+            if( Loader::parseCommands() ) {
+                blinkerThread.requestTerminate();
+                blinkerThread.wait();
+                Loader::jump(BOARD_FLASH_FIRMWARE);
+            }
             exit( 0 );
         }
 
 };
 
-int main(void) {
-    BlinkerThread blinkerThread;
-    LoaderThread loaderThread;
+LoaderThread loaderThread;
 
+int main(void) {
 	halInit();
     System::init();
     ioInit();

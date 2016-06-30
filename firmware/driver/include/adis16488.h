@@ -7,30 +7,40 @@
 #define ADIS16488_H
 
 
+#include "ch.hpp"
+#include "PubSub.h"
+#include "g_matrix.h"
+#include "g_vector.h"
+#include "g_quaternion.h"
+
+#define	ADIS_BUFFER_SIZE	20
+#define	ADIS_UPDATE_PERIOD	2
+
+using namespace geometry;
+using namespace chibios_rt;
 
 
+class Adis : public BaseStaticThread<4096> {
+                                            Adis();
+                                           ~Adis();
+    public:
+        static Adis&                        instance();
 
-#include "ch.h"
-#include "hal.h"
+        static Topic<vectorData>            accel;
+        static Topic<vectorData>            gyro;
+        static Topic<vectorData>            mag;
+        static Topic<scalarData>            temp;
+        static Topic<scalarData>            press;
+    private:
+        virtual void                        main(void);
+        void                                init();
+        bool                                testConnection();
+        void                                read( u8 page, u8 address, u32 length, u16* buffer );
+        void                                write( u8 page, u8 address, u32 length, const u16* buffer );
 
-
-#define	ADIS16488_NAME			"ADIS16488"
-//#define	ADIS16488_DEBUG						// uncomment for enable debug, comment for disable
-//#define	ADIS16488_SOFT_RESET				// comment for for soft reset, comment for HARD reset
-#define	ADIS16488_UPDATE_PERIOD		2			// data update period in ms
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    /**	init ADIS16488 - set default counfiguration */
-    void adis16488Init(void);
-    void adis16488Update(void);
-
-#ifdef __cplusplus
-}
-#endif
+        u16                                 txBuffer[ADIS_BUFFER_SIZE];
+        u16                                 rxBuffer[ADIS_BUFFER_SIZE];
+};
 
 #endif
 

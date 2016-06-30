@@ -21,9 +21,21 @@ class MainWindow : public QMainWindow {
 		static MainWindow&		instance();
 		static Ui::MainWindow&	ui();
 		static QSettings&		settings();
-	private:
+    private:
+        void					updateSerialPorts();
+        void					updateSerialBauds();
+        void					menuChanged(QAction* action);
+        void					checkSerialPorts();
+        void					addSerialPort(const QString& portName);
+        void					removeSerialPort(const QString& portName);
+
 		static MainWindow*		_instance;
 		static Ui::MainWindow*	_ui;
+
+        static QActionGroup*    _serialPortActionGroup;
+        static QActionGroup*	_serialBaudActionGroup;
+        static QAction*			_serialDisconnectAction;
+        static QTimer*          _serialUpdater;
 };
 
 #endif // MAINWINDOW_H

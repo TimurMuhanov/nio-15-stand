@@ -7,33 +7,43 @@
 #define CONNECTION_H
 
 
-
-
 #define MAVLINK_DEFAULT_COMM		MAVLINK_COMM_0
 
 
-
-
-#include "ch.h"
+#include "ch.hpp"
 #include "hal.h"
+#include "Thread.h"
+#include "Telemetry.h"
+#include "Imu.h"
+#include "mavlink_bridge_header.h"
+#include "mavlink.h"
 
-#include "thread.h"
-#include "io.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+using namespace chibios_rt;
 
-	/**	init module */
-    void connectionInit(void);
 
-    /**	set cpu udage
-    @param      usage       cpu usage in range 0..1 */
-    void connectionSetCpuInfo(float usage, u32 usageTime, u32 systemTime, u32 threadCount);
+class Connection : public BaseStaticThread<2048> {
+                                            Connection();
+                                           ~Connection();
+    public:
+        static Connection&                  instance() {
+            static Connection instance;
+            return instance;
+        }
 
-#ifdef __cplusplus
-}
-#endif
+        void                                valueSend(u32 time, string key, float value);
+        void                                vectorValueSend(u32 time, string key, Vector<3> v);
+        void                                quatValueSend(u32 time, string key, Quaternion<> q);
+
+        /**	set cpu udage
+        @param      usage       cpu usage in range 0..1 */
+        void                                setCpuInfo( float cpuUsage, u32 time, u32 threadCount );
+
+        Mutex                               _mutex;
+    private:
+        virtual void                        main(void);
+};
+
 
 #endif
 

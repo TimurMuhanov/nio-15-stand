@@ -1,4 +1,4 @@
-#include "ch.h"
+#include "ch.hpp"
 #include "hal.h"
 
 #include "system.h"
@@ -7,21 +7,25 @@
 
 int main(void) {
 	halInit();
-	chSysInit();
+    System::init();
 
-    ioInit();
-//    FileSystem::init();
-//    Settings::init();
-//    Log::init();
+    chRegSetThreadName("main");
 
-    imuInit();
-    navInit();
+    Telemetry::instance();
+    Terminal::instance();
+    Connection::instance();
+
+    FileSystem::init();
+    Settings::init();
+    //Log::instance();
+
     encoderInit();
-    servoInit();
-    servoPower(TRUE);
+//    servoInit();
+//    servoPower(TRUE);
+    Adis::instance();
+    Imu::instance();
 
-    connectionInit();
-    controlInit();
+//    controlInit();
 
     Thread::loop();
 }

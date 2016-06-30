@@ -12,6 +12,7 @@
 #include "thread.h"
 #include "ls7366.h"
 #include "imu.h"        // for data types
+#include "Terminal.h"
 
 
 #define ENCODER_PERIOD_MS			2
@@ -36,9 +37,9 @@
 
 /// converts encoder pulses to real angle in deg
 #define ENCODER_PULSES_TO_ANGLE(p,ppr,offset)		((ppr)>0 ? \
-														( ((p)>(ppr)/2) ? -(360*(1-(p)/(float)(ppr))) : (360*(p)/(float)(ppr)) ) : \
-														( ((p)<-(ppr)/2) ? (360*(1+(p)/(float)(ppr))) : (360*(p)/(float)(ppr)) ) \
-													)
+                                                            ( ((p)>(ppr)/2) ? -(360*(1-(p)/(float)(ppr))) : (360*(p)/(float)(ppr)) ) : \
+                                                            ( ((p)<-(ppr)/2) ? (360*(1+(p)/(float)(ppr))) : (360*(p)/(float)(ppr)) ) \
+                                                        )
 
 
 
@@ -54,6 +55,8 @@ extern "C" {
 		@param		id					encoder id form 0 to ENCODER_NUMBER-1
 		@retval		structure with encoder data in deg */
 	scalarData encoderGet(u32 id);
+        void       encoderFix();
+        void        encoderSetOffset(u32 id, float offset);
 
 #ifdef __cplusplus
 }

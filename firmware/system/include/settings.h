@@ -1,7 +1,6 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#ifdef __cplusplus
 
 #include "ch.h"
 #include "ff.h"
@@ -19,7 +18,8 @@ class Settings {
 
         static void                         init();
         static void                         sync();
-        static void                         set( const string& name, const string& value );
+        static bool                         contains( const string& );
+        static void                         set( const string& key, const string& value );
         static string                       get( const string& );
         static void                         remove( const string& );
         static map<string, string>&         settings();
@@ -27,8 +27,5 @@ class Settings {
         static map<string, string>          _settings;
         static FIL                          _file;
 };
-
-
-#endif
 
 #endif // SETTINGS_H

@@ -1,5 +1,5 @@
 #include "Flash.h"
-#include "io.h"
+#include "Terminal.h"
 
 
 Flash::Flash() : BaseStaticThread<512>() {

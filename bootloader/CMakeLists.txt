@@ -10,11 +10,11 @@ set( BOARD servo-1 )
 
 set( SOURCES
     main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/io.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/telemetry.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/thread.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/usbcfg.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/Terminal.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/Telemetry.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/Thread.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/driver/Flash.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../firmware/system/usbcfg.c
 	${CMAKE_CURRENT_SOURCE_DIR}/../firmware/board/${BOARD}/board.c
 )
 set( INCLUDE
@@ -25,8 +25,7 @@ set( INCLUDE
 include( ../library/chibios.cmake )
 
 set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--script=\"${CMAKE_CURRENT_SOURCE_DIR}/../firmware/board/${BOARD}/STM32F405xG_bootloader.ld\"" )
-#set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--script=\"${CMAKE_CURRENT_SOURCE_DIR}/../firmware/board/${BOARD}/STM32F405xG.ld\"" )
-#add_definitions(-DCORTEX_VTOR_INIT=BOARD_FLASH_FIRMWARE)
+add_definitions(-DCORTEX_VTOR_INIT=BOARD_FLASH_BOOTLOADER)
 
 
 include_directories( ${INCLUDE} )

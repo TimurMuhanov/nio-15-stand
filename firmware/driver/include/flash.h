@@ -8,10 +8,10 @@
 #include "ch.hpp"
 
 
+#define FLASH_BUFFER_SIZE               256
+
+
 using namespace chibios_rt;
-
-
-#define BUFFER_SIZE         256
 
 
 class Flash : public BaseStaticThread<512> {
@@ -33,13 +33,13 @@ class Flash : public BaseStaticThread<512> {
     private:
         virtual void                    main(void);
 
-        const u32                       bufferSize = BUFFER_SIZE;
-        u8                              dataBuffer[BUFFER_SIZE];
-        u32                             addressBuffer[BUFFER_SIZE];
+        const u32                       bufferSize = FLASH_BUFFER_SIZE;
+        u8                              dataBuffer[FLASH_BUFFER_SIZE];
+        u32                             addressBuffer[FLASH_BUFFER_SIZE];
 
         u32                             beginIndex = 0;
         u32                             endIndex = 0;
-        CounterSemaphore                freeBytes{ bufferSize };
+        CounterSemaphore                freeBytes{ FLASH_BUFFER_SIZE };
         CounterSemaphore                usedBytes{ 0 };
 };
 

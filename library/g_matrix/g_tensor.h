@@ -9,7 +9,7 @@
 //#include <QString>
 
 
-#define DEFUALT_TYPE        double
+#define DEFUALT_TYPE        float
 
 
 namespace geometry {

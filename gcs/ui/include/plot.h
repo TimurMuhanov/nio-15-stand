@@ -6,7 +6,7 @@
 #include "qcustomplot.h"
 
 
-#define REPLOT_TIME_MS		20
+#define REPLOT_TIME_MS		30
 
 
 enum DataRange{
@@ -44,12 +44,12 @@ class Plot : public QObject {
 		static Plot&			instance();
 	/*signals:
 		void					newPlotParameter(PlotParameter* parameter);*/
-        void					clear();
 
 	public slots:
 		void					addData(const QString& name, const double key, const double data);
 
 	private slots:
+        void					reset();
 		void					replot();
 		void					plotRangeChangeToAll();
 		void					plotRangeChangeToPeriod();

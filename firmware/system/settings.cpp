@@ -1,5 +1,5 @@
-#include "settings.h"
-#include "io.h"
+#include "Settings.h"
+#include "FileSystem.h"
 #include <algorithm>
 
 
@@ -32,20 +32,20 @@ void Settings::init() {
 
     string record;
     while( FileSystem::readLine( _file, record ) ) {
-        string name, value;
+        string key, value;
         unsigned int i=0;
 
         while( find( separators.begin(), separators.end(), record[i] ) != separators.end() && i<record.length() )
             i++;
         while( find( separators.begin(), separators.end(), record[i] ) == separators.end() && i<record.length() )
-            name += record[i++];
+            key += record[i++];
         while( find( separators.begin(), separators.end(), record[i] ) != separators.end() && i<record.length() )
             i++;
         while( find( separators.begin(), separators.end(), record[i] ) == separators.end() && i<record.length() )
             value += record[i++];
 
-        if( !( name.empty() || value.empty() ) )
-            set(name, value);
+        if( !( key.empty() || value.empty() ) )
+            set(key, value);
     }
 }
 
@@ -66,18 +66,28 @@ void Settings::sync() {
     FileSystem::sync( _file );
 }
 
-void Settings::set( const string& name, const string& value ) {
-    _settings[name] = value;
+bool Settings::contains(const string& key) {
+    if( _settings.find(key) != _settings.end() ) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
-string Settings::get( const string& name ) {
-    if( _settings.find(name) != _settings.end() )
-        return _settings[name];
-    return string();
+void Settings::set( const string& key, const string& value ) {
+    _settings[key] = value;
 }
 
-void Settings::remove( const string& name ) {
-    _settings.erase( _settings.find( name ) );
+string Settings::get( const string& key ) {
+    if( contains(key) ) {
+        return _settings[key];
+    } else {
+        return string();
+    }
+}
+
+void Settings::remove( const string& key ) {
+    _settings.erase( _settings.find( key ) );
 }
 
 map<string, string>&Settings::settings() {

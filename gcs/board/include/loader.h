@@ -21,11 +21,11 @@ class Loader : public QObject {
         void                    selectFile();
         void                    receive(const QByteArray& data);
         bool                    send(uint8_t cmd);
-        bool                    send(const QByteArray& data);
-        bool                    get(uint8_t cmd);
+        void                    send(const QByteArray& data);
+        bool                    get(uint8_t cmd, unsigned long timeout = 1000);
         QByteArray              int2array(int number);
 
-        QFile                  _firmwareFile;
+        QByteArray             _firmwareData;
         static const uint8_t   _begin = 0xFE;
         static const uint8_t   _connect = 0x7F;
         static const uint8_t   _go = 0x21;
@@ -37,13 +37,10 @@ class Loader : public QObject {
 
         static const uint32_t  _addressBase = 0x08040000;
         static QByteArray      _pack;
-        static const int       _packLength = 128;
-
-//        static QMutex          _mutex;
-//        static QByteArray      _responce;
-//        static QWaitCondition  _responceReceived;
-
-        static qint64           bg;
+        static const int       _packLength = 1024;
+        static QMutex          _mutex;
+        static QByteArray      _responce;
+        static QWaitCondition  _responceReceived;
 
         static QThread         _thread;
 };

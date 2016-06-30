@@ -23,7 +23,7 @@ class MagnetometerVisualiser : public QOpenGLWidget, protected QOpenGLFunctions 
 						MagnetometerVisualiser(QWidget* parent = 0);
 					   ~MagnetometerVisualiser();
 					   
-        void			appendMag( ValueVector, double x, double y , double z );
+        void			appendMag( double x, double y , double z );
 		void			clear();
 		GLfloat         wrap_180(GLfloat angle);
 

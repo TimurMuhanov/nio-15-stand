@@ -40,7 +40,7 @@ namespace geometry {
         Type norm = 0; \
         for( int i=0; i<size; i++ ) \
             norm += (*this)(i)*(*this)(i); \
-        return sqrt(norm); \
+        return sqrtf(norm); \
     } \
  \
     inline \

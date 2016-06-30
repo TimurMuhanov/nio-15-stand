@@ -50,9 +50,31 @@
 		<message id="155" name="SYSTEM_INFO">
 			<description>System info.</description>
 			<field type="float" name="cpu_usage">CPU usage in rage in 0..1</field>
-			<field type="uint32_t" name="usage_time">Thread running time in systime</field>
-			<field type="uint32_t" name="system_time">System running time in systime</field>
+			<field type="uint32_t" name="time">Time from system start in ms</field>
 			<field type="uint32_t" name="thread_count">Number of running threads</field>
+		</message>
+		<message id="156" name="VALUE">
+			<description>Custom plot value.</description>
+			<field type="uint32_t" name="time_usec">Timestamp (microseconds since system boot)</field>
+			<field type="char[15]" name="key">Key</field>
+			<field type="float" name="value">Value</field>
+		</message>
+		<message id="157" name="VECTOR_VALUE">
+			<description>Custom vector plot value.</description>
+			<field type="uint32_t" name="time_usec">Timestamp (microseconds since system boot)</field>
+			<field type="char[15]" name="key">Key</field>
+			<field type="float" name="x">Value X</field>
+			<field type="float" name="y">Value Y</field>
+			<field type="float" name="z">Value Z</field>
+		</message>
+		<message id="158" name="QUAT_VALUE">
+			<description>Custom quaternion plot value.</description>
+			<field type="uint32_t" name="time_usec">Timestamp (microseconds since system boot)</field>
+			<field type="char[15]" name="key">Key</field>
+			<field type="float" name="w">Value W</field>
+			<field type="float" name="x">Value X</field>
+			<field type="float" name="y">Value Y</field>
+			<field type="float" name="z">Value Z</field>
 		</message>
 	</messages>
 </mavlink>

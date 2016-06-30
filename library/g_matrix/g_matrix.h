@@ -83,6 +83,15 @@ namespace geometry {
         public:
             MATRIX_BASE_FUNCTIONS(size, size)
 
+            inline Matrix<size, size, Type>             transponced() {
+                Matrix<size, size, Type> returnMatrix;
+                for( int i=0; i<size; i++) {
+                    for( int j=0; j<size; j++)
+                        returnMatrix(j,i) = (*this)(i,j);
+                }
+                return returnMatrix;
+            }
+
             inline Type                                 determinant() {
                 Type returnValue=1;
                 Matrix< size, size, Type > L;
@@ -101,7 +110,7 @@ namespace geometry {
                 for( int i = 0; i < size; i++ )
                     for( int j = 0; j < size; j++ )
                         if( i == j )
-                            B(i,j) = 1.0;
+                            B(i,j) = 1.0f;
 
                 for( int k = 0; k < size; k++ ) {
                     temp = A(k,k);

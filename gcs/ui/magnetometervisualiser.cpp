@@ -44,18 +44,15 @@ GLfloat MagnetometerVisualiser::wrap_180(GLfloat angle) {
     return angle;
 }
 
-void MagnetometerVisualiser::appendMag( ValueVector vector, double x, double y , double z ) {
-    switch(vector) {
-        case ValueVector::Mag:
-            makeCurrent();
-            vertex vert = { (GLfloat) x, (GLfloat) y, (GLfloat) z };
-            vertices.append( vert );
-            glBindBuffer( GL_ARRAY_BUFFER, verticesBuffer );
-            glBufferData( GL_ARRAY_BUFFER, vertices.length()*3*sizeof(GLfloat), vertices.data(), GL_DYNAMIC_DRAW_ARB );
-            glBindBuffer( GL_ARRAY_BUFFER, 0 );
-            doneCurrent();
-            break;
-    }
+void MagnetometerVisualiser::appendMag( double x, double y , double z ) {
+    makeCurrent();
+    vertex vert = { (GLfloat) x, (GLfloat) y, (GLfloat) z };
+    vertices.append( vert );
+    glBindBuffer( GL_ARRAY_BUFFER, verticesBuffer );
+    glBufferData( GL_ARRAY_BUFFER, vertices.length()*3*sizeof(GLfloat), vertices.data(), GL_DYNAMIC_DRAW_ARB );
+    glBindBuffer( GL_ARRAY_BUFFER, 0 );
+    doneCurrent();
+
     if( !repaintTimer->isActive() )
         repaintTimer->start(40);
 }
@@ -68,12 +65,6 @@ void MagnetometerVisualiser::clear() {
 
 void MagnetometerVisualiser::initializeGL() {
     initializeOpenGLFunctions();
-
-    connect(
-        &Connection::instance(),
-        &Connection::valueVectorReceived,
-        this,
-        &MagnetometerVisualiser::appendMag);
 
     //qDebug() << "OpenGL version" << QString::fromLocal8Bit( (const char *) glGetString(GL_VERSION) );
 
@@ -116,11 +107,13 @@ void MagnetometerVisualiser::resizeGL(int width, int height) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    if(height >= width)
-        glViewport(0, (GLint)(height-width)/2, (GLint)width, (GLint)width);
-    else
-        glViewport((GLint)(width-height)/2, 0, (GLint)height, (GLint)height);
-    glFrustum(-SPHERE_RADIUS*1.1, SPHERE_RADIUS*1.1, -SPHERE_RADIUS*1.1-DISTANCE*0.2, SPHERE_RADIUS*1.1-DISTANCE*0.2, DISTANCE-SPHERE_RADIUS*1.2, DISTANCE+SPHERE_RADIUS*1.2);
+    glViewport(0, 0, width, height);
+    GLdouble ratio = (GLdouble)width/height;
+    if(height >= width) {
+        glFrustum(-SPHERE_RADIUS, SPHERE_RADIUS, -SPHERE_RADIUS/ratio-DISTANCE*0.2, SPHERE_RADIUS/ratio-DISTANCE*0.2, DISTANCE-SPHERE_RADIUS, DISTANCE+SPHERE_RADIUS);
+    } else {
+        glFrustum(-SPHERE_RADIUS*ratio, SPHERE_RADIUS*ratio, -SPHERE_RADIUS-DISTANCE*0.2, SPHERE_RADIUS-DISTANCE*0.2, DISTANCE-SPHERE_RADIUS, DISTANCE+SPHERE_RADIUS);
+    }
 
     currentWidth = width;
     currentHeight = height;
@@ -135,7 +128,7 @@ void MagnetometerVisualiser::paintGL() {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef( 0, -DISTANCE*0.23, -DISTANCE);
+    glTranslatef( 0, -DISTANCE*0.2, -DISTANCE);
     glRotatef(yAxisRotation, 0.0, 1.0, 0.0);
     glRotatef(xAxisRotation, 1.0, 0.0, 0.0);
 

@@ -4,17 +4,19 @@
 
 
 Logger::Logger(QObject *parent) : QObject(parent) {
-    QObject::connect(
-		MainWindow::ui().loggingPathButton,
-		SIGNAL(clicked()),
-		SLOT(loggingPathChange()) );
+    connect( MainWindow::ui().loggingPathButton, &QPushButton::clicked, this, &Logger::loggingPathChange );
+    connect( &Connection::instance(), &Connection::connected, this, &Logger::reset );
 
-    _path = MainWindow::settings().value( "logger/savePath" ).toString();
-    if( !QDir( _path ).exists() ) {
-        _path = QCoreApplication::applicationDirPath()+"/logs";
-        if( !QDir( _path ).exists() ) QDir().mkdir( _path );
-        MainWindow::settings().setValue( "logger/savePath", _path );	}
-    MainWindow::ui().loggingPathLabel->setText(_path);
+    if( MainWindow::settings().contains( "logger/savePath" ) ) {
+        _rootPath = MainWindow::settings().value( "logger/savePath" ).toString();
+    } else {
+        _rootPath = QDir::homePath() + "/Desktop/experiment";
+        MainWindow::settings().setValue( "logger/savePath", _rootPath );
+    }
+    if( !QDir( _rootPath ).exists() ) {
+        QDir().mkdir( _rootPath );
+    }
+    MainWindow::ui().loggingPathLabel->setText(_rootPath);
 }
 
 Logger::~Logger() {
@@ -29,32 +31,40 @@ Logger& Logger::instance() {
 
 void Logger::addData(const QString& name, const double time, std::initializer_list<double> data) {
     if( !_logs.contains(name) ) {
-        _logs[name] = new QFile(_path + QDir::separator() + name + QString(".csv") );
+        _logs[name] = new QFile(_path + QDir::separator() + name + QString(".txt") );
         if( !_logs[name]->open(QIODevice::WriteOnly) )
             QMessageBox::information( &MainWindow::instance(), tr("Unable to open log file"), _logs[name] ->errorString());
     }
 
     QString line = QString::number(time, 'f', 6);
     for(double value : data) {
-        line += QString(",") + QString::number(value, 'f', 6);
+        line += QString("\t") + QString::number(value, 'f', 6);
     }
 
-	//qDebug() << "Logger::addData" << name << line.toLatin1();
     _logs[name]->write( line.toLatin1()+"\n" );
+}
+
+void Logger::reset() {
+    for( auto log : _logs.values() ) {
+        delete log;
+    }
+    _logs.clear();
+
+    _path = _rootPath + "/" + QDateTime::currentDateTime().toString("dd-MM-yyyy HH-mm-ss");
+    QDir().mkdir(_path);
+    MainWindow::ui().loggingPathLabel->setText(_path);
 }
 
 void Logger::loggingPathChange() {
 	QString path( QFileDialog::getExistingDirectory(
 		&MainWindow::instance(),
 		tr("Log File Save Directory"),
-        _path ) );
+        _rootPath ) );
 
-    for( auto log : _logs.values() ) {
-        delete log;
-    }
-    _logs.clear();
+    if( path.isNull() )
+        return;
 
-    _path = path;
-    MainWindow::ui().loggingPathLabel->setText(_path);
-    MainWindow::settings().setValue( "logger/savePath", _path );
+    _rootPath = path;
+    MainWindow::settings().setValue( "logger/savePath", _rootPath );
+    MainWindow::ui().loggingPathLabel->setText(_rootPath);
 }

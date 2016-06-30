@@ -67,25 +67,24 @@
 #define BOARD_FLASH_SECTOR_11		0x080E0000		/* 0x080FFFFF 128 Kbytes */
 #define BOARD_FLASH_SECTOR_END		0x08100000
 
-#define BOARD_ADDRESS_TO_SECTOR(address)	(	(address >= BOARD_FLASH_SECTOR_0) ? (\
-												(address < BOARD_FLASH_SECTOR_1) ? (0) : ( \
-												(address < BOARD_FLASH_SECTOR_2) ? (1) : ( \
-												(address < BOARD_FLASH_SECTOR_3) ? (2) : ( \
-												(address < BOARD_FLASH_SECTOR_4) ? (3) : ( \
-												(address < BOARD_FLASH_SECTOR_5) ? (4) : ( \
-												(address < BOARD_FLASH_SECTOR_6) ? (5) : ( \
-												(address < BOARD_FLASH_SECTOR_7) ? (6) : ( \
-												(address < BOARD_FLASH_SECTOR_8) ? (7) : ( \
-												(address < BOARD_FLASH_SECTOR_9) ? (8) : ( \
-												(address < BOARD_FLASH_SECTOR_10) ? (9) : ( \
-												(address < BOARD_FLASH_SECTOR_11) ? (10) : ( \
-												(address < BOARD_FLASH_SECTOR_END) ? (11) : ( 11 ) \
+#define BOARD_ADDRESS_TO_SECTOR(address)	(	((address) >= BOARD_FLASH_SECTOR_0) ? (\
+												((address) < BOARD_FLASH_SECTOR_1) ? (0) : ( \
+												((address) < BOARD_FLASH_SECTOR_2) ? (1) : ( \
+												((address) < BOARD_FLASH_SECTOR_3) ? (2) : ( \
+												((address) < BOARD_FLASH_SECTOR_4) ? (3) : ( \
+												((address) < BOARD_FLASH_SECTOR_5) ? (4) : ( \
+												((address) < BOARD_FLASH_SECTOR_6) ? (5) : ( \
+												((address) < BOARD_FLASH_SECTOR_7) ? (6) : ( \
+												((address) < BOARD_FLASH_SECTOR_8) ? (7) : ( \
+												((address) < BOARD_FLASH_SECTOR_9) ? (8) : ( \
+												((address) < BOARD_FLASH_SECTOR_10) ? (9) : ( \
+												((address) < BOARD_FLASH_SECTOR_11) ? (10) : ( \
+												((address) < BOARD_FLASH_SECTOR_END) ? (11) : ( 11 ) \
 											) ) ) ) ) ) ) ) ) ) ) ) : (11) )
+#define BOARD_IS_ADRESS_CORRECT(address)    ( (address) >= BOARD_FLASH_SECTOR_0 && (address) < BOARD_FLASH_SECTOR_END )
 
 #define BOARD_FLASH_BOOTLOADER		0x08000000
 #define BOARD_FLASH_FIRMWARE		0x08000000
-/** estimating up flash size */
-#define BOARD_FLASH_FIRMWARE_SIZE	0x00050000
 
 #define JUMP_TO(address) boardStop(); \
 						 int h; \
@@ -102,6 +101,7 @@
 #define BOARD_RADIO_DEVICE			SD1
 #define BOARD_RS422_DEVICE			SD3
 #define BOARD_USB_DEVICE			SDU1
+//#define BOARD_BLUETOOTH_DEVICE		UARTD2
 #define BOARD_BLUETOOTH_DEVICE		SD2
 
 #define BOARD_PITE_PORT				GPIOC
