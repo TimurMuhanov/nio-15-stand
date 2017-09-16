@@ -388,6 +388,10 @@ void boardInit(void) {
 	sdcStart(&SDCD1, NULL);
 	#endif
 
+    #if HAL_USE_ADC
+    adcStart(&ADCD1, NULL);
+    #endif
+
     palSetPadMode(GPIOC, 15, PAL_MODE_OUTPUT_PUSHPULL);         // blue
     palClearPad(GPIOC, 15);
     palSetPadMode(GPIOC, 13, PAL_MODE_OUTPUT_PUSHPULL);         // red
@@ -433,4 +437,9 @@ void boardStop(void) {
 	#if HAL_USE_SDC
 	sdcStop(&SDCD1);
 	#endif
+
+    #if HAL_USE_ADC
+    adcStop(&ADCD1);
+    #endif
+
 }

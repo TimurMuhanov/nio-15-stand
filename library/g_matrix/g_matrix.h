@@ -28,11 +28,13 @@ namespace geometry {
     inline Type&                                operator()( int row, int column ) { \
         if( row < rows && column < columns ) \
             return Tensor<rows*columns, Type>::array[ row*columns+column ]; \
+        return Tensor<rows*columns, Type>::array[ 0 ]; \
     } \
  \
     inline const Type&                          operator()( int row, int column ) const { \
         if( row < rows && column < columns ) \
             return Tensor<rows*columns, Type>::array[ row*columns+column ]; \
+        return Tensor<rows*columns, Type>::array[ 0 ]; \
     }
 
 

@@ -23,19 +23,20 @@ set( SOURCES
     system/Control.cpp
     system/Connection.cpp
     system/PubSub.cpp
-	system/usbcfg.c
+    system/usbcfg.c
+    driver/Battery.cpp
     driver/Led.cpp
     driver/Ls7366.cpp
     driver/Adis16488.cpp
     board/${BOARD}/board.c
 )
 set( INCLUDE
-	app/include
-	system/include
-	driver/include
-	board/${BOARD}
+    app/include
+    system/include
+    driver/include
+    board/${BOARD}
     ../library/g_matrix
-	../library/mavlink
+    ../library/mavlink
     ../library/mavlink/nio15
 )
 include( ../library/chibios.cmake )

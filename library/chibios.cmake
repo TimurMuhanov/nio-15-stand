@@ -15,6 +15,7 @@ set( SOURCES
 	${CMAKE_CURRENT_LIST_DIR}/chibios/os/hal/src/hal.c
 	${CMAKE_CURRENT_LIST_DIR}/chibios/os/hal/src/hal_queues.c
 	${CMAKE_CURRENT_LIST_DIR}/chibios/os/hal/src/hal_mmcsd.c
+        ${CMAKE_CURRENT_LIST_DIR}/chibios/os/hal/src/adc.c
 	${CMAKE_CURRENT_LIST_DIR}/chibios/os/hal/src/ext.c
 	${CMAKE_CURRENT_LIST_DIR}/chibios/os/hal/src/gpt.c
 	${CMAKE_CURRENT_LIST_DIR}/chibios/os/hal/src/i2c.c

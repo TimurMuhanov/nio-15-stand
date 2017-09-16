@@ -5,6 +5,8 @@
 #include "driver.h"
 #include "app.h"
 
+Battery battery;
+
 int main(void) {
 	halInit();
     System::init();
@@ -19,6 +21,7 @@ int main(void) {
     Settings::init();
     //Log::instance();
 
+    battery.init();
     encoderInit();
 //    servoInit();
 //    servoPower(TRUE);

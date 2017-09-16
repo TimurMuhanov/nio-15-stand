@@ -3,7 +3,6 @@
 #include "Settings.h"
 #include "Control.h"
 #include "imu.h"
-#include "nav.h"
 #include "encoder.h"
 #include "servo.h"
 #include "PubSub.h"
@@ -128,10 +127,10 @@ Connection::Connection() {
     mavlink_system.sysid = 0;
     mavlink_system.compid = MAV_COMP_ID_IMU;
 
-    thread_t* tread = chThdCreateStatic(  connectionReceiveWorkingArea,
+    /*thread_t* tread = */chThdCreateStatic(  connectionReceiveWorkingArea,
                         sizeof(connectionReceiveWorkingArea),
                         NORMALPRIO, connectionReceive, NULL);
-    start(NORMALPRIO);
+    //start(NORMALPRIO);
 }
 
 Connection::~Connection() {

@@ -104,6 +104,8 @@
 //#define BOARD_BLUETOOTH_DEVICE		UARTD2
 #define BOARD_BLUETOOTH_DEVICE		SD2
 
+#define BOARD_BATTERY_ADC_DEVICE    ADCD1
+
 #define BOARD_PITE_PORT				GPIOC
 #define BOARD_PITE_PIN				13
 #define BOARD_PITS_PORT				GPIOC
@@ -263,7 +265,7 @@
 #define GPIOC_OTG_FS_POWER_ON       0U
 #define GPIOC_PIN1                  1U
 #define GPIOC_PIN2                  2U
-#define GPIOC_PDM_OUT               3U
+#define GPIOC_ADC_BAT               3U
 #define GPIOC_PIN4                  4U
 #define GPIOC_PIN5                  5U
 #define GPIOC_PIN6                  6U
@@ -641,7 +643,7 @@
  * PC0  - OTG_FS_POWER_ON           (output pushpull maximum).
  * PC1  - PIN1                      (input pullup).
  * PC2  - PIN2                      (input pullup).
- * PC3  - PDM_OUT                   (input pullup).
+ * PC3  - ADC_BAT                   (analog floating).
  * PC4  - PIN4                      (input pullup).
  * PC5  - PIN5                      (input pullup).
  * PC6  - PIN6                      (input pullup).
@@ -657,8 +659,8 @@
  */
 #define VAL_GPIOC_MODER             (PIN_MODE_OUTPUT(GPIOC_OTG_FS_POWER_ON) |\
                                      PIN_MODE_INPUT(GPIOC_PIN1) |           \
-                                     PIN_MODE_INPUT(GPIOC_PIN2) |           \
-                                     PIN_MODE_INPUT(GPIOC_PDM_OUT) |        \
+                                     PIN_MODE_INPUT(GPIOC_PIN2) |        \
+                                     PIN_MODE_ANALOG(GPIOC_ADC_BAT) |           \
                                      PIN_MODE_INPUT(GPIOC_PIN4) |           \
                                      PIN_MODE_INPUT(GPIOC_PIN5) |           \
                                      PIN_MODE_INPUT(GPIOC_PIN6) |           \
@@ -673,8 +675,8 @@
                                      PIN_MODE_INPUT(GPIOC_PIN15))
 #define VAL_GPIOC_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOC_OTG_FS_POWER_ON) |\
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN1) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOC_PIN2) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOC_PDM_OUT) |    \
+                                     PIN_OTYPE_PUSHPULL(GPIOC_PIN2) |    \
+                                     PIN_OTYPE_PUSHPULL(GPIOC_ADC_BAT) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN4) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN5) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN6) |       \
@@ -689,8 +691,8 @@
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN15))
 #define VAL_GPIOC_OSPEEDR           (PIN_OSPEED_100M(GPIOC_OTG_FS_POWER_ON) |\
                                      PIN_OSPEED_100M(GPIOC_PIN1) |          \
-                                     PIN_OSPEED_100M(GPIOC_PIN2) |          \
-                                     PIN_OSPEED_100M(GPIOC_PDM_OUT) |       \
+                                     PIN_OSPEED_100M(GPIOC_PIN2) |       \
+                                     PIN_OSPEED_100M(GPIOC_ADC_BAT) |          \
                                      PIN_OSPEED_100M(GPIOC_PIN4) |          \
                                      PIN_OSPEED_100M(GPIOC_PIN5) |          \
                                      PIN_OSPEED_100M(GPIOC_PIN6) |          \
@@ -705,8 +707,8 @@
                                      PIN_OSPEED_100M(GPIOC_PIN15))
 #define VAL_GPIOC_PUPDR             (PIN_PUPDR_FLOATING(GPIOC_OTG_FS_POWER_ON) |\
                                      PIN_PUPDR_PULLUP(GPIOC_PIN1) |         \
-                                     PIN_PUPDR_PULLUP(GPIOC_PIN2) |         \
-                                     PIN_PUPDR_PULLUP(GPIOC_PDM_OUT) |      \
+                                     PIN_PUPDR_PULLUP(GPIOC_PIN2) |      \
+                                     PIN_PUPDR_FLOATING(GPIOC_ADC_BAT) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PIN4) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PIN5) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PIN6) |         \
@@ -721,8 +723,8 @@
                                      PIN_PUPDR_PULLUP(GPIOC_PIN15))
 #define VAL_GPIOC_ODR               (PIN_ODR_HIGH(GPIOC_OTG_FS_POWER_ON) |  \
                                      PIN_ODR_HIGH(GPIOC_PIN1) |             \
-                                     PIN_ODR_HIGH(GPIOC_PIN2) |             \
-                                     PIN_ODR_HIGH(GPIOC_PDM_OUT) |          \
+                                     PIN_ODR_HIGH(GPIOC_PIN2) |          \
+                                     PIN_ODR_HIGH(GPIOC_ADC_BAT) |             \
                                      PIN_ODR_HIGH(GPIOC_PIN4) |             \
                                      PIN_ODR_HIGH(GPIOC_PIN5) |             \
                                      PIN_ODR_HIGH(GPIOC_PIN6) |             \
@@ -737,8 +739,8 @@
                                      PIN_ODR_HIGH(GPIOC_PIN15))
 #define VAL_GPIOC_AFRL              (PIN_AFIO_AF(GPIOC_OTG_FS_POWER_ON, 0) |\
                                      PIN_AFIO_AF(GPIOC_PIN1, 0) |           \
-                                     PIN_AFIO_AF(GPIOC_PIN2, 0) |           \
-                                     PIN_AFIO_AF(GPIOC_PDM_OUT, 0) |        \
+                                     PIN_AFIO_AF(GPIOC_PIN2, 0) |        \
+                                     PIN_AFIO_AF(GPIOC_ADC_BAT, 0) |           \
                                      PIN_AFIO_AF(GPIOC_PIN4, 0) |           \
                                      PIN_AFIO_AF(GPIOC_PIN5, 0) |           \
                                      PIN_AFIO_AF(GPIOC_PIN6, 0) |           \

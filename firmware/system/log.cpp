@@ -73,7 +73,7 @@ void Log::main() {
     FileSystem::write( _file, header );
     FileSystem::sync( _file );
 
-    UINT len = 0;
+//    UINT len = 0;
 
     systime_t time = chVTGetSystemTime();
     while( !shouldTerminate() ) {

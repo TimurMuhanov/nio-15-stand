@@ -115,6 +115,7 @@ namespace geometry {
                     return _scalar;
                 if( index>0 && index<4 )
                     return _vector(index-1);
+                return _scalar;
             }
 
             inline const Type&                          operator()( int index ) const {

@@ -41,11 +41,13 @@ namespace geometry {
             inline Type&                            operator()( int index ) {
                 if( index < elements )
                     return Tensor<elements, Type>::array[ index ];
+                return Tensor<elements, Type>::array[ 0 ];
             }
 
             inline const Type&                      operator()( int index ) const {
                 if( index < elements )
                     return Tensor<elements, Type>::array[ index ];
+                return Tensor<elements, Type>::array[ 0 ];
             }
 
             template<typename otherType>

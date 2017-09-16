@@ -274,6 +274,12 @@ void Connection::parseSerial(const QByteArray& data) {
                 case MAVLINK_MSG_ID_VALUE:{
                     mavlink_value_t value;
                     mavlink_msg_value_decode(&mavlink_message, &value);
+                    if( QString(value.key) == QString("bat") ) {
+                        double i;
+                        double d = modf((double)value.value,&i);
+                        MainWindow::ui().batteryLevelValueLabel->setText(
+                            QString("<html><head/><body><p><span style=\" font-size:12pt;\">%1.</span><span style=\" font-size:10pt;\">%2</span><span style=\" font-size:12pt;\">V</span></p></body></html>").arg((int)i).arg((int)(d*100)) );
+                    }
                     Plot::instance().addData( value.key, value.time_usec/1000.0, value.value );
                 } break;
 
