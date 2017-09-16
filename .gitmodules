@@ -1,0 +1,6 @@
+[submodule "3rdparty/ChibiOS"]
+	path = 3rdparty/ChibiOS
+	url = https://github.com/ChibiOS/ChibiOS.git
+[submodule "3rdparty/stm32-cmake"]
+	path = 3rdparty/stm32-cmake
+	url = https://github.com/ObKo/stm32-cmake.git
