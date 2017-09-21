@@ -5,15 +5,14 @@ set(STM32_CHIP STM32F103RB)
 
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake/gcc_stm32.cmake)
 
-set(TOOLCHAIN_PREFIX "C:/Program Files (x86)/GNU Tools ARM Embedded/5.4 2016q3")
-
 project( firmware )
 enable_language( ASM )
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --specs=nosys.specs")
 
 set(CHIBIOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ChibiOS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake)
-
 
 FIND_PACKAGE(ChibiOS 3 COMPONENTS nil pal hal serial REQUIRED)
 
