@@ -1,4 +1,5 @@
 # build directory
 *build
 installer
+.idea
 */*.user*

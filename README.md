@@ -22,6 +22,9 @@
 
 3. IDE:
 	- CLion. Download and install CLion IDE, set path to the `/bin` directory of MinGW w64 in CLion settings.
+4. Change file \3rdparty\stm32-cmake\cmake\gcc_stm32f4.cmake
+	- SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mabi=aapcs" CACHE INTERNAL "executable linker flags")
+	- SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mabi=aapcs --specs=nosys.specs" CACHE INTERNAL "executable linker flags")
 
 
 ### Build process
