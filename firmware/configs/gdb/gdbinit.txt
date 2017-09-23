@@ -1,0 +1,6 @@
+file F:/nio/nio15-new/firmware/cmake-build-debug/firmware
+target extended-remote COM5
+monitor swdp_scan
+attach 1
+load F:/nio/nio15-new/firmware/cmake-build-debug/firmware
+start

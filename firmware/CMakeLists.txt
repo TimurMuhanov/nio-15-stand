@@ -1,7 +1,10 @@
 cmake_minimum_required( VERSION 2.8 )
 
+set(BOARDNAME NoNameChina_STM32F103)
+
 #set(STM32_CHIP STM32F415RG)
-set(STM32_CHIP STM32F103RB)
+
+include(./board/${BOARDNAME}/board.cmake)
 
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake/gcc_stm32.cmake)
 
@@ -16,13 +19,17 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake)
 
 FIND_PACKAGE(ChibiOS 3 COMPONENTS rt pal hal serial REQUIRED)
 
-add_executable(${CMAKE_PROJECT_NAME} test.cpp board.c ${ChibiOS_SOURCES})
+add_executable(${CMAKE_PROJECT_NAME} test.cpp ${BOARD_SOURCES} ${ChibiOS_SOURCES})
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ChibiOS_INCLUDE_DIRS})
-
-message(${ChibiOS_INCLUDE_DIRS})
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ChibiOS_INCLUDE_DIRS} ${BOARD_INCLUDE_DIRS})
 
 set(STM32_LINKER_SCRIPT ${ChibiOS_LINKER_SCRIPT})
+
+set(EXECUTABLE_NAME ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME})
+
+configure_file(./configs/gdb/gdb_load.txt.in ${CMAKE_CURRENT_BINARY_DIR}/gdb_load.txt)
+
+add_custom_target(flash COMMAND ${TOOLCHAIN_PREFIX}/bin/arm-none-eabi-gdb -x ${CMAKE_CURRENT_BINARY_DIR}/gdb_load.txt DEPENDS ${CMAKE_PROJECT_NAME})
 
 STM32_SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME})
 

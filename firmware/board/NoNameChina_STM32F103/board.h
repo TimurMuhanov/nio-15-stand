@@ -48,6 +48,7 @@
 
 #define GPIOC_LED4              8
 #define GPIOC_LED3              9
+#define GPIOC_LED13             13
 
 /*
  * I/O ports initial setup, this configuration is established soon after reset
@@ -109,7 +110,7 @@
  * PC9  - Push-pull output (LED3), initially low state.
  */
 #define VAL_GPIOCCRL            0x88888888      /*  PC7...PC0 */
-#define VAL_GPIOCCRH            0x88888833      /* PC15...PC8 */
+#define VAL_GPIOCCRH            0x88288833      /* PC15...PC8 */
 #define VAL_GPIOCODR            0xFFFFFCFF
 
 /*
