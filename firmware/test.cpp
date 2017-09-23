@@ -1,5 +1,6 @@
 #include "ch.h"
 #include "hal.h"
+#include "usbcfg.h"
 
 /*
  * This is a periodic thread that does absolutely nothing except flashing
@@ -18,12 +19,23 @@ static THD_FUNCTION(Thread1, arg) {
     }
 }
 
+SerialUSBDriver                     SDU1;
+
 int main(void) {
 
     halInit();
     chSysInit();
 
     chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+
+    // com port over usb init
+    sduObjectInit(&SDU1);
+    sduStart(&SDU1, &serusbcfg);
+
+    usbDisconnectBus(serusbcfg.usbp);
+    chThdSleepMilliseconds(1000);
+    usbStart(serusbcfg.usbp, &usbcfg);
+    usbConnectBus(serusbcfg.usbp);
 
     while (true) {
 //        if (palReadPad(GPIOA, GPIOA_BUTTON))

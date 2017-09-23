@@ -17,13 +17,16 @@ set(CHIBIOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ChibiOS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake)
 
-FIND_PACKAGE(ChibiOS 3 COMPONENTS rt pal hal serial REQUIRED)
+find_package(ChibiOS 3 COMPONENTS rt pal hal serial serial_usb usb REQUIRED)
 
-add_executable(${CMAKE_PROJECT_NAME} test.cpp ${BOARD_SOURCES} ${ChibiOS_SOURCES})
+add_executable(${CMAKE_PROJECT_NAME} test.cpp usbcfg.c ${BOARD_SOURCES} ${ChibiOS_SOURCES})
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ChibiOS_INCLUDE_DIRS} ${BOARD_INCLUDE_DIRS})
 
 set(STM32_LINKER_SCRIPT ${ChibiOS_LINKER_SCRIPT})
+
+
+# build and flash targets
 
 set(EXECUTABLE_NAME ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME})
 
