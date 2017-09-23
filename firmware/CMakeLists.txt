@@ -14,7 +14,7 @@ set(CHIBIOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ChibiOS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake)
 
-FIND_PACKAGE(ChibiOS 3 COMPONENTS nil pal hal serial REQUIRED)
+FIND_PACKAGE(ChibiOS 3 COMPONENTS rt pal hal serial REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME} test.cpp board.c ${ChibiOS_SOURCES})
 
