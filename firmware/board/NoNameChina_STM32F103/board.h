@@ -36,7 +36,7 @@
 /*
  * MCU type, supported types are defined in ./os/hal/platforms/hal_lld.h.
  */
-#define STM32F10X_MD_VL
+#define STM32F10X_MD
 
 /*
  * IO pins assignments.
@@ -88,7 +88,7 @@
  * PA10 - Normal input      (USART1 RX).
  */
 #define VAL_GPIOACRL            0xB4B34B84      /*  PA7...PA0 */
-#define VAL_GPIOACRH            0x888884B8      /* PA15...PA8 */
+#define VAL_GPIOACRH            0x888BB4B8      /* PA15...PA8 */
 #define VAL_GPIOAODR            0xFFFFFFFF
 
 /*

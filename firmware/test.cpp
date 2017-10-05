@@ -13,9 +13,9 @@ static THD_FUNCTION(Thread1, arg) {
     chRegSetThreadName("blinker");
     while (true) {
         palSetPad(GPIOC, GPIOC_LED13);
-        chThdSleepMilliseconds(100);
+        chThdSleepMilliseconds(1000);
         palClearPad(GPIOC, GPIOC_LED13);
-        chThdSleepMilliseconds(100);
+        chThdSleepMilliseconds(1000);
     }
 }
 
@@ -32,10 +32,10 @@ int main(void) {
     sduObjectInit(&SDU1);
     sduStart(&SDU1, &serusbcfg);
 
-    usbDisconnectBus(serusbcfg.usbp);
+//    usbDisconnectBus(serusbcfg.usbp);
     chThdSleepMilliseconds(1000);
     usbStart(serusbcfg.usbp, &usbcfg);
-    usbConnectBus(serusbcfg.usbp);
+//    usbConnectBus(serusbcfg.usbp);
 
     while (true) {
 //        if (palReadPad(GPIOA, GPIOA_BUTTON))
