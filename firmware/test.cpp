@@ -39,7 +39,11 @@ int main(void) {
 
     while (true) {
 //        if (palReadPad(GPIOA, GPIOA_BUTTON))
-            chThdSleepMilliseconds(500);
-            sdPut(&SDU1,0x41);
+        //chThdSleepMilliseconds(500);
+        //sdPut(&SDU1,sdGet(&SDU1));
+        unsigned char b = sdGet(&SDU1);
+        if (b == 0x42) {
+            sdPut(&SDU1,0x43);
+        }
     }
 }
