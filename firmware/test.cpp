@@ -40,5 +40,6 @@ int main(void) {
     while (true) {
 //        if (palReadPad(GPIOA, GPIOA_BUTTON))
             chThdSleepMilliseconds(500);
+            sdPut(&SDU1,0x41);
     }
 }
