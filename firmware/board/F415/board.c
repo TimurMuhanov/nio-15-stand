@@ -121,4 +121,14 @@ bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
  * @todo    Add your board-specific code, if any.
  */
 void boardInit(void) {
+#if HAL_USE_SDC
+	sdcStart(&SDCD1, NULL);
+#endif
+
+}
+
+void boardStop(void) {
+#if HAL_USE_SDC
+    sdcStop(&SDCD1);
+#endif
 }

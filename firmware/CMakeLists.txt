@@ -12,7 +12,7 @@ set(CHIBIOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ChibiOS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake)
 
-find_package(ChibiOS 3 COMPONENTS rt pal hal serial serial_usb usb REQUIRED)
+find_package(ChibiOS 3 COMPONENTS rt pal hal serial serial_usb usb sdc mmcsd chprintf REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME} test_new.cpp usbcfg.c ${BOARD_SOURCES} ${ChibiOS_SOURCES})
 
