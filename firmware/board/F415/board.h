@@ -88,7 +88,7 @@
 #define GPIOB_PIN14                 14U
 #define GPIOB_PIN15                 15U
 
-#define GPIOC_OTG_FS_POWER_ON       0U
+#define GPIOC_LED1                  0U
 #define GPIOC_PIN1                  1U
 #define GPIOC_PIN2                  2U
 #define GPIOC_PDM_OUT               3U
@@ -101,9 +101,9 @@
 #define GPIOC_SCLK                  10U
 #define GPIOC_PIN11                 11U
 #define GPIOC_SDIN                  12U
-#define GPIOC_PIN13                 13U
-#define GPIOC_PIN14                 14U
-#define GPIOC_PIN15                 15U
+#define GPIOC_LED4                  13U
+#define GPIOC_LED3                  14U
+#define GPIOC_LED2                  15U
 
 #define GPIOD_PIN0                  0U
 #define GPIOD_PIN1                  1U
@@ -483,7 +483,7 @@
  * PC14 - PIN14                     (input pullup).
  * PC15 - PIN15                     (input pullup).
  */
-#define VAL_GPIOC_MODER             (PIN_MODE_OUTPUT(GPIOC_OTG_FS_POWER_ON) |\
+#define VAL_GPIOC_MODER             (PIN_MODE_OUTPUT(GPIOC_LED1) |\
                                      PIN_MODE_INPUT(GPIOC_PIN1) |           \
                                      PIN_MODE_INPUT(GPIOC_PIN2) |           \
                                      PIN_MODE_INPUT(GPIOC_PDM_OUT) |        \
@@ -496,10 +496,10 @@
                                      PIN_MODE_ALTERNATE(GPIOC_SCLK) |       \
                                      PIN_MODE_INPUT(GPIOC_PIN11) |          \
                                      PIN_MODE_ALTERNATE(GPIOC_SDIN) |       \
-                                     PIN_MODE_INPUT(GPIOC_PIN13) |          \
-                                     PIN_MODE_INPUT(GPIOC_PIN14) |          \
-                                     PIN_MODE_INPUT(GPIOC_PIN15))
-#define VAL_GPIOC_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOC_OTG_FS_POWER_ON) |\
+                                     PIN_MODE_OUTPUT(GPIOC_LED4) |          \
+                                     PIN_MODE_OUTPUT(GPIOC_LED3) |          \
+                                     PIN_MODE_OUTPUT(GPIOC_LED2))
+#define VAL_GPIOC_OTYPER            (PIN_OTYPE_PUSHPULL(GPIOC_LED1) |\
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN1) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN2) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PDM_OUT) |    \
@@ -512,10 +512,10 @@
                                      PIN_OTYPE_PUSHPULL(GPIOC_SCLK) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOC_PIN11) |      \
                                      PIN_OTYPE_PUSHPULL(GPIOC_SDIN) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOC_PIN13) |      \
-                                     PIN_OTYPE_PUSHPULL(GPIOC_PIN14) |      \
-                                     PIN_OTYPE_PUSHPULL(GPIOC_PIN15))
-#define VAL_GPIOC_OSPEEDR           (PIN_OSPEED_100M(GPIOC_OTG_FS_POWER_ON) |\
+                                     PIN_OTYPE_PUSHPULL(GPIOC_LED4) |      \
+                                     PIN_OTYPE_PUSHPULL(GPIOC_LED3) |      \
+                                     PIN_OTYPE_PUSHPULL(GPIOC_LED2))
+#define VAL_GPIOC_OSPEEDR           (PIN_OSPEED_100M(GPIOC_LED1) |\
                                      PIN_OSPEED_100M(GPIOC_PIN1) |          \
                                      PIN_OSPEED_100M(GPIOC_PIN2) |          \
                                      PIN_OSPEED_100M(GPIOC_PDM_OUT) |       \
@@ -528,10 +528,10 @@
                                      PIN_OSPEED_100M(GPIOC_SCLK) |          \
                                      PIN_OSPEED_100M(GPIOC_PIN11) |         \
                                      PIN_OSPEED_100M(GPIOC_SDIN) |          \
-                                     PIN_OSPEED_100M(GPIOC_PIN13) |         \
-                                     PIN_OSPEED_100M(GPIOC_PIN14) |         \
-                                     PIN_OSPEED_100M(GPIOC_PIN15))
-#define VAL_GPIOC_PUPDR             (PIN_PUPDR_FLOATING(GPIOC_OTG_FS_POWER_ON) |\
+                                     PIN_OSPEED_100M(GPIOC_LED4) |         \
+                                     PIN_OSPEED_100M(GPIOC_LED3) |         \
+                                     PIN_OSPEED_100M(GPIOC_LED2))
+#define VAL_GPIOC_PUPDR             (PIN_PUPDR_PULLUP(GPIOC_LED1) |\
                                      PIN_PUPDR_PULLUP(GPIOC_PIN1) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PIN2) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PDM_OUT) |      \
@@ -544,10 +544,10 @@
                                      PIN_PUPDR_FLOATING(GPIOC_SCLK) |       \
                                      PIN_PUPDR_PULLUP(GPIOC_PIN11) |        \
                                      PIN_PUPDR_FLOATING(GPIOC_SDIN) |       \
-                                     PIN_PUPDR_PULLUP(GPIOC_PIN13) |        \
-                                     PIN_PUPDR_PULLUP(GPIOC_PIN14) |        \
-                                     PIN_PUPDR_PULLUP(GPIOC_PIN15))
-#define VAL_GPIOC_ODR               (PIN_ODR_HIGH(GPIOC_OTG_FS_POWER_ON) |  \
+                                     PIN_PUPDR_PULLUP(GPIOC_LED4) |        \
+                                     PIN_PUPDR_PULLUP(GPIOC_LED3) |        \
+                                     PIN_PUPDR_PULLUP(GPIOC_LED2))
+#define VAL_GPIOC_ODR               (PIN_ODR_HIGH(GPIOC_LED1) |  \
                                      PIN_ODR_HIGH(GPIOC_PIN1) |             \
                                      PIN_ODR_HIGH(GPIOC_PIN2) |             \
                                      PIN_ODR_HIGH(GPIOC_PDM_OUT) |          \
@@ -560,10 +560,10 @@
                                      PIN_ODR_HIGH(GPIOC_SCLK) |             \
                                      PIN_ODR_HIGH(GPIOC_PIN11) |            \
                                      PIN_ODR_HIGH(GPIOC_SDIN) |             \
-                                     PIN_ODR_HIGH(GPIOC_PIN13) |            \
-                                     PIN_ODR_HIGH(GPIOC_PIN14) |            \
-                                     PIN_ODR_HIGH(GPIOC_PIN15))
-#define VAL_GPIOC_AFRL              (PIN_AFIO_AF(GPIOC_OTG_FS_POWER_ON, 0) |\
+                                     PIN_ODR_HIGH(GPIOC_LED4) |            \
+                                     PIN_ODR_HIGH(GPIOC_LED3) |            \
+                                     PIN_ODR_HIGH(GPIOC_LED2))
+#define VAL_GPIOC_AFRL              (PIN_AFIO_AF(GPIOC_LED1, 0) |\
                                      PIN_AFIO_AF(GPIOC_PIN1, 0) |           \
                                      PIN_AFIO_AF(GPIOC_PIN2, 0) |           \
                                      PIN_AFIO_AF(GPIOC_PDM_OUT, 0) |        \
@@ -576,9 +576,9 @@
                                      PIN_AFIO_AF(GPIOC_SCLK, 6) |           \
                                      PIN_AFIO_AF(GPIOC_PIN11, 0) |          \
                                      PIN_AFIO_AF(GPIOC_SDIN, 6) |           \
-                                     PIN_AFIO_AF(GPIOC_PIN13, 0) |          \
-                                     PIN_AFIO_AF(GPIOC_PIN14, 0) |          \
-                                     PIN_AFIO_AF(GPIOC_PIN15, 0))
+                                     PIN_AFIO_AF(GPIOC_LED4, 0) |          \
+                                     PIN_AFIO_AF(GPIOC_LED3, 0) |          \
+                                     PIN_AFIO_AF(GPIOC_LED2, 0))
 
 /*
  * GPIOD setup:
