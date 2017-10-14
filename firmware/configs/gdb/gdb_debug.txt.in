@@ -2,5 +2,6 @@ target extended-remote ${COM_PORT}
 monitor swdp_scan
 attach 1
 load ${EXECUTABLE_NAME}
-kill
-quit
+file ${EXECUTABLE_NAME}
+break main
+run

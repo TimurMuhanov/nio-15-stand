@@ -1,6 +1,0 @@
-target extended-remote COM5
-monitor swdp_scan
-attach 1
-load F:/nio/build/firmware
-file F:/nio/build/firmware
-run
