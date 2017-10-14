@@ -44,6 +44,11 @@
 	    - Set CMake option `-DTOOLCHAIN_PREFIX="path/to/arm_toolchain"`
 		- Set COM port for BlackSpehere BlackMagic debugger:
 		`-DCOM_PORT=/dev/cu.usbmodemxxxxxxxx`
+
+### Patching
+
+Add following line after 3rdparty/stm32-cmake/cmake/ChibiOS/ChibiOS3_HAL.cmake:20
+SET(CHIBIOS_${module}_SEARCH_HEADERS hal_${module}.h)
 	    
 ### Build process
 
