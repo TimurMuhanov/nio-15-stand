@@ -1,4 +1,4 @@
-target extended-remote /dev/tty.usbmodemB6C78813
+target extended-remote COM5
 monitor swdp_scan
 attach 1
 load ${EXECUTABLE_NAME}
