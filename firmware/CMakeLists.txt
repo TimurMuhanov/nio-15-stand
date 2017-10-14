@@ -2,8 +2,6 @@ cmake_minimum_required( VERSION 2.8 )
 
 set(BOARDNAME F415)
 
-#set(STM32_CHIP STM32F415RG)
-
 include(./board/${BOARDNAME}/board.cmake)
 
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake/gcc_stm32.cmake)
