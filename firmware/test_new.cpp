@@ -2,6 +2,7 @@
 #include "hal.h"
 #include "usbcfg.h"
 #include "chprintf.h"
+#include "ff.h"
 
 
 static THD_WORKING_AREA(waThread1, 128);
@@ -33,10 +34,15 @@ char fhex(uint8_t hex) {
     }
 }
 
+FATFS filesystem;
+
 int main(void) {
 
     halInit();
     chSysInit();
+
+    Led led;
+    led.blink(Led::Blue, 1000);
 
     chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
@@ -47,13 +53,28 @@ int main(void) {
     chThdSleepMilliseconds(1000);
     usbStart(serusbcfg.usbp, &usbcfg);
 
-//    uint8_t buffer[512];
-//    bool result = sdcRead(&SDCD1, 10, buffer, 512);
-    BlockDeviceInfo inf;
-    bool result = sdcGetInfo(&SDCD1, &inf);
+    bool connectResult = sdcConnect(&SDCD1);
+
+    uint8_t buffer[512];
+    bool readResult = sdcRead(&SDCD1, 0, buffer, 512);
+
+    sdcflags_t err = sdcGetAndClearErrors(&SDCD1);
+
+//    bool mountResult = f_mount(&filesystem, "", 1 );
+//
+//    DIR dir;
+//    FRESULT openResult = f_opendir (&dir, ".");
+
+//    TCHAR label[256];
+//    DWORD unused;
+//    FRESULT labelResult = f_getlabel("", label, &unused);
+
 
     while (true) {
         chThdSleepMilliseconds(500);
-        chprintf((BaseSequentialStream*)&SDU1, "%u %u %u\n\r", inf.blk_num, inf.blk_size, result);
+        chprintf((BaseSequentialStream*)&SDU1, "\n\r%u %u %X\n\r", connectResult, readResult, err);
+//        for(int i=0;i<512;++i) {
+//            chprintf((BaseSequentialStream*)&SDU1, "%x ", buffer[i]);
+//        }
     }
 }

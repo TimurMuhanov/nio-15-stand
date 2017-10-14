@@ -18,6 +18,12 @@ add_executable(${CMAKE_PROJECT_NAME} test_new.cpp usbcfg.c ${BOARD_SOURCES} ${Ch
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ChibiOS_INCLUDE_DIRS} ${BOARD_INCLUDE_DIRS})
 
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/../3rdparty/ChibiOS/os/various/fatfs_bindings/fatfs_diskio.c
+        ${CMAKE_CURRENT_LIST_DIR}/../3rdparty/ChibiOS/os/various/fatfs_bindings/fatfs_syscall.c
+        ${CMAKE_CURRENT_LIST_DIR}/../3rdparty/ChibiOS/ext/fatfs/src/ff.c
+        ${CMAKE_CURRENT_LIST_DIR}/../3rdparty/ChibiOS/ext/fatfs/src/option/unicode.c)
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../3rdparty/ChibiOS/ext/fatfs/src")
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --specs=nosys.specs")
 set(STM32_LINKER_SCRIPT ${ChibiOS_LINKER_SCRIPT})

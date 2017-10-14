@@ -539,11 +539,11 @@
                                      PIN_PUPDR_PULLUP(GPIOC_PIN5) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PIN6) |         \
                                      PIN_PUPDR_FLOATING(GPIOC_MCLK) |       \
-                                     PIN_PUPDR_PULLUP(GPIOC_SDC0) |         \
-                                     PIN_PUPDR_PULLUP(GPIOC_SDC1) |         \
-                                     PIN_PUPDR_PULLUP(GPIOC_SDC2) |       \
-                                     PIN_PUPDR_PULLUP(GPIOC_SDC3) |        \
-                                     PIN_PUPDR_PULLUP(GPIOC_SDC_CLK) |       \
+                                     PIN_PUPDR_FLOATING(GPIOC_SDC0) |         \
+                                     PIN_PUPDR_FLOATING(GPIOC_SDC1) |         \
+                                     PIN_PUPDR_FLOATING(GPIOC_SDC2) |       \
+                                     PIN_PUPDR_FLOATING(GPIOC_SDC3) |        \
+                                     PIN_PUPDR_FLOATING(GPIOC_SDC_CLK) |       \
                                      PIN_PUPDR_PULLUP(GPIOC_LED4) |        \
                                      PIN_PUPDR_PULLUP(GPIOC_LED3) |        \
                                      PIN_PUPDR_PULLUP(GPIOC_LED2))
@@ -650,7 +650,7 @@
                                      PIN_OSPEED_100M(GPIOD_LED6))
 #define VAL_GPIOD_PUPDR             (PIN_PUPDR_PULLUP(GPIOD_PIN0) |         \
                                      PIN_PUPDR_PULLUP(GPIOD_PIN1) |         \
-                                     PIN_PUPDR_PULLUP(GPIOD_SDC_CMD) |         \
+                                     PIN_PUPDR_FLOATING(GPIOD_SDC_CMD) |         \
                                      PIN_PUPDR_PULLUP(GPIOD_PIN3) |         \
                                      PIN_PUPDR_FLOATING(GPIOD_RESET) |      \
                                      PIN_PUPDR_FLOATING(GPIOD_OVER_CURRENT) |\
