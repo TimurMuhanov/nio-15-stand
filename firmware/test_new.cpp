@@ -41,9 +41,9 @@ int main(void) {
 
     Led yellowLed(GPIOC, Led_Yellow, 4000);
     yellowLed.start();
-//
-//    Led blueLed(GPIOC, Led_Blue, 400);
-//    blueLed.start();
+
+    Led blueLed(GPIOC, Led_Blue, 400);
+    blueLed.start();
 
     while (true) {
         chThdSleepMilliseconds(500);
