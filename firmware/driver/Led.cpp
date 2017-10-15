@@ -1,52 +1,58 @@
-/*#include "led.h"
+#include "driver/Led.h"
 
 
+Led::Led(ioportid_t port, uint8_t pin, uint32_t periodMs) :
+    _isRunning(false),
+    _port(port),
+    _pin(pin),
+    _periodMs(periodMs) {
 
-
-char buf[ IO_WRITE_BUFFER ];
-u32 len;
-
-
-
-
-void print(const char* string, ...) {
-	va_list ap;
-	
-	va_start( ap, string );
-	
-	len = vsnprintf( buf, IO_WRITE_BUFFER, string, ap );
-	
-	sdWrite( &BOARD_TERMINAL_SD, (const u8*) buf, len );
-	
-	va_end ( ap );
+    palSetPad(_port, _pin);
 }
 
-
-
-
-
-void send(const u8* buf, const u32 len) {
-	sdAsynchronousWrite( &BOARD_TERMINAL_SD, buf, len );
+Led::~Led() {
+    if(_isRunning) {
+        stop();
+        wait();
+    }
+    palSetPad(_port, _pin);
 }
 
-
-
-
-void sendToTelemethry(const u8* buf, const u32 len) { 
-	sdAsynchronousWrite( &BOARD_TELEMETHRY_SD, buf, len );
+void Led::setPeriod(uint32_t periodMs) {
+    _mutex.lock();
+    _periodMs = periodMs;
+    _mutex.unlock();
 }
 
-
-
-
-void receiveFromTelemethry(u8* buf, const u32 len) {
-	sdRead( &BOARD_TELEMETHRY_SD, buf, len );
+bool Led::isRunning() const {
+    return _isRunning;
 }
 
-
-
-
-u32 availableFromTelemethry(void) {
-	return chQSpaceI( &BOARD_TELEMETHRY_SD.oqueue );
+void Led::start() {
+    if(!_isRunning) {
+        _isRunning = true;
+        BaseStaticThread<1024>::start(LOWPRIO);
+    }
 }
-*/
+
+void Led::stop() {
+    if(_isRunning) {
+        requestTerminate();
+    }
+}
+
+void Led::main() {
+    setName("Led");
+
+    systime_t time = chVTGetSystemTime();
+    while(!shouldTerminate()) {
+        _mutex.lock();
+        time += MS2ST(_periodMs);
+        _mutex.unlock();
+        palTogglePad(_port, _pin);
+        sleepUntil(time);
+    }
+
+    _isRunning = false;
+    exit(0);
+}

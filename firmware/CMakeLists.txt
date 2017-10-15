@@ -12,14 +12,29 @@ set(CHIBIOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ChibiOS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake)
 
-find_package(ChibiOS 3 COMPONENTS rt pal hal serial serial_usb usb REQUIRED)
+find_package(ChibiOS 3 COMPONENTS rt pal hal serial_usb usb REQUIRED)
 
-add_executable(${CMAKE_PROJECT_NAME} test_new.cpp usbcfg.c ${BOARD_SOURCES} ${ChibiOS_SOURCES})
+add_executable(${CMAKE_PROJECT_NAME} test_new.cpp)
 
-target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${ChibiOS_INCLUDE_DIRS} ${BOARD_INCLUDE_DIRS})
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+        ${BOARD_SOURCES}
+        usbcfg.c
+        driver/Led.cpp
+        driver/Led.h)
+
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${BOARD_INCLUDE_DIRS})
+
+target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+        ${ChibiOS_SOURCES}
+        ../3rdparty/ChibiOS/os/various/cpp_wrappers/ch.cpp
+        ../3rdparty/ChibiOS/os/various/cpp_wrappers/ch.hpp
+        ../3rdparty/ChibiOS/os/various/cpp_wrappers/syscalls_cpp.cpp
+        ../3rdparty/ChibiOS/os/various/cpp_wrappers/syscalls_cpp.hpp)
+
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${ChibiOS_INCLUDE_DIRS} ../3rdparty/ChibiOS/os/various/cpp_wrappers/)
 
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --specs=nosys.specs")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles --specs=nosys.specs -Wl,--gc-sections,-lnosys,--defsym=__process_stack_size__=0x900,--defsym=__main_stack_size__=0x900")
 set(STM32_LINKER_SCRIPT ${ChibiOS_LINKER_SCRIPT})
 
 
