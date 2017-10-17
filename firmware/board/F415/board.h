@@ -50,6 +50,11 @@
  * MCU type as defined in the ST header.
  */
 
+/*
+ * Device assignments.
+ */
+#define BOARD_BATTERY_ADC_DEVICE    ADCD1
+
 
 /*
  * IO pins assignments.
@@ -1287,7 +1292,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void boardInit(void);
+    void boardInit(void);
+    void boardStop(void);
 #ifdef __cplusplus
 }
 #endif

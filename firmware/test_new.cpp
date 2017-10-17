@@ -3,6 +3,8 @@
 #include "driver/Led.h"
 #include "driver/Battery.h"
 #include "usbcfg.h"
+#include "cstdio"
+#include "cstring"
 
 #define Led_Blue        GPIOC_LED2
 #define Led_Red         GPIOC_LED4
@@ -46,30 +48,13 @@ int main(void) {
     Led blueLed(GPIOC, Led_Blue, 400);
     blueLed.start();
 
-    Batt batt(100);
+    Battery batt(100);
     batt.start();
-
-    uint8_t chh,chl;
 
     while (true) {
         chThdSleepMilliseconds(500);
-        chh = (uint8_t)((batt._ADC)*10);
-        chl = chh&0x0F;
-        chh = ((chh&0xF0)>>4);
-        if (chh>9) {
-            chh += 'A'-10;
-        } else {
-            chh +='0';
-        }
-        if (chl>9) {
-            chl += 'A'-10;
-        } else {
-            chl +='0';
-        }
-        chSequentialStreamPut(&SDU1,'0');
-        chSequentialStreamPut(&SDU1,'x');
-        chSequentialStreamPut(&SDU1,chh);
-        chSequentialStreamPut(&SDU1,chl);
-        chSequentialStreamPut(&SDU1,' ');
+        char buffer[256];
+        std::snprintf(buffer, 256, "voltage %f\n\r", batt._ADC);
+        chSequentialStreamWrite(&SDU1, (uint8_t*)buffer, std::strlen(buffer));
     }
 }

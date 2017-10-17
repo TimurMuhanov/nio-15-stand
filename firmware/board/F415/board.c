@@ -118,7 +118,18 @@ bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
 
 /**
  * @brief   Board-specific initialization code.
- * @todo    Add your board-specific code, if any.
  */
 void boardInit(void) {
+#ifdef HAL_USE_ADC
+    adcStart(&BOARD_BATTERY_ADC_DEVICE, NULL);
+#endif
+}
+
+/**
+ * @brief   Board-specific deinitialization code.
+ */
+void boardStop(void) {
+#ifdef HAL_USE_ADC
+    adcStop(&BOARD_BATTERY_ADC_DEVICE);
+#endif
 }

@@ -14,24 +14,24 @@ static ADCConversionGroup adc_conv_group = {
         ADC_SQR3_SQ1_N(ADC_CHANNEL_IN13)	// SQR3 register, select 1 channels: 13
 };
 
-Batt::Batt(uint32_t periodMs) :
+Battery::Battery(uint32_t periodMs) :
         _periodMs(periodMs) {
 }
 
-Batt::~Batt() {
+Battery::~Battery() {
     stop();
     wait();
 }
 
-void Batt::start() {    // can to use without overloading
+void Battery::start() {    // can to use without overloading
     BaseStaticThread<1024>::start(NORMALPRIO);
 }
 
-void Batt::stop() {
+void Battery::stop() {
     requestTerminate();
 }
 
-void Batt::main() {
+void Battery::main() {
     setName("Battery");
     uint16_t    buffer[_samples_num];
     float       avg;
