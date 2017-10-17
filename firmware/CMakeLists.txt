@@ -28,6 +28,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${BOARD_INCLUDE_DIRS})
 
+# ChibiOS
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         ${ChibiOS_SOURCES}
         ../3rdparty/ChibiOS/os/various/cpp_wrappers/ch.cpp
@@ -37,6 +38,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${ChibiOS_INCLUDE_DIRS} ../3rdparty/ChibiOS/os/various/cpp_wrappers/)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles --specs=nosys.specs")
+
+# MAVLink
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/mavlink ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/mavlink/nio15)
 
 
 
