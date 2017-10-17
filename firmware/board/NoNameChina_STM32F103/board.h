@@ -87,7 +87,7 @@
  * PA9  - Alternate output  (USART1 TX).
  * PA10 - Normal input      (USART1 RX).
  */
-#define VAL_GPIOACRL            0xB4B34B84      /*  PA7...PA0 */
+#define VAL_GPIOACRL            0xB8B34B84      /*  PA7...PA0 */
 #define VAL_GPIOACRH            0x888BB4B8      /* PA15...PA8 */
 #define VAL_GPIOAODR            0xFFFFFFFF
 
