@@ -486,7 +486,7 @@
 #define VAL_GPIOC_MODER             (PIN_MODE_OUTPUT(GPIOC_LED1) |\
                                      PIN_MODE_INPUT(GPIOC_PIN1) |           \
                                      PIN_MODE_INPUT(GPIOC_PIN2) |           \
-                                     PIN_MODE_INPUT(GPIOC_ADC) |        \
+                                     PIN_MODE_ANALOG(GPIOC_ADC) |        \
                                      PIN_MODE_INPUT(GPIOC_SINK) |           \
                                      PIN_MODE_INPUT(GPIOC_RDY) |           \
                                      PIN_MODE_INPUT(GPIOC_PWM5) |           \
@@ -534,7 +534,7 @@
 #define VAL_GPIOC_PUPDR             (PIN_PUPDR_PULLUP(GPIOC_LED1) |\
                                      PIN_PUPDR_PULLUP(GPIOC_PIN1) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PIN2) |         \
-                                     PIN_PUPDR_PULLUP(GPIOC_ADC) |      \
+                                     PIN_PUPDR_FLOATING(GPIOC_ADC) |      \
                                      PIN_PUPDR_PULLUP(GPIOC_SINK) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_RDY) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PWM5) |         \

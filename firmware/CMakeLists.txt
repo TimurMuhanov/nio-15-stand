@@ -12,9 +12,9 @@ set(CHIBIOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ChibiOS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake)
 
-set(CHIBIOS_PROCESS_STACK_SIZE 0x900)
-set(CHIBIOS_MAIN_STACK_SIZE 0x900)
-find_package(ChibiOS 3 COMPONENTS rt pal hal serial_usb usb REQUIRED)
+set(CHIBIOS_PROCESS_STACK_SIZE 0x1200)
+set(CHIBIOS_MAIN_STACK_SIZE 0x1200)
+find_package(ChibiOS 3 COMPONENTS rt pal hal serial_usb usb adc REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME} test_new.cpp)
 
@@ -22,7 +22,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         ${BOARD_SOURCES}
         usbcfg.c
         driver/Led.cpp
-        driver/Led.h)
+        driver/Led.h
+        driver/Battery.cpp
+        driver/Battery.h)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${BOARD_INCLUDE_DIRS})
 
