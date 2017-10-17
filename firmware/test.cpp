@@ -8,7 +8,6 @@
  */
 static THD_WORKING_AREA(waThread1, 128);
 static THD_FUNCTION(Thread1, arg) {
-
     (void)arg;
     chRegSetThreadName("blinker");
     while (true) {
@@ -19,7 +18,7 @@ static THD_FUNCTION(Thread1, arg) {
     }
 }
 
-SerialUSBDriver                     SDU1;
+SerialUSBDriver SDU1;
 
 int main(void) {
 
@@ -39,11 +38,12 @@ int main(void) {
 
     while (true) {
 //        if (palReadPad(GPIOA, GPIOA_BUTTON))
-        //chThdSleepMilliseconds(500);
+        chThdSleepMilliseconds(500);
         //sdPut(&SDU1,sdGet(&SDU1));
-        unsigned char b = sdGet(&SDU1);
-        if (b == 0x42) {
-            sdPut(&SDU1,0x43);
-        }
+//        unsigned char b = sdGet(&SDU1);
+//        if (b == 0x42) {
+//            sdPut(&SDU1,0x43);
+//    }
+        chSequentialStreamPut(&SDU1,'A');
     }
 }
