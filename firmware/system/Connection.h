@@ -12,10 +12,10 @@
 
 #include "ch.hpp"
 #include "hal.h"
-#include "Thread.h"
-#include "Telemetry.h"
+#include "system/include/Thread.h"
+#include "system/include/Telemetry.h"
 #include "Imu.h"
-#include "mavlink_bridge_header.h"
+#include "system/include/mavlink_bridge_header.h"
 #include "mavlink.h"
 
 

@@ -8,7 +8,7 @@
 
 #include "Terminal.h"
 #include "FileSystem.h"
-#include "Connection.h"
+#include "system/Connection.h"
 #include "Settings.h"
 #include "Log.h"
 #include "Control.h"
