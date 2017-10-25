@@ -57,10 +57,14 @@ int main(void) {
     mavlink_msg_heartbeat_pack(0,0,&rawMsg,0,0,0,0,0);
     int length = mavlink_msg_to_send_buffer(buffer, &rawMsg);
 
+    BaseSequentialStream;
+    BaseChannel;
+    BaseAsynchronousChannel;
+
     while (true) {
         chThdSleepMilliseconds(1000);
 //        char buffer[256];
 //        std::snprintf(buffer, 256, "voltage %f\n\r", batt._ADC);
-        chSequentialStreamWrite(&SDU1, (uint8_t*)buffer, length);
+        chnWrite(&SDU1, (uint8_t*)buffer, length);
     }
 }

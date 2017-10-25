@@ -1,50 +1,60 @@
-/**	@defgroup	CONNECTION
-	@author		Zaripov Kamil
-				Communicate with Ground Control Station
-	@{ */
+/**	@author Timur Muhanov
+    @date 25.10.2017 */
 
-#ifndef CONNECTION_H
-#define CONNECTION_H
+#pragma once
 
-
-#define MAVLINK_DEFAULT_COMM		MAVLINK_COMM_0
-
-
+#include <string>
 #include "ch.hpp"
 #include "hal.h"
-#include "system/include/Thread.h"
-#include "system/include/Telemetry.h"
-#include "Imu.h"
-#include "system/include/mavlink_bridge_header.h"
 #include "mavlink.h"
-
 
 using namespace chibios_rt;
 
-
-class Connection : public BaseStaticThread<2048> {
-                                            Connection();
-                                           ~Connection();
+class Connection {
     public:
-        static Connection&                  instance() {
-            static Connection instance;
-            return instance;
-        }
+        Connection(BaseAsynchronousChannel * channel);
+        ~Connection();
 
-        void                                valueSend(u32 time, string key, float value);
-        void                                vectorValueSend(u32 time, string key, Vector<3> v);
-        void                                quatValueSend(u32 time, string key, Quaternion<> q);
+        void start();
+        void stop();
+        void wait();
 
-        /**	set cpu udage
-        @param      usage       cpu usage in range 0..1 */
-        void                                setCpuInfo( float cpuUsage, u32 time, u32 threadCount );
+        void sendBatteryStatus(float voltage);
 
-        Mutex                               _mutex;
     private:
-        virtual void                        main(void);
+        class HeartbeatSender : public BaseStaticThread<2048> {
+            public:
+                HeartbeatSender(BaseAsynchronousChannel * channel);
+
+                void stop() override;
+
+            private:
+                void main() override;
+
+                BaseAsynchronousChannel * _channel = nullptr;
+        };
+
+        class Parser : public BaseStaticThread<2048> {
+            public:
+                Parser(BaseAsynchronousChannel * channel);
+
+                void stop() override;
+
+            private:
+
+                void main() override;
+
+                BaseAsynchronousChannel * _channel = nullptr;
+                mavlink_message_t _rawMavlinkMessage;
+                mavlink_status_t _status;
+        };
+
+        BaseAsynchronousChannel * _channel = nullptr;
+
+        uint8_t _buffer[MAVLINK_MAX_PACKET_LEN];
+        mavlink_message_t _rawMavlinkMessage;
+        mavlink_sys_status_t _sysStatusMessage;
+
+        HeartbeatSender _heartbeatSender;
+        Parser _parser;
 };
-
-
-#endif
-
-/** @} */

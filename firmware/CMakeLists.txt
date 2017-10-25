@@ -16,7 +16,7 @@ set(CHIBIOS_PROCESS_STACK_SIZE 0x1200)
 set(CHIBIOS_MAIN_STACK_SIZE 0x1200)
 find_package(ChibiOS 3 COMPONENTS rt pal hal serial_usb usb adc chprintf REQUIRED)
 
-add_executable(${CMAKE_PROJECT_NAME} test_new.cpp)
+add_executable(${CMAKE_PROJECT_NAME} test_new.cpp driver/Link.cpp driver/Link.h)
 
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         ${BOARD_SOURCES}
@@ -25,10 +25,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         driver/Led.h
         driver/Battery.cpp
         driver/Battery.h
-#        system/Connection.cpp
-#        system/Connection.h
-        system/Serial.cpp
-        system/Serial.h)
+        system/Connection.cpp
+        system/Connection.h)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${BOARD_INCLUDE_DIRS})
 

@@ -21,7 +21,6 @@ public:
 private:
     void main() override;
     uint32_t    _periodMs;
-    Mutex       _mutex;
     uint8_t     _samples_num = 16;
     float       _mul = 0.00320388349514563106796116504854f;
 };

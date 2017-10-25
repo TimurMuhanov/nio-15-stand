@@ -33,14 +33,13 @@ void Battery::stop() {
 
 void Battery::main() {
     setName("Battery");
+
     uint16_t    buffer[_samples_num];
     float       avg;
     systime_t   time = chVTGetSystemTime();
 
     while(!shouldTerminate()) {
-        _mutex.lock();
         time += MS2ST(_periodMs);
-        _mutex.unlock();
         // Делаются замеры АЦП
         avg = 0;
         adcConvert(&BOARD_BATTERY_ADC_DEVICE, &adc_conv_group, buffer, _samples_num);
@@ -52,5 +51,5 @@ void Battery::main() {
         sleepUntil(time);
     }
 
-    exit(0);
+    exit(MSG_OK);
 }
