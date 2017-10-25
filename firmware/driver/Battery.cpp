@@ -31,6 +31,10 @@ void Battery::stop() {
     requestTerminate();
 }
 
+void Battery::setConnection(Connection * connection) {
+    _connection = connection;
+}
+
 void Battery::main() {
     setName("Battery");
 
@@ -46,7 +50,11 @@ void Battery::main() {
         for (size_t i = 0; i < _samples_num; i++) {
             avg += buffer[i];
         }
-        _ADC = avg*_mul/_samples_num;
+        float adc = avg*_mul/_samples_num;
+
+        if(_connection != nullptr) {
+            _connection->sendBatteryStatus(adc);
+        }
 
         sleepUntil(time);
     }
