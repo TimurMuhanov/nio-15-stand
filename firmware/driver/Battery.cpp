@@ -50,10 +50,10 @@ void Battery::main() {
         for (size_t i = 0; i < _samples_num; i++) {
             avg += buffer[i];
         }
-        float adc = avg*_mul/_samples_num;
+        avg *= _mul/_samples_num;
 
         if(_connection != nullptr) {
-            _connection->sendBatteryStatus(adc);
+            _connection->sendBatteryStatus(avg);
         }
 
         sleepUntil(time);

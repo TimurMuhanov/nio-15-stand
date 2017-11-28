@@ -12,8 +12,8 @@ set(CHIBIOS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ChibiOS)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/stm32-cmake/cmake)
 
-set(CHIBIOS_PROCESS_STACK_SIZE 0x1200)
-set(CHIBIOS_MAIN_STACK_SIZE 0x1200)
+set(CHIBIOS_PROCESS_STACK_SIZE 0x2400)
+set(CHIBIOS_MAIN_STACK_SIZE 0x2400)
 find_package(ChibiOS 3 COMPONENTS rt pal hal serial_usb usb adc chprintf REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME} test_new.cpp driver/Link.cpp driver/Link.h)

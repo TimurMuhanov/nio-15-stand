@@ -19,42 +19,37 @@ class Connection {
         void stop();
         void wait();
 
-        void sendBatteryStatus(float voltage);
+        void sendBatteryStatus(float voltage);  // Почему это нельзя засунуть в парсер?
+                                                // И зачем он нужен, если даже не парсит
 
     private:
         class HeartbeatSender : public BaseStaticThread<2048> {
             public:
                 HeartbeatSender(BaseAsynchronousChannel * channel);
-
                 void stop() override;
-
             private:
                 void main() override;
-
+                uint8_t _buffer[MAVLINK_MAX_PACKET_LEN];
+                mavlink_message_t rawMsg;   // Как не занимать память?
                 BaseAsynchronousChannel * _channel = nullptr;
         };
 
         class Parser : public BaseStaticThread<2048> {
             public:
                 Parser(BaseAsynchronousChannel * channel);
-
                 void stop() override;
-
             private:
-
                 void main() override;
-
                 BaseAsynchronousChannel * _channel = nullptr;
                 mavlink_message_t _rawMavlinkMessage;
                 mavlink_status_t _status;
         };
 
         BaseAsynchronousChannel * _channel = nullptr;
-
         uint8_t _buffer[MAVLINK_MAX_PACKET_LEN];
         mavlink_message_t _rawMavlinkMessage;
         mavlink_sys_status_t _sysStatusMessage;
-
         HeartbeatSender _heartbeatSender;
         Parser _parser;
+        bool  _isRunning = false;
 };

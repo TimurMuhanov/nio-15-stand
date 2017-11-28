@@ -6,6 +6,10 @@
 #include "hal.h"
 #include "ch.hpp"
 
+#define Led_Blue        GPIOC_LED2
+#define Led_Red         GPIOC_LED4
+#define Led_Yellow      GPIOC_LED1
+
 using namespace chibios_rt;
 
 class Led : public BaseStaticThread<1024> {
