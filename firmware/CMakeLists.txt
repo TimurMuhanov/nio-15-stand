@@ -26,7 +26,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
         driver/Battery.cpp
         driver/Battery.h
         system/Connection.cpp
-        system/Connection.h)
+        system/Connection.h
+        driver/PWM.cpp
+        driver/PWM.h)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${BOARD_INCLUDE_DIRS})
 

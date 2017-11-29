@@ -237,10 +237,10 @@
 /*
  * GPIOA setup:
  *
- * PA0  - BUTTON                    (input floating).
- * PA1  - PIN1                      (input pullup).
- * PA2  - PIN2                      (input pullup).
- * PA3  - PIN3                      (input pullup).
+ * PA0  - SERVO1                    (alternate 1).
+ * PA1  - SERVO2                    (alternate 1).
+ * PA2  - SERVO3                    (alternate 1).
+ * PA3  - SERVO4                    (alternate 1).
  * PA4  - LRCK                      (alternate 6).
  * PA5  - SPC                       (alternate 5).
  * PA6  - SDO                       (alternate 5).
@@ -254,10 +254,10 @@
  * PA14 - SWCLK                     (alternate 0).
  * PA15 - PIN15                     (input pullup).
  */
-#define VAL_GPIOA_MODER             (PIN_MODE_INPUT(GPIOA_PWM1) |         \
-                                     PIN_MODE_INPUT(GPIOA_PWM2) |           \
-                                     PIN_MODE_INPUT(GPIOA_PWM3) |           \
-                                     PIN_MODE_INPUT(GPIOA_PWM4) |           \
+#define VAL_GPIOA_MODER             (PIN_MODE_ALTERNATE(GPIOA_PWM1) |         \
+                                     PIN_MODE_ALTERNATE(GPIOA_PWM2) |           \
+                                     PIN_MODE_ALTERNATE(GPIOA_PWM3) |           \
+                                     PIN_MODE_ALTERNATE(GPIOA_PWM4) |           \
                                      PIN_MODE_ALTERNATE(GPIOA_CS1) |       \
                                      PIN_MODE_ALTERNATE(GPIOA_SCK1) |        \
                                      PIN_MODE_ALTERNATE(GPIOA_MISO1) |        \
@@ -302,7 +302,7 @@
                                      PIN_OSPEED_100M(GPIOA_TMS) |         \
                                      PIN_OSPEED_100M(GPIOA_TCK) |         \
                                      PIN_OSPEED_100M(GPIOA_TDI))
-#define VAL_GPIOA_PUPDR             (PIN_PUPDR_FLOATING(GPIOA_PWM1) |     \
+#define VAL_GPIOA_PUPDR             (PIN_PUPDR_PULLUP(GPIOA_PWM1) |     \
                                      PIN_PUPDR_PULLUP(GPIOA_PWM2) |         \
                                      PIN_PUPDR_PULLUP(GPIOA_PWM3) |         \
                                      PIN_PUPDR_PULLUP(GPIOA_PWM4) |         \
@@ -334,10 +334,10 @@
                                      PIN_ODR_HIGH(GPIOA_TMS) |            \
                                      PIN_ODR_HIGH(GPIOA_TCK) |            \
                                      PIN_ODR_HIGH(GPIOA_TDI))
-#define VAL_GPIOA_AFRL              (PIN_AFIO_AF(GPIOA_PWM1, 0) |         \
-                                     PIN_AFIO_AF(GPIOA_PWM2, 0) |           \
-                                     PIN_AFIO_AF(GPIOA_PWM3, 0) |           \
-                                     PIN_AFIO_AF(GPIOA_PWM4, 0) |           \
+#define VAL_GPIOA_AFRL              (PIN_AFIO_AF(GPIOA_PWM1, 1) |         \
+                                     PIN_AFIO_AF(GPIOA_PWM2, 1) |           \
+                                     PIN_AFIO_AF(GPIOA_PWM3, 1) |           \
+                                     PIN_AFIO_AF(GPIOA_PWM4, 1) |           \
                                      PIN_AFIO_AF(GPIOA_CS1, 6) |           \
                                      PIN_AFIO_AF(GPIOA_SCK1, 5) |            \
                                      PIN_AFIO_AF(GPIOA_MISO1, 5) |            \
@@ -354,8 +354,8 @@
 /*
  * GPIOB setup:
  *
- * PB0  - PIN0                      (input pullup).
- * PB1  - PIN1                      (input pullup).
+ * PB0  - SERVO7                    (alternate 2).
+ * PB1  - SERVO8                    (alternate 2).
  * PB2  - PIN2                      (input pullup).
  * PB3  - SWO                       (alternate 0).
  * PB4  - PIN4                      (input pullup).
@@ -363,7 +363,7 @@
  * PB6  - SCL                       (alternate 4).
  * PB7  - PIN7                      (input pullup).
  * PB8  - PIN8                      (input pullup).
- * PB9  - SDA                       (alternate 4).
+ * PB9  - SOUND                     (alternate 2).
  * PB10 - CLK_IN                    (input pullup).
  * PB11 - PIN11                     (input pullup).
  * PB12 - PIN12                     (input pullup).
@@ -371,8 +371,8 @@
  * PB14 - PIN14                     (input pullup).
  * PB15 - PIN15                     (input pullup).
  */
-#define VAL_GPIOB_MODER             (PIN_MODE_INPUT(GPIOB_PWM7) |           \
-                                     PIN_MODE_INPUT(GPIOB_PWM8) |           \
+#define VAL_GPIOB_MODER             (PIN_MODE_ALTERNATE(GPIOB_PWM7) |           \
+                                     PIN_MODE_ALTERNATE(GPIOB_PWM8) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN2) |           \
                                      PIN_MODE_ALTERNATE(GPIOB_TDO) |        \
                                      PIN_MODE_INPUT(GPIOB_TRST) |           \
@@ -380,7 +380,7 @@
                                      PIN_MODE_ALTERNATE(GPIOB_U1Tx) |        \
                                      PIN_MODE_INPUT(GPIOB_U1Rx) |           \
                                      PIN_MODE_INPUT(GPIOB_PIN8) |           \
-                                     PIN_MODE_OUTPUT(GPIOB_SOUND) |        \
+                                     PIN_MODE_ALTERNATE(GPIOB_SOUND) |        \
                                      PIN_MODE_INPUT(GPIOB_U3Tx) |         \
                                      PIN_MODE_INPUT(GPIOB_U3Rx) |          \
                                      PIN_MODE_INPUT(GPIOB_CS2) |          \
@@ -451,8 +451,8 @@
                                      PIN_ODR_HIGH(GPIOB_SCK2) |            \
                                      PIN_ODR_HIGH(GPIOB_MISO2) |            \
                                      PIN_ODR_HIGH(GPIOB_MOSI2))
-#define VAL_GPIOB_AFRL              (PIN_AFIO_AF(GPIOB_PWM7, 0) |           \
-                                     PIN_AFIO_AF(GPIOB_PWM8, 0) |           \
+#define VAL_GPIOB_AFRL              (PIN_AFIO_AF(GPIOB_PWM7, 2) |           \
+                                     PIN_AFIO_AF(GPIOB_PWM8, 2) |           \
                                      PIN_AFIO_AF(GPIOB_PIN2, 0) |           \
                                      PIN_AFIO_AF(GPIOB_TDO, 0) |            \
                                      PIN_AFIO_AF(GPIOB_TRST, 0) |           \
@@ -460,7 +460,7 @@
                                      PIN_AFIO_AF(GPIOB_U1Tx, 4) |            \
                                      PIN_AFIO_AF(GPIOB_U1Rx, 0))
 #define VAL_GPIOB_AFRH              (PIN_AFIO_AF(GPIOB_PIN8, 0) |           \
-                                     PIN_AFIO_AF(GPIOB_SOUND, 0) |            \
+                                     PIN_AFIO_AF(GPIOB_SOUND, 2) |            \
                                      PIN_AFIO_AF(GPIOB_U3Tx, 0) |         \
                                      PIN_AFIO_AF(GPIOB_U3Rx, 0) |          \
                                      PIN_AFIO_AF(GPIOB_CS2, 0) |          \
@@ -476,8 +476,8 @@
  * PC2  - PIN2                      (input pullup).
  * PC3  - PDM_OUT                   (input pullup).
  * PC4  - PIN4                      (input pullup).
- * PC5  - PIN5                      (input pullup).
- * PC6  - PIN6                      (input pullup).
+ * PC5  - SERVO5                    (alternate 2).
+ * PC6  - SERVO6                    (alternate 2).
  * PC7  - MCLK                      (alternate 6).
  * PC8  - PIN8                      (input pullup).
  * PC9  - PIN9                      (input pullup).
@@ -494,7 +494,7 @@
                                      PIN_MODE_ANALOG(GPIOC_ADC) |        \
                                      PIN_MODE_INPUT(GPIOC_SINK) |           \
                                      PIN_MODE_INPUT(GPIOC_RDY) |           \
-                                     PIN_MODE_INPUT(GPIOC_PWM5) |           \
+                                     PIN_MODE_ALTERNATE(GPIOC_PWM5) |           \
                                      PIN_MODE_ALTERNATE(GPIOC_PWM6) |       \
                                      PIN_MODE_INPUT(GPIOC_SD0) |           \
                                      PIN_MODE_INPUT(GPIOC_SD1) |           \
@@ -543,7 +543,7 @@
                                      PIN_PUPDR_PULLUP(GPIOC_SINK) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_RDY) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_PWM5) |         \
-                                     PIN_PUPDR_FLOATING(GPIOC_PWM6) |       \
+                                     PIN_PUPDR_PULLUP(GPIOC_PWM6) |       \
                                      PIN_PUPDR_PULLUP(GPIOC_SD0) |         \
                                      PIN_PUPDR_PULLUP(GPIOC_SD1) |         \
                                      PIN_PUPDR_FLOATING(GPIOC_SD2) |       \
@@ -574,8 +574,8 @@
                                      PIN_AFIO_AF(GPIOC_ADC, 0) |        \
                                      PIN_AFIO_AF(GPIOC_SINK, 0) |           \
                                      PIN_AFIO_AF(GPIOC_RDY, 0) |           \
-                                     PIN_AFIO_AF(GPIOC_PWM5, 0) |           \
-                                     PIN_AFIO_AF(GPIOC_PWM6, 6))
+                                     PIN_AFIO_AF(GPIOC_PWM5, 2) |           \
+                                     PIN_AFIO_AF(GPIOC_PWM6, 2))
 #define VAL_GPIOC_AFRH              (PIN_AFIO_AF(GPIOC_SD0, 0) |           \
                                      PIN_AFIO_AF(GPIOC_SD1, 0) |           \
                                      PIN_AFIO_AF(GPIOC_SD2, 6) |           \
