@@ -682,7 +682,7 @@
                                      PIN_ODR_HIGH(GPIOD_CS3) |            \
                                      PIN_ODR_HIGH(GPIOD_MODE) |            \
                                      PIN_ODR_LOW(GPIOD_CONN) |              \
-                                     PIN_ODR_LOW(GPIOD_PITS) |              \
+                                     PIN_ODR_HIGH(GPIOD_PITS) |              \
                                      PIN_ODR_LOW(GPIOD_PITE) |              \
                                      PIN_ODR_LOW(GPIOD_RSTI))
 #define VAL_GPIOD_AFRL              (PIN_AFIO_AF(GPIOD_RSTR1, 0) |           \

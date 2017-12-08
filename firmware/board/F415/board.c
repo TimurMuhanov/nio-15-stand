@@ -119,9 +119,29 @@ bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
 /**
  * @brief   Board-specific initialization code.
  */
+
+PWMConfig pwmConfig = {
+        1000000,    //frequency
+        20000,      //period
+        NULL,
+        {
+                {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+                {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+                {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+                {PWM_OUTPUT_ACTIVE_HIGH, NULL},
+        },          //channels
+        0,          //clock
+        0           //*tim
+};
+
 void boardInit(void) {
 #ifdef HAL_USE_ADC
     adcStart(&BOARD_BATTERY_ADC_DEVICE, NULL);
+#endif
+#ifdef HAL_USE_PWM
+    palClearPad(GPIOD, GPIOD_PITS);
+    pwmStart(&PWMD2, &pwmConfig);
+    pwmStart(&PWMD3, &pwmConfig);
 #endif
 }
 
@@ -131,5 +151,9 @@ void boardInit(void) {
 void boardStop(void) {
 #ifdef HAL_USE_ADC
     adcStop(&BOARD_BATTERY_ADC_DEVICE);
+#endif
+#ifdef HAL_USE_PWM
+    pwmStop(&PWMD2);
+    pwmStop(&PWMD3);
 #endif
 }

@@ -5,6 +5,7 @@
 #include "system/Connection.h"
 #include "usbcfg.h"
 #include "mavlink.h"
+#include "driver/Pwm.h"
 
 SerialUSBDriver SDU1;
 
@@ -35,6 +36,23 @@ int main(void) {
     Battery batt(100);
     batt.start();
     batt.setConnection(&conn);
+
+    PwmSetValue(0,5);
+    PwmSetValue(1,15);
+    PwmSetValue(2,25);
+    PwmSetValue(5,35);
+    PwmSetValue(4,45);
+    PwmSetValue(7,55);
+    PwmSetValue(6,65);
+    PwmSetValue(3,75);
+
+    Sound(50);
+    chThdSleepMilliseconds(1000);
+    Sound(0);
+    chThdSleepMilliseconds(1000);
+    Sound(1000);
+    chThdSleepMilliseconds(1000);
+    Sound(0);
 
     while (true) {
         chThdSleepMilliseconds(1000);
